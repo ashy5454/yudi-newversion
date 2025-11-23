@@ -1,0 +1,91 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    function isAdmin() {
+      return exists(/databases/(default)/documents/admins/$(request.auth.uid));
+    }
+    
+    function isValidImageFile() {
+      return request.resource.contentType.matches('image/.*') &&
+             request.resource.size < 5 * 1024 * 1024; // 5MB limit
+    }
+    
+    function isValidAudioFile() {
+      return request.resource.contentType.matches('audio/.*') &&
+             request.resource.size < 10 * 1024 * 1024; // 10MB limit
+    }
+    
+    // User avatar images
+    match /users/{userId}/avatar/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isOwner(userId) && isValidImageFile();
+      allow delete: if isAuthenticated() && (isOwner(userId) || isAdmin());
+    }
+    
+    // Persona avatar images
+    match /personas/{personaId}/avatar/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && 
+                     (isOwner(firestore.get(/databases/(default)/documents/personas/$(personaId)).data.creator.id) || isAdmin()) &&
+                     isValidImageFile();
+      allow delete: if isAuthenticated() && 
+                      (isOwner(firestore.get(/databases/(default)/documents/personas/$(personaId)).data.creator.id) || isAdmin());
+    }
+    
+    // Chat attachments (images)
+    match /rooms/{roomId}/attachments/{messageId}/{fileName} {
+      allow read: if isAuthenticated() && 
+                     isOwner(firestore.get(/databases/(default)/documents/rooms/$(roomId)).data.userId);
+      allow write: if isAuthenticated() && 
+                      isOwner(firestore.get(/databases/(default)/documents/rooms/$(roomId)).data.userId) &&
+                      isValidImageFile();
+      allow delete: if isAuthenticated() && 
+                      (isOwner(firestore.get(/databases/(default)/documents/rooms/$(roomId)).data.userId) || isAdmin());
+    }
+    
+    // Voice messages
+    match /rooms/{roomId}/voice/{messageId}/{fileName} {
+      allow read: if isAuthenticated() && 
+                     isOwner(firestore.get(/databases/(default)/documents/rooms/$(roomId)).data.userId);
+      allow write: if isAuthenticated() && 
+                      isOwner(firestore.get(/databases/(default)/documents/rooms/$(roomId)).data.userId) &&
+                      isValidAudioFile();
+      allow delete: if isAuthenticated() && 
+                      (isOwner(firestore.get(/databases/(default)/documents/rooms/$(roomId)).data.userId) || isAdmin());
+    }
+    
+    // System files (admin only)
+    match /system/{fileName} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+    
+    // Backup files (admin only)
+    match /backups/{fileName} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+    
+    // Public assets (readable by all authenticated users)
+    match /public/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    
+    // Default deny all other paths
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

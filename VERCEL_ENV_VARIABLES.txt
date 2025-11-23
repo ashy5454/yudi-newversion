@@ -1,0 +1,54 @@
+================================================
+VERCEL ENVIRONMENT VARIABLES
+================================================
+
+Copy these values and add them to Vercel Dashboard:
+https://vercel.com/dashboard → yudi → Settings → Environment Variables
+
+For each variable below:
+1. Click "Add New" 
+2. Paste the Name
+3. Paste the Value
+4. Select "All" (Production, Preview, Development)
+5. Click "Save"
+
+================================================
+
+Name: GEMINI_API_KEY
+Value: AIzaSyAb8RN6LOYHrSovdPz9jN4E-Tq-AFDsu7w16GqcnszNYxf-MdoQ
+
+Name: GOOGLE_PROJECT_ID
+Value: yudi-8bd6f
+
+Name: GOOGLE_PROJECT_LOCATION
+Value: asia-south1
+
+Name: NEXT_PUBLIC_FIREBASE_API_KEY
+Value: AIzaSyCJL0zm1lrejfzLQpZNiWExtjo_vT_l1zQ
+
+Name: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+Value: yudi-8bd6f.firebaseapp.com
+
+Name: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+Value: yudi-8bd6f
+
+Name: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+Value: yudi-8bd6f.firebasestorage.app
+
+Name: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+Value: 882569998626
+
+Name: NEXT_PUBLIC_FIREBASE_APP_ID
+Value: 1:882569998626:web:4669942f4304a1f2fb757b
+
+Name: NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+Value: G-1WDBCQ7PG4
+
+================================================
+TOTAL: 10 variables to add
+================================================
+
+After adding all variables, run in terminal:
+vercel --prod
+
+================================================
