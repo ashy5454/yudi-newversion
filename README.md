@@ -1,30 +1,56 @@
-# Yudi Chat
+# Yudi Chat - AI Voice & Text Chat Application
 
-A Next.js application with Firebase Google OAuth authentication and AI chat capabilities.
+A modern Next.js application featuring AI-powered voice and text chat with customizable personas.
 
-## Features
+## 🌟 Features
 
-- 🔐 Firebase Google OAuth Authentication
-- 🛡️ Protected Routes
-- 🎨 Modern UI with Tailwind CSS
-- 🎤 Real-time Audio Chat Interface
-- 🤖 AI Persona Management
-- 📱 Responsive Design
+- **Voice Chat**: Real-time voice conversations with AI using Gemini 2.0 Flash Live API
+  - Gender-based voice selection (Male, Female, Neutral)
+  - Natural, conversational AI responses
+  - Multiple voice options per gender
+  
+- **Text Chat**: Traditional text-based chat interface
+  - Real-time messaging
+  - Persona-based conversations
+  
+- **Custom Personas**: Create and customize AI personalities
+  - AI-powered persona enhancement
+  - Custom system prompts
+  - Age, gender, and personality customization
+  
+- **Firebase Integration**:
+  - Google OAuth authentication
+  - Firestore database for messages and personas
+  - Cloud Storage for avatars
+  
+- **Modern UI**:
+  - Dark/Light theme support
+  - Responsive design
+  - Beautiful animations and transitions
 
-## Getting Started
+## 🚀 Tech Stack
 
-### Prerequisites
+- **Framework**: Next.js 15.3.5
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **UI Components**: Radix UI
+- **Authentication**: Firebase Auth
+- **Database**: Cloud Firestore
+- **AI**: Google Gemini API
+- **Voice**: Gemini Live API
+
+## 📋 Prerequisites
 
 - Node.js 18+ 
 - Firebase project
-- Google Cloud account
+- Google Gemini API key
 
-### Installation
+## 🛠️ Installation
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
-cd yudi-chat
+git clone <your-repo-url>
+cd yudi-chat-master
 ```
 
 2. Install dependencies:
@@ -32,115 +58,71 @@ cd yudi-chat
 npm install
 ```
 
-3. Set up Firebase:
-   - Go to [Firebase Console](https://console.firebase.google.com/)
-   - Create a new project
-   - Enable Authentication with Google provider
-   - Get your Firebase configuration
-
-4. Create environment variables:
-   Create a `.env.local` file in the project root:
-
+3. Set up environment variables:
+Create a `.env.local` file with:
 ```env
-# Firebase Configuration
-NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key_here
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com
+GEMINI_API_KEY=your_gemini_api_key_here
+NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
 NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project_id.appspot.com
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
-
-# Firebase Admin (for server-side operations)
-FIREBASE_ADMIN_PROJECT_ID=your_project_id
-FIREBASE_ADMIN_PRIVATE_KEY=your_private_key_here
-FIREBASE_ADMIN_CLIENT_EMAIL=your_client_email_here
 ```
 
-5. Run the development server:
+4. Run the development server:
 ```bash
 npm run dev
 ```
 
-6. Open [http://localhost:3000](http://localhost:3000) in your browser.
+5. Open [http://localhost:3000](http://localhost:3000)
 
-## Firebase Setup
+## 🔧 Configuration
 
-### 1. Enable Authentication
-- Go to Firebase Console > Authentication > Sign-in method
-- Enable Google provider
-- Add your authorized domains (localhost:3000 for development)
+### Firebase Setup
+1. Create a Firebase project
+2. Enable Google Authentication
+3. Create Firestore database
+4. Add authorized domains in Firebase Console
 
-### 2. Get Firebase Config
-- Go to Project Settings > General
-- Scroll down to "Your apps"
-- Click on the web app or create a new one
-- Copy the configuration object
+### Gemini API
+1. Get API key from [Google AI Studio](https://aistudio.google.com/app/apikey)
+2. Add to `.env.local`
 
-### 3. Set up Firebase Admin
-- Go to Project Settings > Service Accounts
-- Click "Generate new private key"
-- Download the JSON file
-- Use the values for admin environment variables
+## 📦 Deployment
 
-## Project Structure
-
-```
-src/
-├── app/                    # Next.js app directory
-│   ├── api/               # API routes
-│   ├── (main)/            # Main app routes
-│   └── layout.tsx         # Root layout
-├── components/            # React components
-│   ├── AuthContext.tsx    # Authentication context
-│   ├── LoginButton.tsx    # Login/logout component
-│   ├── ProtectedRoute.tsx # Route protection
-│   └── ui/               # UI components
-├── lib/                   # Utilities and configurations
-│   ├── firebase.ts       # Firebase client config
-│   ├── firebase-admin.ts # Firebase admin config
-│   ├── auth-utils.ts     # Auth utilities
-│   └── types.ts          # TypeScript types
-└── hooks/                # Custom React hooks
-    └── useAuthToken.ts   # Auth token hook
+### Firebase App Hosting
+```bash
+npm run build
+firebase deploy --only apphosting
 ```
 
-## Authentication Flow
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed deployment instructions.
 
-1. **Client-side**: Users sign in with Google OAuth
-2. **Context**: Authentication state is managed globally
-3. **Protected Routes**: Unauthenticated users are redirected
-4. **API Calls**: Server-side token verification
-5. **Database**: Firebase Admin for secure operations
+## 🎨 Features in Detail
 
-## Database Schema
+### Voice Chat
+- **Natural Conversations**: AI responds with human-like speech patterns
+- **Multiple Voices**: Randomly selected from gender-appropriate voice pools
+- **Real-time Audio**: Low-latency voice streaming
 
-The application uses the following data models:
+### Persona System
+- Create custom AI personalities
+- AI-enhanced persona generation
+- Persistent persona storage
+- Public/Private persona sharing
 
-- **User**: User profiles and preferences
-- **Persona**: AI chat personas
-- **Room**: Chat rooms between users and personas
-- **Message**: Chat messages
-- **Call**: Voice call records
-- **UserCredit**: Credit system
-- **Analytic**: Usage analytics
-- **Admin**: Admin roles
-- **Mood**: User mood tracking
-- **Memory**: User memory storage
-- **ResponseData**: Response guidelines
+## 📝 License
 
-## API Routes
+MIT
 
-- `GET /api/user` - Get current user data
-- `POST /api/user` - Create/update user profile
+## 👥 Contributors
 
-## Contributing
+Yudi Team
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+## 🙏 Acknowledgments
 
-## License
-
-This project is licensed under the MIT License.
+- Google Gemini API
+- Firebase
+- Next.js
+- Radix UI
