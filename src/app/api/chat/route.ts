@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
     console.log("System Instruction:", systemInstruction);
 
     // Get API key
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY?.trim();
     if (!apiKey) {
         return NextResponse.json(
             { message: 'GEMINI_API_KEY is not configured' },
