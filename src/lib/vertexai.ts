@@ -5,13 +5,14 @@ import { GoogleGenAI } from "@google/genai";
  * Uses Gemini API for both development and production (simpler auth)
  */
 export function getVertexAIClient(): GoogleGenAI {
-  const apiKey = process.env.GEMINI_API_KEY;
-  
+  const apiKey = process.env.GEMINI_API_KEY?.trim();
+
   if (!apiKey) {
     throw new Error("GEMINI_API_KEY environment variable is not set");
   }
 
-  // This uses your API key directly, which works perfectly in any environment.
+  console.log(`Initializing Gemini Client. Cleaned Key Length: ${apiKey.length}`);
+
   return new GoogleGenAI({
     apiKey: apiKey,
   });
