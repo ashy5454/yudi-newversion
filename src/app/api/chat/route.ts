@@ -28,10 +28,12 @@ export async function POST(req: NextRequest) {
         );
     }
 
-    // fetch chat history
-    const history = await MessageAdminDb.getByRoomId(roomId, personaId, 10);
-    if (!history) {
-        console.log("Chat history not found");
+    // fetch chat history (last 10 messages)
+    const history = await MessageAdminDb.getByRoomId(roomId, 10);
+    if (!history || !history.messages || history.messages.length === 0) {
+        console.log("No chat history found, starting fresh conversation");
+    } else {
+        console.log(`Loaded ${history.messages.length} messages from history`);
     }
 
     // 1. Generate AI response
@@ -91,7 +93,7 @@ export async function POST(req: NextRequest) {
     console.log("Chat Route Key Length:", apiKey.length); // Should be 39
 
     // Build contents array with history
-    const contents = history.messages.map((m) => ({
+    const contents = (history?.messages || []).map((m) => ({
         role: m.senderType === 'user' ? 'user' : 'model',
         parts: [{ text: m.content }]
     }));
