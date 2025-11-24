@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "@/components/AuthContext";
 import { Toaster } from "@/components/ui/sonner";
+import AnalyticsListener from "@/components/AnalyticsListener";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -43,17 +44,18 @@ export default async function RootLayout({
         className={`${poppins.variable} ${plusJakartaSans.variable} ${spaceMono.variable} antialiased`}
         suppressHydrationWarning
       >
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <AuthProvider>
-              {children}
-              <Toaster />
-            </AuthProvider>
-          </ThemeProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AnalyticsListener />
+          <AuthProvider>
+            {children}
+            <Toaster />
+          </AuthProvider>
+        </ThemeProvider>
 
       </body>
     </html>
