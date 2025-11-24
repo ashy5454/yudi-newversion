@@ -12,13 +12,16 @@ export async function POST(req: NextRequest) {
         }
 
         // Get API key
-        const apiKey = process.env.GEMINI_API_KEY?.trim();
+        // The .replace() removes ALL whitespace characters (including \r\n embedded in the string)
+        const rawKey = process.env.GEMINI_API_KEY || '';
+        const apiKey = rawKey.replace(/\s/g, ''); // Remove ALL whitespace
         if (!apiKey) {
             return NextResponse.json(
                 { error: 'GEMINI_API_KEY is not configured' },
                 { status: 500 }
             );
         }
+        console.log("Persona Enhance Route Key Length:", apiKey.length); // Should be 39
 
         const prompt = `Based on this basic persona information, generate detailed characteristics:
 

@@ -78,13 +78,17 @@ export async function POST(req: NextRequest) {
     console.log("System Instruction:", systemInstruction);
 
     // Get API key
-    const apiKey = process.env.GEMINI_API_KEY?.trim();
+    // The .replace() removes ALL whitespace characters (including \r\n embedded in the string)
+    const rawKey = process.env.GEMINI_API_KEY || '';
+    const apiKey = rawKey.replace(/\s/g, ''); // Remove ALL whitespace
+
     if (!apiKey) {
         return NextResponse.json(
             { message: 'GEMINI_API_KEY is not configured' },
             { status: 500 }
         );
     }
+    console.log("Chat Route Key Length:", apiKey.length); // Should be 39
 
     // Build contents array with history
     const contents = history.messages.map((m) => ({
