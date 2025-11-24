@@ -24,7 +24,7 @@ env:
   - variable: NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
     value: G-1WDBCQ7PG4
   - variable: GEMINI_API_KEY
-    secret: GEMINI_API_KEY
+    secret: projects/882569998626/secrets/GEMINI_API_KEY/versions/3
     availability:
       - BUILD
       - RUNTIME
