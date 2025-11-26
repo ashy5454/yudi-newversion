@@ -16,14 +16,14 @@ export default function PersonaInterface() {
     useEffect(() => {
         // Only fetch if not already loading and personas array is empty
         if (!loading && personas.length === 0) {
-            fetchPersonas(8, true);
+            fetchPersonas(100, true);
         }
     }, [fetchPersonas, loading, personas.length]);
 
     // Sort personas based on the selected sort option
     const sortedPersonas = useMemo(() => {
         const sorted = [...personas];
-        
+
         switch (sortBy) {
             case "usage":
                 return sorted.sort((a, b) => (b.usageCount || 0) - (a.usageCount || 0));
@@ -65,8 +65,8 @@ export default function PersonaInterface() {
                 <div className="text-center">
                     <h3 className="text-lg font-semibold text-red-600 mb-2">Error Loading Personas</h3>
                     <p className="text-gray-600 mb-4">{error}</p>
-                    <button 
-                        onClick={() => fetchPersonas(8, true)}
+                    <button
+                        onClick={() => fetchPersonas(100, true)}
                         className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                     >
                         Retry

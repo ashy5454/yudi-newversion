@@ -30,7 +30,9 @@ export default function AppSidebar() {
                 </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuItem onClick={() => router.push("/m/account")}>
+                    My Account
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuLabel>
                     <Button variant="destructive" size="sm" onClick={handleSignOut}>
