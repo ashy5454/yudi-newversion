@@ -3,4 +3,19 @@ runConfig:
   maxInstances: 4
   cpu: 1
   memoryMiB: 512
-  
+
+env:
+  - variable: NEXT_PUBLIC_FIREBASE_API_KEY
+    value: AIzaSyCJL0zm1lrejfzLQpZNiWExtjo_vT_l1zQ
+  - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    value: yudi-8bd6f.firebaseapp.com
+  - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    value: yudi-8bd6f
+  - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+    value: yudi-8bd6f.firebasestorage.app
+  - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+    value: "882569998626"
+  - variable: NEXT_PUBLIC_FIREBASE_APP_ID
+    value: 1:882569998626:web:bfe08aeb23a49109fb757b
+  - variable: FIREBASE_PROJECT_ID
+    value: yudi-8bd6f
