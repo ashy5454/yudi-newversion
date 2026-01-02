@@ -12,13 +12,21 @@ export default function PersonaInterface() {
     const isMobile = useIsMobile();
     const { personas, fetchPersonas, loading, error } = usePersona();
     const [sortBy, setSortBy] = useState("createdAt");
+    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        // Only fetch if not already loading and personas array is empty
-        if (!loading && personas.length === 0) {
-            fetchPersonas(100, true);
+        setMounted(true);
+    }, []);
+
+    useEffect(() => {
+        // Fetch personas on mount - always fetch on first render
+        if (mounted && !loading && personas.length === 0) {
+            console.log('Fetching personas...');
+            fetchPersonas(100, true).catch(err => {
+                console.error('Error fetching personas:', err);
+            });
         }
-    }, [fetchPersonas, loading, personas.length]);
+    }, [mounted, loading]); // Only depend on mounted and loading
 
     // Sort personas based on the selected sort option
     const sortedPersonas = useMemo(() => {
@@ -84,8 +92,18 @@ export default function PersonaInterface() {
                     {/* Chat List */}
                     <ScrollArea className="h-[calc(100vh-270px)] overflow-hidden">
                         <div className="flex flex-col justify-center items-center gap-2 pt-2">
-                            {loading ? (
+                            {loading && sortedPersonas.length === 0 ? (
                                 renderSkeletons()
+                            ) : sortedPersonas.length === 0 ? (
+                                <div className="text-center text-muted-foreground p-8">
+                                    <p className="mb-4">No personas found.</p>
+                                    <button
+                                        onClick={() => fetchPersonas(100, true)}
+                                        className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
+                                    >
+                                        Refresh
+                                    </button>
+                                </div>
                             ) : (
                                 sortedPersonas.map((persona) => (
                                     <div
@@ -106,8 +124,18 @@ export default function PersonaInterface() {
                     {/* Chat List */}
                     <ScrollArea className="h-[calc(100vh-180px)] overflow-auto bg-transparent">
                         <div className="flex flex-wrap justify-center items-start gap-2 pt-2">
-                            {loading ? (
+                            {loading && sortedPersonas.length === 0 ? (
                                 renderSkeletons()
+                            ) : sortedPersonas.length === 0 ? (
+                                <div className="text-center text-muted-foreground p-8">
+                                    <p className="mb-4">No personas found.</p>
+                                    <button
+                                        onClick={() => fetchPersonas(100, true)}
+                                        className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
+                                    >
+                                        Refresh
+                                    </button>
+                                </div>
                             ) : (
                                 sortedPersonas.map((persona) => (
                                     <div

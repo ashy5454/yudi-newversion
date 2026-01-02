@@ -241,6 +241,7 @@ body {
   }
 
   @keyframes pulse-glow {
+
     0%,
     100% {
       opacity: 1;
@@ -258,7 +259,26 @@ body {
     animation: float 6s ease-in-out infinite;
   }
 
+  @keyframes infinite-scroll {
+    from {
+      transform: translateX(0);
+    }
+
+    to {
+      transform: translateX(calc(-100% - var(--gap, 16px)));
+    }
+  }
+
+  .animate-infinite-scroll {
+    animation: infinite-scroll var(--speed, 40s) linear infinite;
+  }
+
+  .animate-infinite-scroll:hover {
+    animation-play-state: paused;
+  }
+
   @keyframes float {
+
     0%,
     100% {
       transform: translateY(0px);
@@ -267,5 +287,41 @@ body {
     50% {
       transform: translateY(-10px);
     }
+  }
+
+  /* Meteor effect animation */
+  @keyframes meteor {
+    0% {
+      transform: rotate(215deg) translateX(0);
+      opacity: 1;
+    }
+
+    70% {
+      opacity: 1;
+    }
+
+    100% {
+      transform: rotate(215deg) translateX(-500px);
+      opacity: 0;
+    }
+  }
+
+  /* Shimmer effect animation */
+  @keyframes shimmer {
+    from {
+      background-position: 0 0;
+    }
+
+    to {
+      background-position: -200% 0;
+    }
+  }
+
+  .animate-meteor-effect {
+    animation: meteor 5s linear infinite;
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s linear infinite;
   }
 }

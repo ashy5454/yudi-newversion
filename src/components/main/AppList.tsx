@@ -28,8 +28,10 @@ export default function AppList() {
     useEffect(() => {
         if (user?.uid) {
             const unsubscribe = subscribeToUserRooms(user.uid);
-            return () => unsubscribe();
-            clearRooms();
+            return () => {
+                unsubscribe();
+                clearRooms();
+            };
         }
     }, [user?.uid, subscribeToUserRooms, clearRooms]);
 
@@ -144,12 +146,12 @@ export default function AppList() {
                                 Array.from({ length: 5 }, (_, index) => (
                                     <div key={index} className="animate-pulse">
                                         <div className="bg-background/60 rounded-xl mb-2 p-2 flex flex-row items-center justify-between mx-1 md:mx-0">
-                                            <div className="w-10 h-10muted rounded-full"></div>
+                                            <div className="w-10 h-10 bg-muted rounded-full"></div>
                                             <div className="flex-1 px-4">
-                                                <div className="h-4g-muted rounded mb-2"></div>
-                                                <div className="h-3bg-muted rounded w-3/4"></div>
+                                                <div className="h-4 bg-muted rounded mb-2"></div>
+                                                <div className="h-3 bg-muted rounded w-3/4"></div>
                                             </div>
-                                            <div className="w-4 h-4muted rounded-full"></div>
+                                            <div className="w-4 h-4 bg-muted rounded-full"></div>
                                         </div>
                                     </div>
                                 ))
@@ -183,12 +185,12 @@ export default function AppList() {
                                 Array.from({ length: 5 }, (_, index) => (
                                     <div key={index} className="animate-pulse">
                                         <div className="bg-background/60 rounded-xl mb-2 p-2 flex flex-row items-center justify-between">
-                                            <div className="w-10 h-10muted rounded-full"></div>
+                                            <div className="w-10 h-10 bg-muted rounded-full"></div>
                                             <div className="flex-1 px-4">
-                                                <div className="h-4g-muted rounded mb-2"></div>
-                                                <div className="h-3bg-muted rounded w-3/4"></div>
+                                                <div className="h-4 bg-muted rounded mb-2"></div>
+                                                <div className="h-3 bg-muted rounded w-3/4"></div>
                                             </div>
-                                            <div className="w-4 h-4muted rounded-full"></div>
+                                            <div className="w-4 h-4 bg-muted rounded-full"></div>
                                         </div>
                                     </div>
                                 ))

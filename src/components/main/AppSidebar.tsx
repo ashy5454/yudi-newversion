@@ -4,15 +4,16 @@ import { ThemeToggle } from "../ThemeToggle";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Globe2Icon, HomeIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "../AuthContext";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
 
 export default function AppSidebar() {
     const isMobile = useIsMobile();
     const router = useRouter();
+    const pathname = usePathname();
     const { user } = useAuth();
-    const isPersonaRoute = window.location.pathname.includes("/persona");
+    const isPersonaRoute = pathname?.includes("/persona") ?? false;
 
     const { signOut } = useAuth();
 

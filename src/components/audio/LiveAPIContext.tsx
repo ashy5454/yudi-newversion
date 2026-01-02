@@ -1,5 +1,6 @@
 "use client";
 import { useLiveApi, UseLiveApiResults } from '@/hooks/media/use-live-api';
+import { UserContext } from '@/lib/audio/system-instruction';
 import { createContext, FC, ReactNode, useContext, useState, useEffect } from 'react';
 
 const LiveAPIContext = createContext<UseLiveApiResults | undefined>(undefined);
@@ -7,19 +8,21 @@ const LiveAPIContext = createContext<UseLiveApiResults | undefined>(undefined);
 export type LiveAPIProviderProps = {
   children: ReactNode;
   apiKey: string;
+  userContext?: UserContext;
 };
 
 export const LiveAPIProvider: FC<LiveAPIProviderProps> = ({
   apiKey: propApiKey,
+  userContext,
   children,
 }) => {
-  const apiKey = (propApiKey || process.env.NEXT_PUBLIC_GEMINI_API_KEY || "").trim();
+  const apiKey = (propApiKey || process.env.NEXT_PUBLIC_GEMINI_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_API_KEY || "").trim();
   const [isClient, setIsClient] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected' | 'error'>('disconnected');
 
-  // Always call hooks at the top level
-  const liveAPI = useLiveApi({ apiKey: apiKey || "dummy" }); // Use dummy key if missing to avoid hook errors
+  // Always call hooks at the top level - now passing userContext
+  const liveAPI = useLiveApi({ apiKey: apiKey || "dummy", userContext }); // Use dummy key if missing to avoid hook errors
 
   useEffect(() => {
     setIsClient(true);
@@ -89,7 +92,7 @@ export const LiveAPIProvider: FC<LiveAPIProviderProps> = ({
         <div className="text-center max-w-md mx-auto p-6">
           <div className="text-lg text-red-600 mb-4">Configuration Error</div>
           <div className="text-sm text-gray-600 mb-4">
-            API Key is missing. Please add <code>GEMINI_API_KEY</code> to your <code>.env.local</code> file and restart the server.
+            API Key is missing. Please add <code>NEXT_PUBLIC_GEMINI_API_KEY</code> to your <code>.env</code> file and restart the server.
           </div>
         </div>
       </div>

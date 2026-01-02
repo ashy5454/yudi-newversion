@@ -1,9 +1,10 @@
 const AudioRecordingWorklet = `
 class AudioProcessingWorklet extends AudioWorkletProcessor {
 
-  // send and clear buffer every 2048 samples, 
-  // which at 16khz is about 8 times a second
-  buffer = new Int16Array(2048);
+  // 🚀 LATENCY OPTIMIZATION: Reduced buffer to 1024 samples for lower latency
+  // At 16khz this is 64ms chunks (~16 chunks/second instead of 8)
+  // This reduces input latency from 128ms to 64ms
+  buffer = new Int16Array(1024);
 
   // current write index
   bufferWriteIndex = 0;

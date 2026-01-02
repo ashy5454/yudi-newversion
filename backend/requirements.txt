@@ -1,0 +1,21 @@
+# Flask web framework
+Flask>=3.0.3
+Werkzeug>=3.0.4
+flask-cors>=5.0.0
+
+# For testing (optional)
+requests>=2.32.3
+
+# Environment variable loading
+python-dotenv>=1.0.1
+
+# Google Generative AI (for embeddings in Pinecone)
+# Note: Package name is google-generativeai (not google-genai)
+google-generativeai>=0.8.3
+
+# Pinecone Vector Database (fast semantic memory for text chat)
+# Note: Package was renamed from pinecone-client to pinecone
+pinecone>=5.4.1
+
+# Note: Voice calls use Gemini Live API (frontend-only, no backend needed)
+

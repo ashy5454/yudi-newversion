@@ -10,8 +10,16 @@ import { useRoom } from "@/hooks/useRoom";
 import { usePersona } from "@/hooks/usePersona";
 import { useAuth } from "@/components/AuthContext";
 import { Room, Persona } from "@/lib/firebase/dbTypes";
+import { Modality } from '@google/genai';
 
-export default function CallInterface() {
+import { generateSystemInstruction, UserContext } from "@/lib/audio/system-instruction";
+
+interface CallInterfaceProps {
+    room: Room;
+    persona: Persona;
+}
+
+export default function CallInterface({ room, persona }: CallInterfaceProps) {
     const router = useRouter();
     const params = useParams();
     const roomId = params?.roomId as string;
@@ -19,12 +27,84 @@ export default function CallInterface() {
     const videoRef = useRef<HTMLVideoElement>(null);
 
     const { user } = useAuth();
-    const { fetchRoom } = useRoom();
-    const { fetchPersona } = usePersona();
-    const [room, setRoom] = useState<Room | null>(null);
-    const [persona, setPersona] = useState<Persona | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+
+    // Track transcript timestamps to pair user/AI messages correctly
+    const lastUserTranscriptTimeRef = useRef<number>(0);
+    const pendingUserTranscriptRef = useRef<string | null>(null);
+
+    // Handle voice transcript saving to database
+    useEffect(() => {
+        if (!roomId || !persona?.id) return;
+
+        const handleInputTranscript = async (text: string) => {
+            if (!text.trim()) return;
+
+            console.log('💾 Saving user voice transcript to database:', text);
+            try {
+                const { MessageClientDb } = await import('@/lib/firebase/clientDb');
+                const timestamp = Date.now();
+                lastUserTranscriptTimeRef.current = timestamp;
+                pendingUserTranscriptRef.current = text;
+
+                // ✅ CORRECT PATH: MessageClientDb.create saves to rooms/{roomId}/messages subcollection
+                // This ensures voice transcripts are stored in the same location as text messages
+                await MessageClientDb.create({
+                    roomId,
+                    personaId: persona.id,
+                    senderType: 'user',
+                    content: text,
+                    messageType: 'voice_transcript',
+                    type: 'voice', // 👈 KEY: This tag enables filtering in admin dashboard
+                    isSent: true,
+                }, new Date(timestamp));
+
+                console.log('✅ User voice transcript saved to database (subcollection)');
+            } catch (error) {
+                console.error('❌ Failed to save user voice transcript:', error);
+            }
+        };
+
+        const handleOutputTranscript = async (text: string) => {
+            if (!text.trim()) return;
+
+            console.log('💾 Saving AI voice transcript to database:', text);
+            try {
+                const { MessageClientDb } = await import('@/lib/firebase/clientDb');
+                // Use timestamp slightly after user message (if exists) or current time
+                const timestamp = lastUserTranscriptTimeRef.current > 0
+                    ? lastUserTranscriptTimeRef.current + 1000 // 1 second after user message
+                    : Date.now();
+
+                // ✅ CORRECT PATH: MessageClientDb.create saves to rooms/{roomId}/messages subcollection
+                // This ensures voice transcripts are stored in the same location as text messages
+                await MessageClientDb.create({
+                    roomId,
+                    personaId: persona.id,
+                    senderType: 'persona',
+                    content: text,
+                    messageType: 'voice_transcript',
+                    type: 'voice', // 👈 KEY: This tag enables filtering in admin dashboard
+                    isSent: true,
+                }, new Date(timestamp));
+
+                // Reset user transcript tracking
+                pendingUserTranscriptRef.current = null;
+                lastUserTranscriptTimeRef.current = 0;
+
+                console.log('✅ AI voice transcript saved to database (subcollection)');
+            } catch (error) {
+                console.error('❌ Failed to save AI voice transcript:', error);
+            }
+        };
+
+        client.on('inputTranscript', handleInputTranscript);
+        client.on('outputTranscript', handleOutputTranscript);
+
+        return () => {
+            client.off('inputTranscript', handleInputTranscript);
+            client.off('outputTranscript', handleOutputTranscript);
+        };
+    }, [client, roomId, persona?.id]);
 
     const handleBackToChat = () => {
         router.push(`/m/${roomId}/chat`);
@@ -36,156 +116,238 @@ export default function CallInterface() {
         }
     }, []);
 
-    // Fetch Room and Persona
+    // Configure Voice and System Instruction
     useEffect(() => {
-        const loadData = async () => {
-            if (!roomId || !user?.uid) return;
+        if (!room || !persona) return;
 
+        const setupConfig = async () => {
             try {
-                setLoading(true);
-                const roomData = await fetchRoom(roomId);
-                if (!roomData) {
-                    setError("Room not found");
-                    return;
+                // Helper to map persona language to ISO 639-1 codes (Gemini Live API requirement)
+                // CRITICAL FIX: Must return ISO codes like "hi", "te", "en", NOT full names like "Hindi"
+                const getSupportedLanguage = (lang?: string): string => {
+                    if (!lang) return "en-IN"; // Default to Indian English for natural Indian accent
+                    const normalized = lang.toLowerCase();
+                    // Return ISO 639-1 language codes with Indian locale (-IN) for Indian accents
+                    // The -IN suffix is CRITICAL - it determines the accent (Indian vs American/British)
+                    if (normalized.includes("tamil") || normalized.includes("ta")) return "ta-IN";
+                    if (normalized.includes("telugu") || normalized.includes("te")) return "te-IN";
+                    if (normalized.includes("hindi") || normalized.includes("hi")) return "hi-IN";
+                    if (normalized.includes("english") || normalized.includes("en")) return "en-IN"; // Indian English accent
+                    // Default to Indian English for natural Indian accent
+                    return "en-IN";
+                };
+
+                // Fetch conversation history and memories
+                let conversationHistory = '';
+                let memoryContext = '';
+
+                if (room?.userId && user?.uid) {
+                    try {
+                        // Fetch recent conversation history (last 30 messages)
+                        // Note: This runs on client, so we'll use client-side DB access
+                        const { MessageClientDb } = await import('@/lib/firebase/clientDb');
+                        const history = await MessageClientDb.getByRoomId(roomId, 30);
+                        if (history?.messages && history.messages.length > 0) {
+                            // Sort oldest first for context
+                            history.messages.sort((a: any, b: any) => {
+                                const timeA = a.createdAt instanceof Date ? a.createdAt.getTime() : new Date(a.createdAt).getTime();
+                                const timeB = b.createdAt instanceof Date ? b.createdAt.getTime() : new Date(b.createdAt).getTime();
+                                return timeA - timeB;
+                            });
+
+                            conversationHistory = history.messages
+                                .slice(-20) // Last 20 messages for context
+                                .map((msg: any) => `${msg.senderType === 'user' ? 'User' : persona.name}: ${msg.content}`)
+                                .join('\n');
+                        }
+
+                        // Fetch memories from Pinecone backend
+                        try {
+                            // Use the same backend URL pattern as text chat
+                            const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || (typeof window !== 'undefined' ? 'http://localhost:5002' : 'http://localhost:5002');
+                            const memoryQuery = conversationHistory.substring(0, 200) || 'general conversation'; // Use recent context as query
+
+                            // Try both userId and roomId (backend might use either)
+                            const memoryResponse = await fetch(
+                                `${backendUrl}/api/memories/${room.userId || roomId}?query=${encodeURIComponent(memoryQuery)}&top_k=5`,
+                                {
+                                    method: 'GET',
+                                    signal: AbortSignal.timeout(2000) // 2s timeout
+                                }
+                            );
+
+                            if (memoryResponse.ok) {
+                                const memoryData = await memoryResponse.json();
+                                if (memoryData.memories && memoryData.memories.length > 0) {
+                                    const memoryEntries = memoryData.memories.slice(0, 5).map((mem: any, idx: number) => {
+                                        const userMsg = mem.user_message || mem.userMessage || '';
+                                        const response = mem.yudi_response || mem.yudiResponse || mem.value || '';
+                                        return `${idx + 1}. User said: "${userMsg}" → You responded: "${response}"`;
+                                    }).join('\n');
+
+                                    memoryContext = '\n\n📚 PREVIOUS CONVERSATION MEMORIES (Use these to remember past discussions):\n' +
+                                        memoryEntries +
+                                        '\n\nIMPORTANT: Reference these memories naturally when relevant. Remember what you have discussed before. Build on previous conversations.';
+                                    console.log(`✅ Loaded ${memoryData.memories.length} memories for voice chat`);
+                                }
+                            } else {
+                                console.log('Memory API returned non-OK status:', memoryResponse.status);
+                            }
+                        } catch (memoryError) {
+                            // Silently fail - memories are optional for voice chat
+                            console.log('Memories not available (backend may not be running):', memoryError);
+                        }
+                    } catch (historyError) {
+                        console.warn('Could not fetch conversation history:', historyError);
+                    }
                 }
-                setRoom(roomData);
 
-                const personaData = await fetchPersona(roomData.personaId);
-                if (!personaData) {
-                    setError("Persona not found");
-                    return;
-                }
-                setPersona(personaData);
+                // Create dynamic user context for Antigravity prompt
+                const userContext: UserContext = {
+                    userName: user?.displayName || "Friend",
+                    userMood: "neutral",
+                    companionName: persona.name,
+                    companionAge: persona.age || 20,
+                    companionCollege: "IIT Delhi",
+                    recentHistory: conversationHistory, // Add conversation history
+                    // For system instruction generation, use full name format
+                    nativeLanguage: (() => {
+                        const lang = persona.language?.toLowerCase() || '';
+                        if (lang.includes("tamil")) return "Tamil";
+                        if (lang.includes("telugu")) return "Telugu";
+                        if (lang.includes("english")) return "English";
+                        return "Hindi"; // Default
+                    })(),
+                    personality: persona.personality || "friendly, supportive, and slightly playful",
+                };
 
-                // Build comprehensive system instruction with all persona details (matching text chat)
-                const systemInstructionParts = [];
+                // Generate base Antigravity prompt
+                let baseSystemInstruction = generateSystemInstruction(userContext);
 
-                // Add persona identity and characteristics
-                systemInstructionParts.push(`You are ${personaData.name}.`);
-
-                if (personaData.description) {
-                    systemInstructionParts.push(`About you: ${personaData.description}`);
-                }
-
-                if (personaData.age) {
-                    systemInstructionParts.push(`Your age: ${personaData.age} years old.`);
-                }
-
-                if (personaData.gender) {
-                    systemInstructionParts.push(`Your gender: ${personaData.gender}.`);
-                }
-
-                if (personaData.personality) {
-                    systemInstructionParts.push(`Your personality: ${personaData.personality}`);
+                // Add memory context to system instruction
+                if (memoryContext) {
+                    baseSystemInstruction += memoryContext;
                 }
 
-                if (personaData.language) {
-                    systemInstructionParts.push(`Preferred language: ${personaData.language}`);
+                // Build specific persona details (TRUNCATED to prevent 1007 errors from oversized config)
+                const specificParts = [];
+
+                // Add model's base system prompt if available (limit length)
+                if (persona.model?.systemPrompt) {
+                    const truncatedSystemPrompt = persona.model.systemPrompt.substring(0, 2000); // Limit to 2KB
+                    specificParts.push(`\n${truncatedSystemPrompt}`);
                 }
 
-                if (personaData.category) {
-                    systemInstructionParts.push(`Your role: ${personaData.category}`);
+                // Add user's custom prompt if provided (limit length)
+                if (persona.userPrompt) {
+                    const truncatedUserPrompt = persona.userPrompt.substring(0, 1000); // Limit to 1KB
+                    specificParts.push(`\nAdditional instructions: ${truncatedUserPrompt}`);
                 }
 
-                // Add user's custom prompt if provided
-                if (personaData.userPrompt) {
-                    systemInstructionParts.push(`\nAdditional instructions: ${personaData.userPrompt}`);
+                if (persona.description) {
+                    specificParts.push(`About you: ${persona.description.substring(0, 500)}`); // Limit to 500 chars
                 }
 
-                // Add model's base system prompt
-                systemInstructionParts.push(`\n${personaData.model.systemPrompt}`);
+                if (persona.category) {
+                    specificParts.push(`Your role: ${persona.category}`);
+                }
 
-                // Add voice-specific instructions for natural conversation
-                systemInstructionParts.push(`\n\nVoice Conversation Guidelines:
-- Speak naturally and conversationally, as if talking to a friend
-- Use varied sentence lengths and natural pauses
-- Include filler words occasionally (like "um", "well", "you know") to sound more human
-- Express emotions through your tone and word choice
-- Ask follow-up questions to keep the conversation flowing
-- Share relevant thoughts and opinions, not just facts
-- Use contractions (I'm, you're, don't) for a casual tone
-- Respond with 2-4 sentences typically, unless the topic requires more detail
-- Show empathy and understanding in your responses
-- Avoid sounding robotic or overly formal unless your character requires it`);
+                // Add concise voice-specific instructions (keep short to prevent timeouts)
+                specificParts.push(`\nResponse: Casual=1-3 sentences. Advice=story(2-4s) + detailed(5-8s). Deep talks=8-12s. Always respond. Connection stays open.`);
 
-                const systemInstruction = systemInstructionParts.join('\n');
+                // Combine them: Antigravity Base + Specific Persona Details
+                // CRITICAL: Truncate total instruction to prevent oversized config
+                let finalSystemInstruction = baseSystemInstruction + "\n\n" + specificParts.join('\n');
 
-                console.log("Voice System Instruction:", systemInstruction);
+                // 🚨 CRITICAL: Reduce system instruction size to prevent "Deadline expired" (1011) errors
+                // Large system instructions cause server timeouts
+                const MAX_INSTRUCTION_LENGTH = 4000; // ~4KB max (reduced from 8KB to prevent timeouts)
+                if (finalSystemInstruction.length > MAX_INSTRUCTION_LENGTH) {
+                    console.warn(`⚠️ System instruction is too long (${finalSystemInstruction.length} chars), truncating to ${MAX_INSTRUCTION_LENGTH} to prevent 1011 errors...`);
+                    finalSystemInstruction = finalSystemInstruction.substring(0, MAX_INSTRUCTION_LENGTH) + '\n[Instruction truncated to prevent server timeout]';
+                }
 
-                // Available voices by gender
-                const femaleVoices = ["Achernar", "Aoede", "Callirrhoe", "Kore", "Leda"];
-                const maleVoices = ["Achird", "Algenib", "Algieba", "Alnilam", "Charon"];
-                const neutralVoices = ["Puck", "Kore"]; // Neutral/androgynous options
+                console.log("Combined Voice System Instruction:", finalSystemInstruction.substring(0, 200) + "...");
 
-                // Determine voice based on persona gender with randomization
-                let voiceName = "Puck"; // Default
-                const gender = personaData.gender?.toLowerCase();
+                // 🚨 CRITICAL: Only use voices CONFIRMED to work with gemini-2.0-flash-exp
+                // These are the officially supported voices for this model version
+                // IMPORTANT: The Indian accent comes from languageCode (en-IN, hi-IN, etc.), NOT from voice name
+                // Voice names determine timbre/character: warmer, clearer, deeper, etc.
+                // DO NOT use: Achernar, Achird, Algenib, Algieba, Alnilam, Leda (not available)
+
+                // Voice selection for more natural, less robotic sound:
+                // - Callirrhoe: Warmer, more natural female voice (best for Indian English)
+                // - Aoede: Clearer, more articulate female voice
+                // - Kore: Softer, gentler female voice
+                // - Fenrir: Clear, natural male voice (best for Indian English - less robotic)
+                // - Charon: Deeper, more dramatic male voice (use sparingly)
+                const femaleVoices = ["Callirrhoe", "Aoede", "Kore"]; // Prioritize Callirrhoe for warmer, more natural sound
+                const maleVoices = ["Fenrir", "Charon"]; // Prioritize Fenrir for clearer, less robotic sound
+                const neutralVoices = ["Puck", "Kore"]; // Puck is safest default
+
+                // Determine voice based on persona gender
+                let voiceName = "Puck"; // Safest default - always available
+                const gender = persona.gender?.toLowerCase();
 
                 if (gender === 'female') {
-                    // Randomly select from female voices
-                    voiceName = femaleVoices[Math.floor(Math.random() * femaleVoices.length)];
+                    // Use Callirrhoe more often (warmer, more natural for Indian accent)
+                    // 50% Callirrhoe, 30% Aoede, 20% Kore
+                    const rand = Math.random();
+                    voiceName = rand < 0.5 ? "Callirrhoe" : (rand < 0.8 ? "Aoede" : "Kore");
                 } else if (gender === 'male') {
-                    // Randomly select from male voices
-                    voiceName = maleVoices[Math.floor(Math.random() * maleVoices.length)];
+                    // Use Fenrir more often (clearer, less robotic, better for Indian English)
+                    // 85% Fenrir, 15% Charon for variety
+                    voiceName = Math.random() < 0.85 ? "Fenrir" : "Charon";
                 } else {
-                    // Randomly select from neutral voices
                     voiceName = neutralVoices[Math.floor(Math.random() * neutralVoices.length)];
                 }
 
-                console.log(`Selected voice: ${voiceName} for gender: ${personaData.gender || 'neutral'}`);
+                const selectedLanguageCode = getSupportedLanguage(persona.language);
+                console.log(`Selected voice: ${voiceName} for gender: ${persona.gender || 'neutral'} with language: ${selectedLanguageCode} (accent comes from language code - Indian accent when using en-IN, hi-IN, etc.)`);
 
-                setConfig({
-                    generationConfig: {
-                        responseModalities: ["AUDIO"] as any,
-                        speechConfig: {
-                            voiceConfig: {
-                                prebuiltVoiceConfig: {
-                                    voiceName: voiceName
-                                }
+                // FIXED: Use correct Gemini Live API config format
+                // CRITICAL: Only include valid LiveConnectConfig properties (prevents 1007 error)
+                const cleanConfig = {
+                    responseModalities: [Modality.AUDIO],
+                    speechConfig: {
+                        languageCode: getSupportedLanguage(persona.language),
+                        voiceConfig: {
+                            prebuiltVoiceConfig: {
+                                voiceName: voiceName
                             }
-                        },
+                        }
+                        // 🚨 REMOVED: voiceActivityDetection is not a supported property in Gemini Live API
+                        // This was causing Error 1011 (Server internal error)
                     },
                     systemInstruction: {
-                        parts: [{ text: systemInstruction }]
+                        parts: [
+                            {
+                                text: finalSystemInstruction + "\n\nFINAL RULES: Don't repeat user's words. Always respond - never silent. Connection stays open until user disconnects. Response lengths: casual=1-3 sentences, advice=story+5-8 sentences, deep talks=8-12+ sentences."
+                            }
+                        ]
                     }
-                });
+                };
+
+                console.log('✅ Setting clean Gemini Live API config:', JSON.stringify(cleanConfig, null, 2));
+                setConfig(cleanConfig);
 
             } catch (err) {
-                console.error("Error loading call data:", err);
-                setError("Failed to load call data");
-            } finally {
-                setLoading(false);
+                console.error("Error setting call config:", err);
             }
         };
 
-        loadData();
-    }, [roomId, user?.uid, fetchRoom, fetchPersona, setConfig]);
+        setupConfig();
+    }, [room, persona, user, setConfig]);
 
-    if (loading) {
-        return (
-            <div className="fixed left-0 right-0 h-screen flex flex-col items-center justify-center bg-background">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-                <p className="mt-4 text-muted-foreground">Initializing voice chat...</p>
-            </div>
-        );
-    }
 
-    if (error) {
-        return (
-            <div className="fixed left-0 right-0 h-screen flex flex-col items-center justify-center bg-background">
-                <p className="text-destructive mb-4">{error}</p>
-                <Button onClick={handleBackToChat}>Back to Chat</Button>
-            </div>
-        );
-    }
 
     return (
         <div className="fixed left-0 right-0 h-screen flex flex-col items-center justify-center bg-gradient-to-br from-background via-background to-primary/5">
             <div className="max-w-md w-full mx-4 p-8 rounded-3xl bg-background/80 backdrop-blur-sm border border-primary/20 shadow-2xl flex flex-col items-center gap-8">
 
                 <div className="text-center">
-                    <h2 className="text-2xl font-bold">{persona?.name}</h2>
-                    <p className="text-muted-foreground text-sm">{persona?.category || 'AI Assistant'}</p>
+                    <h2 className="text-2xl font-bold">{persona.name}</h2>
+                    <p className="text-muted-foreground text-sm">{persona.category || 'AI Assistant'}</p>
                 </div>
 
                 {/* Visualizer / Status Area */}

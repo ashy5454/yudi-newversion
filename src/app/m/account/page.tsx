@@ -45,6 +45,30 @@ export default function AccountPage() {
                     </div>
 
                     <div className="pt-4 border-t">
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">Firebase User ID</label>
+                            <div className="flex items-center gap-2">
+                                <code className="flex-1 bg-muted p-2 rounded text-sm break-all">
+                                    {user.uid}
+                                </code>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(user.uid);
+                                        alert('User ID copied to clipboard!');
+                                    }}
+                                >
+                                    Copy
+                                </Button>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                                Use this ID as the Document ID when creating your admin document in Firestore
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="pt-4 border-t">
                         <Button variant="destructive" onClick={handleSignOut}>
                             Sign Out
                         </Button>

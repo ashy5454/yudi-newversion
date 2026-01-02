@@ -1,0 +1,37 @@
+# Flask web framework
+Flask==3.0.0
+Werkzeug==3.0.1
+
+# Whisper ASR (using latest available version)
+openai-whisper==20250625
+
+# Audio processing
+librosa>=0.10.0
+soundfile>=0.12.0
+pydub>=0.25.1
+
+# Additional dependencies for audio processing
+numpy>=1.24.0
+scipy>=1.10.0
+resampy>=0.4.2
+
+# For MP3/M4A support
+ffmpeg-python>=0.2.0
+
+# For testing (optional)
+requests>=2.31.0
+
+# Firebase Admin SDK (optional, for Firestore storage)
+# If not installed, LanguageManager uses in-memory storage for testing
+firebase-admin>=6.0.0
+
+# Indic-TTS (Text-to-Speech for Indian languages)
+# OPTIONAL: Uncomment these if you have Python 3.11 installed
+# TTS requires Python 3.11 or lower (not 3.12, 3.13, or 3.14)
+# TTS>=0.20.0
+# torch>=2.0.0
+# torchaudio>=2.0.0
+
+# Note: ffmpeg system binary is also required
+# Install via: brew install ffmpeg (macOS) or apt-get install ffmpeg (Linux)
+

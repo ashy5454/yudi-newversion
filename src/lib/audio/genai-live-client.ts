@@ -61,6 +61,10 @@ export interface LiveClientEventTypes {
   ) => void;
   // Emitted when the current turn is complete
   turncomplete: () => void;
+  // Emitted when user's voice input is transcribed
+  inputTranscript: (text: string) => void;
+  // Emitted when AI's voice output is transcribed
+  outputTranscript: (text: string) => void;
 }
 
 export class GenAILiveClient extends EventEmitter<LiveClientEventTypes> {
@@ -108,12 +112,155 @@ export class GenAILiveClient extends EventEmitter<LiveClientEventTypes> {
     try {
       console.log('Attempting to connect to GenAI Live with model:', this.model);
 
+      // 🧼 CRITICAL: Log config to verify it's clean (helps debug 1007 errors)
+      console.log('📤 Connecting to Gemini Live API');
+      console.log('📤 Model:', this.model);
+      console.log('📤 Config type check:', {
+        hasResponseModalities: !!config.responseModalities,
+        responseModalitiesIsArray: Array.isArray(config.responseModalities),
+        responseModalitiesLength: config.responseModalities?.length || 0,
+        hasSpeechConfig: !!config.speechConfig,
+        hasSystemInstruction: !!config.systemInstruction
+      });
+
+      // CRITICAL: Validate config structure before sending (prevent 1007)
+      if (!config.responseModalities || !Array.isArray(config.responseModalities)) {
+        console.error('❌ ERROR: responseModalities must be a non-empty array!');
+        console.error('   Received:', config.responseModalities);
+        throw new Error('Invalid config: responseModalities must be a non-empty array');
+      }
+
+      if (config.responseModalities.length === 0) {
+        console.error('❌ ERROR: responseModalities array is empty!');
+        throw new Error('Invalid config: responseModalities array cannot be empty');
+      }
+
+      // CRITICAL: Validate languageCode format (must be ISO 639-1 code, not full name)
+      if (config.speechConfig?.languageCode) {
+        const langCode = config.speechConfig.languageCode;
+        // Check if it's a full name instead of ISO code (common mistake)
+        const fullNames = ['Hindi', 'Telugu', 'Tamil', 'English'];
+        if (fullNames.includes(langCode)) {
+          console.error(`❌ ERROR: languageCode is a full name "${langCode}" instead of ISO code!`);
+          console.error('   Gemini Live API requires ISO 639-1 codes like "hi-IN", "te-IN", "en-IN"');
+          console.error('   Converting automatically...');
+
+          // Auto-convert to ISO codes
+          const langMap: Record<string, string> = {
+            'Hindi': 'hi-IN',
+            'Telugu': 'te-IN',
+            'Tamil': 'ta-IN',
+            'English': 'en-IN'
+          };
+          config.speechConfig.languageCode = langMap[langCode] || 'hi-IN';
+          console.log(`   ✅ Converted "${langCode}" to "${config.speechConfig.languageCode}"`);
+        }
+      }
+
+      // CRITICAL: Validate languageCode format (must be ISO 639-1 code, not full name)
+      if (config.speechConfig?.languageCode) {
+        const langCode = config.speechConfig.languageCode;
+        // Check if it's a full name instead of ISO code (common mistake)
+        const fullNames = ['Hindi', 'Telugu', 'Tamil', 'English'];
+        if (fullNames.includes(langCode)) {
+          console.error(`❌ ERROR: languageCode is a full name "${langCode}" instead of ISO code!`);
+          console.error('   Gemini Live API requires ISO 639-1 codes like "hi-IN", "te-IN", "en-IN"');
+          console.error('   Converting automatically...');
+
+          // Auto-convert to ISO codes
+          const langMap: Record<string, string> = {
+            'Hindi': 'hi-IN',
+            'Telugu': 'te-IN',
+            'Tamil': 'ta-IN',
+            'English': 'en-IN'
+          };
+          config.speechConfig.languageCode = langMap[langCode] || 'hi-IN';
+          console.log(`   ✅ Converted "${langCode}" to "${config.speechConfig.languageCode}"`);
+        }
+      }
+
+      // Validate system instruction length (very long instructions might cause issues)
+      if (config.systemInstruction && typeof config.systemInstruction === 'object' && 'parts' in config.systemInstruction && config.systemInstruction.parts) {
+        const parts = Array.isArray(config.systemInstruction.parts) ? config.systemInstruction.parts : [];
+        const totalLength = parts
+          .map((p: any) => (typeof p === 'object' && p && 'text' in p ? (p.text || '') : '').length)
+          .reduce((a: number, b: number) => a + b, 0);
+
+        if (totalLength > 50000) { // 50KB limit (conservative)
+          console.warn(`⚠️ WARNING: System instruction is very long (${totalLength} chars). This might cause 1007 errors.`);
+          console.warn('   Consider truncating or simplifying the system instruction.');
+        }
+      }
+
+      // 🧼 CRITICAL: Sanitize config for UTF-8 encoding before sending
+      // Error 1007 = Invalid UTF-8 data - we must ensure all strings are valid UTF-8
+      const sanitizeConfigForUTF8 = (obj: any): any => {
+        if (typeof obj === 'string') {
+          // Remove invalid UTF-8 sequences
+          try {
+            // Test if string can be encoded as UTF-8
+            new TextEncoder().encode(obj);
+            // Remove control characters (except newline, tab, carriage return)
+            return obj.replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, '');
+          } catch (error) {
+            console.error('⚠️ Invalid UTF-8 in string, sanitizing:', obj.substring(0, 100));
+            // Remove problematic characters
+            return obj.replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, '')
+              .replace(/[^\u0000-\uFFFF]/g, '\uFFFD'); // Replace non-BMP chars
+          }
+        }
+        if (Array.isArray(obj)) {
+          return obj.map(item => sanitizeConfigForUTF8(item));
+        }
+        if (obj && typeof obj === 'object') {
+          const sanitized: any = {};
+          for (const [key, value] of Object.entries(obj)) {
+            sanitized[key] = sanitizeConfigForUTF8(value);
+          }
+          return sanitized;
+        }
+        return obj;
+      };
+
+      // Sanitize the entire config
+      const sanitizedConfig = sanitizeConfigForUTF8(config);
+
+      // Try to stringify to check for circular references or invalid values
+      try {
+        const configString = JSON.stringify(sanitizedConfig, (key, value) => {
+          // If value is undefined, skip it
+          if (value === undefined) return undefined;
+          // If it's an object, check for circular refs
+          if (typeof value === 'object' && value !== null) {
+            if (key === 'responseModalities' && Array.isArray(value)) {
+              // Convert enum values to strings if needed
+              return value.map(v => typeof v === 'string' ? v : (v?.toString() || String(v)));
+            }
+          }
+          return value;
+        }, 2);
+        console.log('📤 Config JSON (UTF-8 sanitized):', configString);
+        console.log('📤 Config size:', configString.length, 'bytes');
+
+        // Verify it can be encoded as UTF-8
+        try {
+          const utf8Bytes = new TextEncoder().encode(configString);
+          console.log('✅ Config can be encoded as UTF-8 (', utf8Bytes.length, 'bytes)');
+        } catch (utf8Error) {
+          console.error('❌ ERROR: Config cannot be encoded as UTF-8:', utf8Error);
+          throw new Error('Config contains invalid UTF-8 sequences');
+        }
+      } catch (stringifyError) {
+        console.error('❌ ERROR: Config cannot be stringified (circular reference or invalid value):', stringifyError);
+        throw new Error('Invalid config: contains circular references or non-serializable values');
+      }
+
       // Add timeout to the connection attempt
+      // The SDK will handle the actual WebSocket setup internally
+      // CRITICAL: Use sanitized config to prevent UTF-8 errors
       const connectionPromise = this.client.live.connect({
         model: this.model,
-        config: {
-          ...config,
-        },
+        config: sanitizedConfig, // Pass UTF-8 sanitized config (prevents 1007 error)
         callbacks,
       });
 
@@ -168,34 +315,96 @@ export class GenAILiveClient extends EventEmitter<LiveClientEventTypes> {
 
   public sendRealtimeInput(chunks: Array<{ mimeType: string; data: string }>) {
     if (this._status !== 'connected' || !this.session) {
-      console.warn('Cannot send realtime input: client is not connected');
-      this.emit('error', new ErrorEvent('Client is not connected'));
+      console.error('❌ Cannot send: Connection not ready', {
+        status: this._status,
+        hasSession: !!this.session
+      });
+      this.emit('error', new ErrorEvent('error', { message: 'Client is not connected' }));
+      return;
+    }
+
+    // 🚨 CRITICAL: Check if session is actually usable (not closing/closed)
+    try {
+      // Test if we can actually send (session might be in closing state)
+      if (!this.session || (this.session as any).closed || (this.session as any).closing) {
+        console.error('❌ Cannot send: Session is closing or closed');
+        this.emit('error', new ErrorEvent('error', { message: 'Session is closing or closed' }));
+        return;
+      }
+    } catch (testError) {
+      console.error('❌ Cannot send: Session test failed', testError);
       return;
     }
 
     try {
-      chunks.forEach(chunk => {
-        this.session!.sendRealtimeInput({ media: chunk });
+      chunks.forEach((chunk, index) => {
+        // Validate mimeType and data
+        if (!chunk.mimeType || !chunk.data) {
+          console.error(`❌ ERROR: Invalid chunk at index ${index}:`, chunk);
+          return;
+        }
+
+        // 🧼 CRITICAL: Sanitize Base64 before sending (prevents 1007 errors)
+        let cleanBase64 = chunk.data;
+        const originalLength = cleanBase64.length;
+
+        // Remove data URI header if present (e.g., "data:audio/pcm;base64,")
+        if (cleanBase64.includes(',')) {
+          cleanBase64 = cleanBase64.split(',').pop() || cleanBase64;
+        }
+        cleanBase64 = cleanBase64.trim();
+
+        // Validate Base64 format (must be pure Base64, no invalid characters)
+        const base64Pattern = /^[A-Za-z0-9+/]*={0,2}$/;
+        if (!base64Pattern.test(cleanBase64)) {
+          console.error(`❌ ERROR: Data at index ${index} is NOT valid Base64 after sanitization!`);
+          console.error(`   Original length: ${originalLength}, Clean length: ${cleanBase64.length}`);
+          console.error(`   First 50 chars: ${cleanBase64.substring(0, 50)}`);
+          throw new Error(`Invalid Base64 format at index ${index} - contains invalid characters`);
+        }
+
+        if (cleanBase64.length === 0) {
+          console.warn(`⚠️ Skipping empty chunk at index ${index}`);
+          return;
+        }
+
+        // Log first chunk for debugging (only once)
+        if (index === 0 && chunks.length > 0) {
+          console.log('📤 Sending audio chunk:', {
+            mimeType: chunk.mimeType,
+            dataLength: cleanBase64.length,
+            preview: cleanBase64.substring(0, 20) + '...'
+          });
+        }
+
+        // Send sanitized chunk
+        try {
+          // 🚨 CRITICAL: Check session state before sending to prevent "CLOSING/CLOSED" errors
+          if (!this.session || (this.session as any).closed || (this.session as any).closing) {
+            // Session is closing/closed, don't attempt to send
+            return;
+          }
+
+          const sanitizedChunk = { mimeType: chunk.mimeType, data: cleanBase64 };
+          this.session.sendRealtimeInput({ media: sanitizedChunk });
+        } catch (sendError: any) {
+          // Handle "WebSocket is already in CLOSING or CLOSED state" errors gracefully
+          if (sendError?.message?.includes('CLOSING') ||
+            sendError?.message?.includes('CLOSED') ||
+            sendError?.message?.includes('already in')) {
+            // Connection is closing/closed, stop sending - don't spam errors
+            console.log('ℹ️ Connection closing/closed, stopping audio send (this is normal during disconnection)');
+            return; // Don't throw - just stop sending
+          }
+          // Log other errors but don't crash
+          console.error('❌ Error sending audio chunk:', sendError);
+        }
       });
-
-      let hasAudio = false;
-      let hasVideo = false;
-      for (let i = 0; i < chunks.length; i++) {
-        const ch = chunks[i];
-        if (ch.mimeType.includes('audio')) hasAudio = true;
-        if (ch.mimeType.includes('image')) hasVideo = true;
-        if (hasAudio && hasVideo) break;
-      }
-
-      let message = 'unknown';
-      if (hasAudio && hasVideo) message = 'audio + video';
-      else if (hasAudio) message = 'audio';
-      else if (hasVideo) message = 'video';
-      this.log(`client.realtimeInput`, message);
     } catch (error) {
-      console.error('Error sending realtime input:', error);
-      this._status = 'disconnected';
-      this.emit('error', new ErrorEvent('error', { message: `Failed to send realtime input: ${error}` }));
+      console.error('❌ Error sending realtime input:', error);
+      this.emit('error', new ErrorEvent('error', {
+        message: `Failed to send realtime input: ${error instanceof Error ? error.message : String(error)}`
+      }));
     }
   }
 
@@ -256,8 +465,10 @@ export class GenAILiveClient extends EventEmitter<LiveClientEventTypes> {
 
       // Check for turn complete
       if (serverContent.turnComplete) {
-        console.log('Turn complete received');
+        console.log('✅ Turn complete received - Connection stays open for next turn');
         this.emit('turncomplete');
+        // CRITICAL: Don't close connection! It should stay open for the next user input
+        // The connection should remain active for continuous conversation
       }
 
       // Check for interrupted
@@ -294,14 +505,22 @@ export class GenAILiveClient extends EventEmitter<LiveClientEventTypes> {
         }
       }
 
-      // Handle input transcription
-      if (serverContent.inputTranscription) {
-        console.log('Input transcription:', serverContent.inputTranscription.text);
+      // Handle input transcription (what the user said)
+      // CRITICAL: Input transcription is for debugging only - DO NOT use it in responses
+      // This is what the user said - we should NOT repeat it back to them
+      if (serverContent.inputTranscription?.text) {
+        const userTranscript = serverContent.inputTranscription.text.trim();
+        console.log('📥 Input transcription (user said):', userTranscript);
+        // Emit event so components can save to database for training
+        this.emit('inputTranscript', userTranscript);
       }
 
-      // Handle output transcription
-      if (serverContent.outputTranscription) {
-        console.log('Output transcription:', serverContent.outputTranscription.text);
+      // Handle output transcription (what the AI said)
+      if (serverContent.outputTranscription?.text) {
+        const aiTranscript = serverContent.outputTranscription.text.trim();
+        console.log('📤 Output transcription (AI said):', aiTranscript);
+        // Emit event so components can save to database for training
+        this.emit('outputTranscript', aiTranscript);
       }
 
       return;
@@ -375,7 +594,35 @@ export class GenAILiveClient extends EventEmitter<LiveClientEventTypes> {
   }
 
   protected onClose(e: CloseEvent) {
-    console.log('WebSocket onClose called with code:', e.code, 'reason:', e.reason);
+    console.log('🔌 WebSocket onClose called', {
+      code: e.code,
+      reason: e.reason || 'None',
+      wasClean: e.wasClean,
+      timestamp: new Date().toISOString()
+    });
+
+    // Enhanced close code logging
+    const closeCodeDescriptions: Record<number, string> = {
+      1000: '✅ Normal closure (1000) - Connection closed cleanly',
+      1001: '⚠️ Going away (1001) - Endpoint is going away',
+      1002: '❌ Protocol error (1002) - Protocol violation',
+      1003: '❌ Unsupported data (1003) - Invalid data type',
+      1005: '❌ No status received (1005) - No close frame received',
+      1006: '❌ Abnormal closure (1006) - Connection lost without close frame',
+      1007: '❌ Invalid frame payload (1007) - Invalid UTF-8 data',
+      1008: '❌ Policy violation (1008) - Policy violation',
+      1009: '❌ Message too big (1009) - Message too large',
+      1010: '❌ Extension error (1010) - Extension negotiation failed',
+      1011: '❌ Server error (1011) - Server internal error',
+      1012: '❌ Service restart (1012) - Service restarting',
+      1013: '❌ Try again later (1013) - Temporary server condition',
+      1014: '❌ Bad gateway (1014) - Bad gateway response',
+      1015: '❌ TLS handshake failure (1015) - TLS handshake failed'
+    };
+
+    const description = closeCodeDescriptions[e.code] || `⚠️ Unknown close code: ${e.code}`;
+    console.log(description);
+
     this._status = 'disconnected';
     let reason = e.reason || '';
 
@@ -393,7 +640,13 @@ export class GenAILiveClient extends EventEmitter<LiveClientEventTypes> {
     } else if (e.code === 1006) {
       reason = 'Abnormal closure';
     } else if (e.code === 1007) {
-      reason = 'Invalid frame payload data';
+      // Check if it's a voice-related error
+      if (reason.toLowerCase().includes('voice') || reason.toLowerCase().includes('not available')) {
+        reason = `Invalid voice name: ${reason}`;
+        console.error(`🚨 VOICE ERROR: The selected voice is not available for gemini-2.0-flash-exp. Error: ${reason}`);
+      } else {
+        reason = 'Invalid frame payload data';
+      }
     } else if (e.code === 1008) {
       reason = 'Policy violation';
     } else if (e.code === 1009) {

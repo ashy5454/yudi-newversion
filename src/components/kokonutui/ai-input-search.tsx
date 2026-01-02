@@ -1,13 +1,11 @@
 "use client";
 
-import { PhoneIcon, Send } from "lucide-react";
+import { Send } from "lucide-react";
 import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { useAutoResizeTextarea } from "@/hooks/use-auto-resize-textarea";
-import FeatureButton from "../main/FeatureButton";
-
-export default function AI_Input_Search({ handleSend, handleFeatureButtonClick }: { handleSend: (s: string) => void, handleFeatureButtonClick: () => void }) {
+export default function AI_Input_Search({ handleSend, isTyping }: { handleSend: (s: string) => void, isTyping?: boolean }) {
     const [value, setValue] = useState("");
     const { textareaRef, adjustHeight } = useAutoResizeTextarea({
         minHeight: 52,
@@ -17,9 +15,12 @@ export default function AI_Input_Search({ handleSend, handleFeatureButtonClick }
     const [isFocused, setIsFocused] = useState(false);
 
     const handleSubmit = () => {
+        const textToSend = value.trim();
+        if (!textToSend) return; // Don't send empty messages
+
         setValue("");
         adjustHeight(true);
-        handleSend(value);
+        handleSend(textToSend);
     };
 
     const handleFocus = () => {
@@ -37,7 +38,7 @@ export default function AI_Input_Search({ handleSend, handleFeatureButtonClick }
     };
 
     return (
-        <div className="w-full max-w-[100vw-20rem]">
+        <div className="w-full">
             <div className="relative w-full mx-auto">
                 <div
                     role="textbox"
@@ -55,12 +56,29 @@ export default function AI_Input_Search({ handleSend, handleFeatureButtonClick }
                         }
                     }}
                 >
-                    <div className="overflow-y-auto max-h-[200px]">
+                    <div className="relative overflow-y-auto max-h-[200px]">
+                        {/* ✅ Send button positioned at top-right of textarea (stays visible above keyboard on mobile) */}
+                        <div className="absolute right-2 top-2 z-10">
+                            <button
+                                type="button"
+                                onClick={handleSubmit}
+                                disabled={!value.trim() || isTyping}
+                                className={cn(
+                                    "rounded-lg p-2 transition-colors shadow-sm",
+                                    value.trim() && !isTyping
+                                        ? "bg-sky-500/20 text-sky-500 hover:bg-sky-500/30 active:bg-sky-500/40"
+                                        : "bg-black/10 dark:bg-white/10 text-black/30 dark:text-white/30 cursor-not-allowed"
+                                )}
+                            >
+                                <Send className={cn("w-4 h-4", isTyping && "opacity-50")} />
+                            </button>
+                        </div>
                         <Textarea
                             id="ai-input-04"
+                            enterKeyHint="send"
                             value={value}
                             placeholder="Type a message..."
-                            className="w-full rounded-xl rounded-b-none px-4 py-3 bg-black/5 dark:bg-white/5 border-none dark:text-white placeholder:text-black/70 dark:placeholder:text-white/70 resize-none focus-visible:ring-0 leading-[1.2]"
+                            className="w-full rounded-xl rounded-b-none px-4 py-3 pr-12 bg-black/5 dark:bg-white/5 border-none dark:text-white placeholder:text-black/70 dark:placeholder:text-white/70 resize-none focus-visible:ring-0 leading-[1.2]"
                             ref={textareaRef}
                             onFocus={handleFocus}
                             onBlur={handleBlur}
@@ -79,7 +97,6 @@ export default function AI_Input_Search({ handleSend, handleFeatureButtonClick }
 
                     <div className="h-12 bg-black/5 dark:bg-white/5 rounded-b-xl">
                         <div className="absolute left-3 bottom-3 flex items-center gap-2">
-                            <FeatureButton onClick={handleFeatureButtonClick} />
                             {/* <label className="cursor-pointer rounded-lg p-2 bg-black/5 dark:bg-white/5">
                                 <input type="file" className="hidden" />
                                 <Paperclip className="w-4 h-4 text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white transition-colors" />
@@ -144,20 +161,6 @@ export default function AI_Input_Search({ handleSend, handleFeatureButtonClick }
                                     )}
                                 </AnimatePresence>
                             </button> */}
-                        </div>
-                        <div className="absolute right-3 bottom-3">
-                            <button
-                                type="button"
-                                onClick={handleSubmit}
-                                className={cn(
-                                    "rounded-lg p-2 transition-colors",
-                                    value
-                                        ? "bg-sky-500/15 text-sky-500"
-                                        : "bg-black/5 dark:bg-white/5 text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white cursor-pointer"
-                                )}
-                            >
-                                <Send className="w-4 h-4" />
-                            </button>
                         </div>
                     </div>
                 </div>

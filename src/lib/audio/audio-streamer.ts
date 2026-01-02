@@ -5,7 +5,9 @@ import {
 
 export class AudioStreamer {
   private sampleRate: number = 24000;
-  private bufferSize: number = 7680;
+  // 🚀 LATENCY OPTIMIZATION: Reduced buffer size from 7680 to 4800 samples
+  // At 24kHz this reduces buffer time from 320ms to 200ms
+  private bufferSize: number = 4800;
   // A queue of audio buffers to be played. Each buffer is a Float32Array.
   private audioQueue: Float32Array[] = [];
   private isPlaying: boolean = false;
@@ -13,13 +15,16 @@ export class AudioStreamer {
   private isStreamComplete: boolean = false;
   private checkInterval: number | null = null;
   private scheduledTime: number = 0;
-  private initialBufferTime: number = 0.1; //0.1 // 100ms initial buffer
+  // 🚀 LATENCY OPTIMIZATION: Reduced initial buffer from 100ms to 30ms for faster playback start
+  private initialBufferTime: number = 0.03; // 30ms initial buffer (was 100ms)
+  // Jitter buffer: Wait for at least 1 chunk before starting playback (ULTRA-LOW LATENCY)
+  private readonly MIN_CHUNKS_BEFORE_PLAYBACK = 1;
   // Web Audio API nodes. source => gain => destination
   public gainNode: GainNode;
   public source: AudioBufferSourceNode;
   private endOfQueueAudioSource: AudioBufferSourceNode | null = null;
 
-  public onComplete = () => {};
+  public onComplete = () => { };
 
   constructor(public context: AudioContext) {
     this.gainNode = this.context.createGain();
@@ -99,11 +104,17 @@ export class AudioStreamer {
     if (processingBuffer.length > 0) {
       this.audioQueue.push(processingBuffer);
     }
-    // Start playing if not already playing.
-    if (!this.isPlaying) {
+    // 🚀 LATENCY OPTIMIZATION: Start playback immediately on first chunk (MIN_CHUNKS_BEFORE_PLAYBACK = 1)
+    // Reduced initial buffer to 30ms for ultra-low latency response
+    if (!this.isPlaying && this.audioQueue.length >= this.MIN_CHUNKS_BEFORE_PLAYBACK) {
       this.isPlaying = true;
-      // Initialize scheduledTime only when we start playing
+      // Initialize scheduledTime only when we start playing - use minimal buffer for fastest response
       this.scheduledTime = this.context.currentTime + this.initialBufferTime;
+      // Immediately schedule first buffer for playback
+      this.scheduleNextBuffer();
+    } else if (this.isPlaying) {
+      // If already playing, immediately try to schedule more buffers if queue is building up
+      // This ensures continuous playback without gaps
       this.scheduleNextBuffer();
     }
   }
@@ -119,7 +130,9 @@ export class AudioStreamer {
   }
 
   private scheduleNextBuffer() {
-    const SCHEDULE_AHEAD_TIME = 0.2;
+    // 🚀 LATENCY OPTIMIZATION: Reduced schedule ahead from 200ms to 100ms
+    // This reduces playback latency while still maintaining smooth audio
+    const SCHEDULE_AHEAD_TIME = 0.1; // 100ms (was 200ms)
 
     while (
       this.audioQueue.length > 0 &&
@@ -179,19 +192,21 @@ export class AudioStreamer {
         }
       } else {
         if (!this.checkInterval) {
+          // 🚀 LATENCY OPTIMIZATION: Reduced check interval from 100ms to 50ms for faster processing
           this.checkInterval = window.setInterval(() => {
             if (this.audioQueue.length > 0) {
               this.scheduleNextBuffer();
             }
-          }, 100) as unknown as number;
+          }, 50) as unknown as number; // 50ms (was 100ms)
         }
       }
     } else {
       const nextCheckTime =
         (this.scheduledTime - this.context.currentTime) * 1000;
+      // 🚀 LATENCY OPTIMIZATION: Reduced timeout buffer from 50ms to 20ms
       setTimeout(
         () => this.scheduleNextBuffer(),
-        Math.max(0, nextCheckTime - 50)
+        Math.max(0, nextCheckTime - 20) // 20ms buffer (was 50ms)
       );
     }
   }

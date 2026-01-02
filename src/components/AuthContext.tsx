@@ -59,6 +59,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
+    // Guard: ensure Firebase auth is initialized before subscribing
+    if (!auth) {
+      console.warn('Firebase auth not initialized yet in AuthProvider');
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseAuthUser | null) => {
       if (firebaseUser) {
         const userData: FirebaseUser = {
@@ -69,7 +76,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           emailVerified: firebaseUser.emailVerified,
         };
         setUser(userData);
-        
+
         // Create user document if it doesn't exist
         await createUserDocument(firebaseUser);
       } else {
@@ -84,9 +91,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signInWithGoogle = async () => {
     try {
       setLoading(true);
+      if (!auth || !googleProvider) throw new Error('Firebase not initialized');
       const result = await signInWithPopup(auth, googleProvider);
       const idToken = await result.user.getIdToken();
-      // 🍪 Store ID token in a cookie for server-side use
+      //  Store ID token in a cookie for server-side use
       document.cookie = `authToken=${idToken}; path=/; max-age=3600; SameSite=Lax`;
     } catch (error) {
       console.error('Error signing in with Google:', error);
@@ -99,6 +107,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = async () => {
     try {
       setLoading(true);
+      if (!auth) throw new Error('Firebase not initialized');
       await firebaseSignOut(auth);
       document.cookie = 'authToken=; path=/; max-age=0'; // 🧹 delete cookie
     } catch (error) {

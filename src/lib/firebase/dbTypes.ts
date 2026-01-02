@@ -103,7 +103,8 @@ export interface Message {
     isSystemMessage?: boolean; // For messages like "Persona joined"
     isError?: boolean;
     errorMessage?: string;
-    messageType?: string; // e.g., "text", "audio", "image"
+    messageType?: string; // e.g., "text", "audio", "image", "voice_transcript"
+    type?: string; // Alternative type field (e.g., "voice") for compatibility with admin dashboard filtering
     metadata?: string; // JSON string for additional data (e.g., audio duration, image URL)
     status?: string; // e.g., "sent", "failed", "processing"
     embedding?: FirebaseFirestore.VectorValue; // Vector with size 1536

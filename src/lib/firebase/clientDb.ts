@@ -129,9 +129,15 @@ const getDocsWithSource = async <T>(query: any): Promise<{ data: T[]; fromCache:
 const serializeFirestoreData = (data: any): any => {
   if (data === null || data === undefined) return data;
   
+  // Handle Firestore Timestamp (has .toDate function)
   if (data.toDate && typeof data.toDate === 'function') {
     // Convert Firestore Timestamp to Date
     return data.toDate();
+  }
+  
+  // Handle Firestore Timestamp (has .seconds property) - fallback for edge cases
+  if (data.seconds !== undefined && typeof data.seconds === 'number') {
+    return new Date(data.seconds * 1000 + (data.nanoseconds || 0) / 1000000);
   }
   
   if (Array.isArray(data)) {
@@ -959,8 +965,36 @@ export const MessageClientDb = {
   },
 
   // Get messages by room ID with pagination
+  // 🛑 BACKWARD COMPATIBILITY: Read from BOTH new subcollection AND old flat collection
   getByRoomId: async (roomId: string, limitCount: number = 50, lastDoc?: DocumentSnapshot): Promise<{ messages: Message[], lastDoc: DocumentSnapshot | null }> => {
     try {
+      // Try NEW structure first: rooms/{roomId}/messages (subcollection)
+      try {
+        let q = query(
+          collection(db, 'rooms', roomId, 'messages'),
+          orderBy('createdAt', 'desc'),
+          limit(limitCount)
+        );
+        
+        if (lastDoc) {
+          q = query(q, startAfter(lastDoc));
+        }
+        
+        const snapshot = await getDocs(q);
+        if (snapshot.docs.length > 0) {
+          const messages = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...serializeFirestoreData(doc.data())
+          }) as Message);
+          const lastDocument = snapshot.docs[snapshot.docs.length - 1] || null;
+          return { messages, lastDoc: lastDocument };
+        }
+      } catch (newError) {
+        // If new structure fails or is empty, fall back to old structure
+        console.warn('New messages subcollection not found, trying old structure:', newError);
+      }
+
+      // Fall back to OLD structure: messages collection with roomId field
       let q = query(
         collection(db, 'messages'),
         where('roomId', '==', roomId),
@@ -973,7 +1007,10 @@ export const MessageClientDb = {
       }
       
       const snapshot = await getDocs(q);
-      const messages = snapshot.docs.map(doc => doc.data() as Message);
+      const messages = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...serializeFirestoreData(doc.data())
+      }) as Message);
       const lastDocument = snapshot.docs[snapshot.docs.length - 1] || null;
       
       return { messages, lastDoc: lastDocument };
@@ -1016,6 +1053,51 @@ export const MessageClientDb = {
     }
   },
 
+  // Create message (with error logging)
+  // 🛑 CRITICAL: Save to rooms/{roomId}/messages subcollection, not flat messages collection
+  create: async (messageData: Omit<Message, 'id' | 'createdAt' | 'updatedAt'>, customTimestamp?: Date | number): Promise<string> => {
+    // 1. SAFETY CHECK: If no Room ID, we can't save!
+    if (!messageData.roomId) {
+      console.error("❌ ERROR: No Room ID provided! Message lost:", messageData.content.substring(0, 50));
+      throw new Error("Room ID is required to save message");
+    }
+
+    try {
+      const timestamp = customTimestamp 
+        ? (customTimestamp instanceof Date ? customTimestamp : new Date(customTimestamp))
+        : new Date();
+      
+      // 2. THE CORRECT PATH: rooms -> [ROOM_ID] -> messages
+      const messagesRef = collection(db, "rooms", messageData.roomId, "messages");
+      const messageRef = doc(messagesRef);
+      
+      // Convert Date to Firestore Timestamp explicitly to ensure proper storage and retrieval
+      // Firestore will convert JavaScript Date objects automatically, but using Timestamp explicitly
+      // ensures consistent behavior and proper serialization back to Date objects
+      const firestoreTimestamp = Timestamp.fromDate(timestamp instanceof Date ? timestamp : new Date(timestamp));
+      
+      // Use 'any' type here because Firestore expects Timestamp, but our Message interface uses Date
+      // serializeFirestoreData will convert Timestamp back to Date when reading
+      const message: any = {
+        id: messageRef.id,
+        ...messageData,
+        createdAt: firestoreTimestamp,
+        updatedAt: firestoreTimestamp
+      };
+      
+      await setDoc(messageRef, message);
+      console.log(`✅ Saved to Room [${messageData.roomId}]: ${messageData.content.substring(0, 50)}...`);
+      return messageRef.id;
+    } catch (error) {
+      console.error("❌ FAILED TO SAVE TO DB:", error);
+      logFirestoreError(error, 'MessageClientDb.create', {
+        collection: 'messages',
+        userId: (messageData as any).userId
+      });
+      throw error;
+    }
+  },
+
   // Mark message as read
   markAsRead: async (id: string): Promise<void> => {
     try {
@@ -1034,30 +1116,100 @@ export const MessageClientDb = {
   },
 
   // Real-time listener for room messages
+  // 🛑 BACKWARD COMPATIBILITY: Listen to BOTH new subcollection AND old flat collection
   onRoomMessagesChange: (roomId: string, callback: (messages: Message[]) => void): Unsubscribe => {
     try {
-      const q = query(
-        collection(db, 'messages'),
-        where('roomId', '==', roomId),
-        orderBy('createdAt', 'asc'),
+      let newMessages: Message[] = [];
+      let oldMessages: Message[] = [];
+      let hasNewData = false;
+      let hasOldData = false;
+
+      // Helper to get message timestamp for sorting
+      const getMessageTime = (msg: Message): number => {
+        if (!msg.createdAt) return 0;
+        if (msg.createdAt instanceof Date) return msg.createdAt.getTime();
+        if (typeof msg.createdAt === 'number') return msg.createdAt;
+        if (typeof (msg.createdAt as any).toMillis === 'function') return (msg.createdAt as any).toMillis();
+        if ((msg.createdAt as any).seconds) return (msg.createdAt as any).seconds * 1000;
+        try {
+          return new Date(msg.createdAt as any).getTime();
+        } catch {
+          return 0;
+        }
+      };
+
+      // Merge function to combine and deduplicate messages
+      const mergeAndCallback = () => {
+        const allMessages = [...newMessages, ...oldMessages];
+        // Remove duplicates by ID and sort
+        const uniqueMessages = Array.from(new Map(allMessages.map(m => [m.id, m])).values())
+          .sort((a, b) => getMessageTime(a) - getMessageTime(b));
+        callback(uniqueMessages);
+      };
+
+      // 1. Listen to NEW structure: rooms/{roomId}/messages (subcollection)
+      // 🛑 CRITICAL FIX: Use 'desc' order to get MOST RECENT messages, not oldest
+      // This ensures new messages (including check-ins) are always included
+      const newQ = query(
+        collection(db, 'rooms', roomId, 'messages'),
+        orderBy('createdAt', 'desc'),
         limit(100)
       );
       
-      return onSnapshot(q, (snapshot) => {
-        const messages = snapshot.docs.map(doc => doc.data() as Message);
-        callback(messages);
+      const unsubscribeNew = onSnapshot(newQ, (snapshot) => {
+        // Messages come in DESC order (newest first), so reverse to get chronological order
+        newMessages = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...serializeFirestoreData(doc.data())
+        }) as Message).reverse(); // Reverse to get oldest first for proper sorting
+        hasNewData = true;
+        mergeAndCallback();
       }, (error) => {
-        // Handle permission errors and not-found errors gracefully
+        // Silently handle errors for new structure (may not exist yet)
+        if (error instanceof FirestoreError && error.code !== 'permission-denied') {
+          console.warn('Error listening to new messages subcollection:', error);
+        }
+        hasNewData = true; // Mark as processed so we don't wait forever
+        if (hasOldData) {
+          mergeAndCallback();
+        }
+      });
+
+      // 2. Listen to OLD structure: messages collection with roomId field (for backward compatibility)
+      // Use 'desc' order to get most recent messages
+      const oldQ = query(
+        collection(db, 'messages'),
+        where('roomId', '==', roomId),
+        orderBy('createdAt', 'desc'),
+        limit(100)
+      );
+      
+      const unsubscribeOld = onSnapshot(oldQ, (snapshot) => {
+        // Messages come in DESC order (newest first), so reverse to get chronological order
+        oldMessages = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...serializeFirestoreData(doc.data())
+        }) as Message).reverse(); // Reverse to get oldest first for proper sorting
+        hasOldData = true;
+        mergeAndCallback();
+      }, (error) => {
+        // Handle permission errors gracefully
         if (error instanceof FirestoreError && 
             (error.code === 'permission-denied' || error.code === 'not-found')) {
-          console.warn('Permission denied or not found for room messages listener, this may be expected');
+          console.warn('Permission denied or not found for old messages collection, this may be expected');
           return;
         }
-        
-        logFirestoreError(error, 'MessageClientDb.onRoomMessagesChange', {
-          collection: 'messages'
-        });
+        hasOldData = true; // Mark as processed
+        if (hasNewData) {
+          mergeAndCallback();
+        }
       });
+
+      // Return unsubscribe function that unsubscribes from both
+      return () => {
+        unsubscribeNew();
+        unsubscribeOld();
+      };
     } catch (error) {
       logFirestoreError(error, 'MessageClientDb.onRoomMessagesChange.setup', {
         collection: 'messages'
@@ -1067,11 +1219,12 @@ export const MessageClientDb = {
   },
 
   // Real-time listener for new messages in room
+  // 🛑 CRITICAL: Listen to rooms/{roomId}/messages subcollection, not flat messages collection
   onNewMessagesInRoom: (roomId: string, callback: (message: Message) => void): Unsubscribe => {
     try {
+      // THE CORRECT PATH: rooms -> [ROOM_ID] -> messages
       const q = query(
-        collection(db, 'messages'),
-        where('roomId', '==', roomId),
+        collection(db, 'rooms', roomId, 'messages'),
         orderBy('createdAt', 'desc'),
         limit(1)
       );
@@ -1079,7 +1232,11 @@ export const MessageClientDb = {
       return onSnapshot(q, (snapshot) => {
         snapshot.docChanges().forEach((change) => {
           if (change.type === 'added') {
-            callback(change.doc.data() as Message);
+            // ✅ Serialize Firestore data to convert Timestamps to Dates
+            callback({
+              id: change.doc.id,
+              ...serializeFirestoreData(change.doc.data())
+            } as Message);
           }
         });
       }, (error) => {

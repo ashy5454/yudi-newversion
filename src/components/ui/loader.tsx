@@ -5,44 +5,51 @@ import React from "react";
 export const LoaderOne = () => {
   const transition = (x: number) => {
     return {
-      duration: 1,
+      duration: 0.6,
       repeat: Infinity,
       repeatType: "loop" as const,
-      delay: x * 0.2,
+      delay: x * 0.15,
       ease: "easeInOut",
     };
   };
+  
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1.5 rounded-md bg-white/10 px-2 py-1">
       <motion.div
         initial={{
           y: 0,
+          scale: 1,
         }}
         animate={{
-          y: [0, 10, 0],
+          y: [0, -6, 0],
+          scale: [1, 1.1, 1],
         }}
         transition={transition(0) as Transition}
-        className="h-4 w-4 rounded-full border border-neutral-300 bg-gradient-to-b from-neutral-400 to-neutral-300"
+        className="h-1.5 w-1.5 rounded-full bg-white"
       />
       <motion.div
         initial={{
           y: 0,
+          scale: 1,
         }}
         animate={{
-          y: [0, 10, 0],
+          y: [0, -6, 0],
+          scale: [1, 1.1, 1],
         }}
         transition={transition(1) as Transition}
-        className="h-4 w-4 rounded-full border border-neutral-300 bg-gradient-to-b from-neutral-400 to-neutral-300"
+        className="h-1.5 w-1.5 rounded-full bg-white"
       />
       <motion.div
         initial={{
           y: 0,
+          scale: 1,
         }}
         animate={{
-          y: [0, 10, 0],
+          y: [0, -6, 0],
+          scale: [1, 1.1, 1],
         }}
         transition={transition(2) as Transition}
-        className="h-4 w-4 rounded-full border border-neutral-300 bg-gradient-to-b from-neutral-400 to-neutral-300"
+        className="h-1.5 w-1.5 rounded-full bg-white"
       />
     </div>
   );

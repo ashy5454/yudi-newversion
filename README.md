@@ -59,7 +59,7 @@ npm install
 ```
 
 3. Set up environment variables:
-Create a `.env.local` file with:
+Create a `.env` file with:
 ```env
 GEMINI_API_KEY=your_gemini_api_key_here
 NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
@@ -87,7 +87,7 @@ npm run dev
 
 ### Gemini API
 1. Get API key from [Google AI Studio](https://aistudio.google.com/app/apikey)
-2. Add to `.env.local`
+2. Add to `.env`
 
 ## 📦 Deployment
 

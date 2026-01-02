@@ -41,6 +41,7 @@ interface UseMessageReturn {
 
     // Real-time subscriptions
     subscribeToRoomMessages: (roomId: string) => () => void;
+    setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
 }
 
 export const useMessage = (): UseMessageReturn => {
@@ -211,6 +212,7 @@ export const useMessage = (): UseMessageReturn => {
         clearMessages,
         refreshMessages,
         subscribeToRoomMessages,
+        setMessages,
     };
 };
 
