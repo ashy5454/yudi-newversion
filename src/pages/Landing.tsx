@@ -67,4 +67,10 @@ export default function Landing() {
         </div>
     );
 }
+// It tells the build server: "Skip building this page statically, just wait for a real user."
+export async function getServerSideProps() {
+    return {
+        props: {},
+    };
+}
 
