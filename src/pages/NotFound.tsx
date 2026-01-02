@@ -1,12 +1,13 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
+// FIX 1: Use Next.js Link instead of react-router-dom
+import Link from 'next/link';
 
 const containerVariants = {
-  hidden: { 
+  hidden: {
     opacity: 0,
     y: 30
   },
-  visible: { 
+  visible: {
     opacity: 1,
     y: 0,
     transition: {
@@ -19,12 +20,12 @@ const containerVariants = {
 };
 
 const itemVariants = {
-  hidden: { 
+  hidden: {
     opacity: 0,
     y: 20
   },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     y: 0,
     transition: {
       duration: 0.6,
@@ -53,13 +54,13 @@ const numberVariants = {
 };
 
 const ghostVariants = {
-  hidden: { 
+  hidden: {
     scale: 0.8,
     opacity: 0,
     y: 15,
     rotate: -5
   },
-  visible: { 
+  visible: {
     scale: 1,
     opacity: 1,
     y: 0,
@@ -97,11 +98,12 @@ const ghostVariants = {
   }
 };
 
-export function NotFound() {
+// FIX 2: Added "default" keyword here
+export default function NotFound() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4">
       <AnimatePresence mode="wait">
-        <motion.div 
+        <motion.div
           className="text-center"
           variants={containerVariants}
           initial="hidden"
@@ -109,7 +111,7 @@ export function NotFound() {
           exit="hidden"
         >
           <div className="flex items-center justify-center gap-4 md:gap-6 mb-8 md:mb-12">
-            <motion.span 
+            <motion.span
               className="text-[80px] md:text-[120px] font-bold  opacity-70 font-signika select-none"
               variants={numberVariants}
               custom={-1}
@@ -121,6 +123,7 @@ export function NotFound() {
               whileHover="hover"
               animate={["visible", "floating"]}
             >
+              {/* Ensure this path is correct in your public folder */}
               <img
                 src="/boo.png"
                 alt="Ghost"
@@ -130,7 +133,7 @@ export function NotFound() {
                 draggable="false"
               />
             </motion.div>
-            <motion.span 
+            <motion.span
               className="text-[80px] md:text-[120px] font-bold  opacity-70 font-signika select-none"
               variants={numberVariants}
               custom={1}
@@ -138,24 +141,24 @@ export function NotFound() {
               4
             </motion.span>
           </div>
-          
-          <motion.h1 
+
+          <motion.h1
             className="text-3xl md:text-5xl font-bold  mb-4 md:mb-6 opacity-70 font-dm-sans select-none"
             variants={itemVariants}
           >
             Boo! Page missing!
           </motion.h1>
-          
-          <motion.p 
+
+          <motion.p
             className="text-lg md:text-xl  mb-8 md:mb-12 opacity-50 font-dm-sans select-none"
             variants={itemVariants}
           >
             Whoops! This page must be a ghost - it&apos;s not here!
           </motion.p>
 
-          <motion.div 
+          <motion.div
             variants={itemVariants}
-            whileHover={{ 
+            whileHover={{
               scale: 1.05,
               transition: {
                 duration: 0.3,
@@ -163,20 +166,22 @@ export function NotFound() {
               }
             }}
           >
-            <Link 
-              to="/"
+            {/* FIX 3: Changed "to" to "href" for Next.js */}
+            <Link
+              href="/"
               className="inline-block bg-primary/80 text-primary-foreground px-8 py-3 rounded-full text-lg font-medium hover:bg-primary transition-colors font-dm-sans select-none"
             >
               Find shelter
             </Link>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             className="mt-12"
             variants={itemVariants}
           >
+            {/* FIX 3: Changed "to" to "href" for Next.js */}
             <Link
-              to="/"
+              href="/"
               className=" opacity-50 hover:opacity-70 transition-opacity underline font-dm-sans select-none"
             >
               What means 404?
