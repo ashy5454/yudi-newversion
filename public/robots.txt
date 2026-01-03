@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://yudi.co.in/sitemap.xml
