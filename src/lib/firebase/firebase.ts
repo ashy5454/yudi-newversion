@@ -33,7 +33,7 @@ const firebaseConfig = {
     '1:882569998626:web:4669942f4304a1f2fb757b',
   measurementId:
     process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID ||
-    'G-1WDBCQ7PG4',
+    'G-53L2NNJH0W', // <--- Update this value
 };
 
 if (!firebaseConfig.apiKey) {
