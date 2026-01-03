@@ -7,11 +7,11 @@ runConfig:
 
 env:
   - variable: GEMINI_API_KEY
-    secret: GEMINI_API_KEY
+    secret: GEMINI_API_KEY/versions/5
   - variable: PINECONE_API_KEY
-    secret: PINECONE_API_KEY
+    secret: PINECONE_API_KEY/versions/1
   - variable: FIREBASE_PRIVATE_KEY
-    secret: FIREBASE_PRIVATE_KEY
+    secret: FIREBASE_PRIVATE_KEY/versions/2
   - variable: NEXT_PUBLIC_FIREBASE_API_KEY
     value: AIzaSyCJL0zm1lrejfzLQpZNiWExtjo_vT_l1zQ
   - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
