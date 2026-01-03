@@ -161,73 +161,76 @@ export default function ChatInterface() {
 
             console.log("⏰ Triggering Silent 4-Hour Check-in...");
 
-            // ✅ Send HIDDEN prompt to AI (no user message will be saved)
-            fetch("/api/chat", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    text: '', // ✅ Empty text means no user message saved to database
-                    hiddenPrompt: silentCheckInPrompt, // ✅ HIDDEN system prompt for AI only
-                    roomId,
-                    personaId: personaIdForCheckIn,
-                    senderType: 'system', // Mark as system message
-                }),
-            })
-                .then(async (response) => {
-                    if (!response.ok) {
-                        throw new Error("Check-in failed");
-                    }
-                    if (!response.body) throw new Error("No response body");
+            // ✅ WRAPPED IN 5s DELAY TO PREVENT 405 COLLISIONS
+            const checkInTimer = setTimeout(() => {
+                console.log("🚀 Triggering Delayed Silent 4-Hour Check-in...");
 
-                    const reader = response.body.getReader();
-                    const decoder = new TextDecoder();
-                    let done = false;
-                    let fullBuffer = '';
-
-                    // Read entire response
-                    while (!done) {
-                        const { value, done: doneReading } = await reader.read();
-                        done = doneReading;
-                        if (value) {
-                            const chunkValue = decoder.decode(value, { stream: !done });
-                            fullBuffer += chunkValue;
-                        }
-                    }
-
-                    // ✅ Create check-in message (AI response only, no user message bubble)
-                    const checkInContent = fullBuffer.trim().replace(/\n+/g, ' ');
-                    if (checkInContent.length > 0) {
-                        // Use Date.now() to ensure we get a proper timestamp (milliseconds)
-                        const checkInTimestamp = Date.now();
-                        console.log(`💾 Saving check-in message with timestamp: ${checkInTimestamp} (${new Date(checkInTimestamp).toISOString()})`);
-
-                        // 🛑 CRITICAL CHANGE: 
-                        // We REMOVED 'handleManualMessage' (local bubble creation).
-                        // We ONLY save to DB. The Listener in ChatInterface will handle the UI.
-                        // This guarantees 1 message = 1 bubble (no duplicates possible).
-                        try {
-                            const messageId = await MessageClientDb.create({
-                                roomId,
-                                personaId: personaIdForCheckIn,
-                                senderType: "persona",
-                                content: checkInContent,
-                                messageType: "text",
-                                isSent: true,
-                            }, new Date(checkInTimestamp));
-                            console.log(`✅ Check-in message saved with ID: ${messageId}`);
-                        } catch (dbError) {
-                            console.error("❌ Failed to save check-in message to DB:", dbError);
-                            // Don't throw - continue even if save fails
-                        }
-                    }
+                fetch("/api/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        text: '',
+                        hiddenPrompt: silentCheckInPrompt,
+                        roomId,
+                        personaId: personaIdForCheckIn,
+                        senderType: 'system',
+                    }),
                 })
-                .catch((error) => {
-                    console.error("Error sending 4-hour check-in:", error);
-                    // Don't mark as failed, let it retry next time if needed
-                    hasCheckedInRef.current.delete(roomId);
-                });
+                    .then(async (response) => {
+                        if (!response.ok) {
+                            throw new Error("Check-in failed");
+                        }
+                        if (!response.body) throw new Error("No response body");
+
+                        const reader = response.body.getReader();
+                        const decoder = new TextDecoder();
+                        let done = false;
+                        let fullBuffer = '';
+
+                        // Read entire response
+                        while (!done) {
+                            const { value, done: doneReading } = await reader.read();
+                            done = doneReading;
+                            if (value) {
+                                const chunkValue = decoder.decode(value, { stream: !done });
+                                fullBuffer += chunkValue;
+                            }
+                        }
+
+                        // ✅ Create check-in message (AI response only, no user message bubble)
+                        const checkInContent = fullBuffer.trim().replace(/\n+/g, ' ');
+                        if (checkInContent.length > 0) {
+                            // Use Date.now() to ensure we get a proper timestamp (milliseconds)
+                            const checkInTimestamp = Date.now();
+                            console.log(`💾 Saving check-in message with timestamp: ${checkInTimestamp} (${new Date(checkInTimestamp).toISOString()})`);
+
+                            // 🛑 CRITICAL CHANGE: 
+                            // We REMOVED 'handleManualMessage' (local bubble creation).
+                            // We ONLY save to DB. The Listener in ChatInterface will handle the UI.
+                            // This guarantees 1 message = 1 bubble (no duplicates possible).
+                            try {
+                                const messageId = await MessageClientDb.create({
+                                    roomId,
+                                    personaId: personaIdForCheckIn,
+                                    senderType: "persona",
+                                    content: checkInContent,
+                                    messageType: "text",
+                                    isSent: true,
+                                }, new Date(checkInTimestamp));
+                                console.log(`✅ Check-in message saved with ID: ${messageId}`);
+                            } catch (dbError) {
+                                console.error("❌ Failed to save check-in message to DB:", dbError);
+                                // Don't throw - continue even if save fails
+                            }
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error sending 4-hour check-in:", error);
+                        // Don't mark as failed, let it retry next time if needed
+                        hasCheckedInRef.current.delete(roomId);
+                    });
+            }, 5000);
+            return () => clearTimeout(checkInTimer);
         }
     }, [sortedMessages, roomId, room]); // Runs when messages change or component loads
 

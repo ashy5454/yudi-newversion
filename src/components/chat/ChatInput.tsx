@@ -116,6 +116,8 @@ export default function ChatInput({ roomId, personaId, onMessageSent, onSynthesi
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+
+
                 },
                 body: JSON.stringify({
                     text: cleanUserText, // ✅ CLEAN text for database saving
