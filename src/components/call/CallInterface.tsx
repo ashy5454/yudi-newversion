@@ -164,7 +164,7 @@ export default function CallInterface({ room, persona }: CallInterfaceProps) {
                         // Fetch memories from Pinecone backend
                         try {
                             // Use the same backend URL pattern as text chat
-                            const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || (typeof window !== 'undefined' ? 'http://localhost:5002' : 'http://localhost:5002');
+                            const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
                             const memoryQuery = conversationHistory.substring(0, 200) || 'general conversation'; // Use recent context as query
 
                             // Try both userId and roomId (backend might use either)
