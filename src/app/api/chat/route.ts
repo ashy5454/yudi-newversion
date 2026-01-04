@@ -87,8 +87,8 @@ export async function POST(req: NextRequest) {
         let recentMessagesText = '';
         if (isFirebaseEnabled) {
             try {
-                // Increased timeout to 2s and limit to 50 messages for proper context
-                const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("History fetch timed out")), 2000));
+                // Increased timeout to 10s and limit to 50 messages for proper context
+                const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("History fetch timed out")), 10000));
                 const fetchPromise = MessageAdminDb.getByRoomId(roomId, 50);
                 history = await Promise.race([fetchPromise, timeoutPromise]) as any;
 
