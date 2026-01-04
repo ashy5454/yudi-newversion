@@ -127,6 +127,16 @@ export async function POST(req: NextRequest) {
             } catch (histError) {
                 console.warn("Failed to fetch history (or timed out):", histError);
             }
+            // DEBUG LOGGING
+            if (history?.messages) {
+                console.log(`[DEBUG] History Messages Count: ${history.messages.length}`);
+                if (history.messages.length > 0) {
+                    console.log(`[DEBUG] Last User Message: ${history.messages[history.messages.length - 1].content}`);
+                    console.log(`[DEBUG] First (Oldest) Message Fetched: ${history.messages[0].content}`);
+                }
+            } else {
+                console.log(`[DEBUG] History object is null or has no messages.`);
+            }
         }
 
         // ========== STAGE 1: VIBE ANALYSIS (The Subconscious) ==========
