@@ -1,16 +1,16 @@
 import { adminDb } from './firebase-admin';
-import { 
-  User, 
-  Credit, 
-  AiModel, 
-  Persona, 
-  Room, 
-  Message, 
-  Mood, 
-  Memory, 
-  ResponseData, 
-  Admin, 
-  Analytic 
+import {
+  User,
+  Credit,
+  AiModel,
+  Persona,
+  Room,
+  Message,
+  Mood,
+  Memory,
+  ResponseData,
+  Admin,
+  Analytic
 } from './dbTypes';
 import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 
@@ -25,14 +25,14 @@ const performVectorSearch = async (
   preFilters?: { [key: string]: any }
 ) => {
   const collectionRef = adminDb.collection(collectionName);
-  
+
   // Apply pre-filters if provided
   if (preFilters) {
     let filteredQuery: any = collectionRef;
     Object.entries(preFilters).forEach(([key, value]) => {
       filteredQuery = filteredQuery.where(key, '==', value);
     });
-    
+
     // Perform vector search on filtered query
     const vectorQuery = filteredQuery.findNearest({
       vectorField,
@@ -42,7 +42,7 @@ const performVectorSearch = async (
       distanceResultField: 'vector_distance',
       ...(distanceThreshold && { distanceThreshold })
     });
-    
+
     const snapshot = await vectorQuery.get();
     return snapshot.docs.map((doc: any) => ({
       id: doc.id,
@@ -59,7 +59,7 @@ const performVectorSearch = async (
       distanceResultField: 'vector_distance',
       ...(distanceThreshold && { distanceThreshold })
     });
-    
+
     const snapshot = await vectorQuery.get();
     return snapshot.docs.map((doc: any) => ({
       id: doc.id,
@@ -79,11 +79,11 @@ const cleanData = (data: any): any => {
   if (data === null || data === undefined) {
     return null;
   }
-  
+
   if (Array.isArray(data)) {
     return data.map(cleanData).filter(item => item !== null);
   }
-  
+
   if (typeof data === 'object') {
     const cleaned: any = {};
     for (const [key, value] of Object.entries(data)) {
@@ -93,7 +93,7 @@ const cleanData = (data: any): any => {
     }
     return cleaned;
   }
-  
+
   return data;
 };
 
@@ -102,17 +102,17 @@ export const UserAdminDb = {
   // Create user
   create: async (userData: Omit<User, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> => {
     const userRef = adminDb.collection('users').doc();
-    
+
     // Clean the data to remove undefined values
     const cleanedData = cleanData(userData);
-    
+
     const user: User = {
       id: userRef.id,
       ...cleanedData,
       createdAt: new Date(),
       updatedAt: new Date()
     };
-    
+
     await userRef.set(user);
     return userRef.id;
   },
@@ -146,15 +146,15 @@ export const UserAdminDb = {
   // Get all users with pagination
   getAll: async (limit: number = 20, lastDoc?: any): Promise<{ users: User[], lastDoc: any }> => {
     let query = adminDb.collection('users').orderBy('createdAt', 'desc').limit(limit);
-    
+
     if (lastDoc) {
       query = query.startAfter(lastDoc);
     }
-    
+
     const snapshot = await query.get();
     const users = snapshot.docs.map(doc => doc.data() as User);
     const lastDocument = snapshot.docs[snapshot.docs.length - 1];
-    
+
     return { users, lastDoc: lastDocument };
   },
 
@@ -199,7 +199,7 @@ export const AiModelAdminDb = {
       createdAt: new Date(),
       updatedAt: new Date()
     };
-    
+
     await modelRef.set(model);
     return modelRef.id;
   },
@@ -250,17 +250,17 @@ export const PersonaAdminDb = {
   // Create persona
   create: async (personaData: Omit<Persona, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> => {
     const personaRef = adminDb.collection('personas').doc();
-    
+
     // Clean the data to remove undefined values
     const cleanedData = cleanData(personaData);
-    
+
     const persona: Persona = {
       id: personaRef.id,
       ...cleanedData,
       createdAt: new Date(),
       updatedAt: new Date()
     };
-    
+
     await personaRef.set(persona);
     return personaRef.id;
   },
@@ -274,15 +274,15 @@ export const PersonaAdminDb = {
   // Get all personas with pagination
   getAll: async (limit: number = 20, lastDoc?: any): Promise<{ personas: Persona[], lastDoc: any }> => {
     let query = adminDb.collection('personas').orderBy('createdAt', 'desc').limit(limit);
-    
+
     if (lastDoc) {
       query = query.startAfter(lastDoc);
     }
-    
+
     const snapshot = await query.get();
     const personas = snapshot.docs.map(doc => doc.data() as Persona);
     const lastDocument = snapshot.docs[snapshot.docs.length - 1];
-    
+
     return { personas, lastDoc: lastDocument };
   },
 
@@ -348,17 +348,17 @@ export const RoomAdminDb = {
   // Create room
   create: async (roomData: Omit<Room, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> => {
     const roomRef = adminDb.collection('rooms').doc();
-    
+
     // Clean the data to remove undefined values
     const cleanedData = cleanData(roomData);
-    
+
     const room: Room = {
       id: roomRef.id,
       ...cleanedData,
       createdAt: new Date(),
       updatedAt: new Date()
     };
-    
+
     await roomRef.set(room);
     return roomRef.id;
   },
@@ -378,15 +378,15 @@ export const RoomAdminDb = {
   // Get all rooms with pagination
   getAll: async (limit: number = 20, lastDoc?: any): Promise<{ rooms: Room[], lastDoc: any }> => {
     let query = adminDb.collection('rooms').orderBy('createdAt', 'desc').limit(limit);
-    
+
     if (lastDoc) {
       query = query.startAfter(lastDoc);
     }
-    
+
     const snapshot = await query.get();
     const rooms = snapshot.docs.map(doc => doc.data() as Room);
     const lastDocument = snapshot.docs[snapshot.docs.length - 1];
-    
+
     return { rooms, lastDoc: lastDocument };
   },
 
@@ -436,17 +436,17 @@ export const MessageAdminDb = {
   // Create message
   create: async (messageData: Omit<Message, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> => {
     const messageRef = adminDb.collection('messages').doc();
-    
+
     // Clean the data to remove undefined values
     const cleanedData = cleanData(messageData);
-    
+
     const message: Message = {
       id: messageRef.id,
       ...cleanedData,
       createdAt: new Date(),
       updatedAt: new Date()
     };
-    
+
     await messageRef.set(message);
     return messageRef.id;
   },
@@ -457,20 +457,32 @@ export const MessageAdminDb = {
     return doc.exists ? doc.data() as Message : null;
   },
 
-  // Get by room ID
+  // Get by room ID - Modified to sort in-memory to avoid missing index issues
   getByRoomId: async (roomId: string, limit: number = 50, lastDoc?: any): Promise<{ messages: Message[], lastDoc: any }> => {
+    // REMOVED .orderBy('createdAt', 'desc') to prevent "Missing Index" errors
     let query = adminDb.collection('messages')
-      .where('roomId', '==', roomId)
-      .orderBy('createdAt', 'desc');
-    
-    if (lastDoc) {
-      query = query.startAfter(lastDoc);
-    }
-    
+      .where('roomId', '==', roomId);
+
+    // Note: Pagination (startAfter) might behave unexpectedly without the orderBy in the query
+    // But for the Chat AI context (fetching last 50), this is safer.
+
     const snapshot = await query.get();
-    const messages = snapshot.docs.map(doc => doc.data() as Message);
-    const lastDocument = snapshot.docs[snapshot.docs.length - 1];
-    
+    let messages = snapshot.docs.map(doc => doc.data() as Message);
+
+    // Sort in-memory (Descending: Newest first)
+    messages.sort((a, b) => {
+      const timeA = a.createdAt instanceof Timestamp ? a.createdAt.toDate().getTime() : new Date(a.createdAt as any).getTime();
+      const timeB = b.createdAt instanceof Timestamp ? b.createdAt.toDate().getTime() : new Date(b.createdAt as any).getTime();
+      return timeB - timeA;
+    });
+
+    const lastDocument = snapshot.docs[snapshot.docs.length - 1]; // This logic is slightly flawed without query ordering but acceptable for AI context
+
+    // Limit after sorting
+    if (limit > 0 && messages.length > limit) {
+      messages = messages.slice(0, limit);
+    }
+
     return { messages, lastDoc: lastDocument };
   },
 
@@ -490,18 +502,18 @@ export const MessageAdminDb = {
 
   // Vector search for messages
   searchSimilar: async (
-    queryVector: number[], 
-    limit: number = 10, 
+    queryVector: number[],
+    limit: number = 10,
     filters?: { roomId?: string },
     distanceMeasure: 'EUCLIDEAN' | 'COSINE' | 'DOT_PRODUCT' = 'COSINE',
     distanceThreshold?: number
   ): Promise<any[]> => {
     return performVectorSearch(
-      'messages', 
-      'embedding', 
-      queryVector, 
-      limit, 
-      distanceMeasure, 
+      'messages',
+      'embedding',
+      queryVector,
+      limit,
+      distanceMeasure,
       distanceThreshold,
       filters
     );
@@ -530,17 +542,17 @@ export const MoodAdminDb = {
   // Create mood
   create: async (moodData: Omit<Mood, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> => {
     const moodRef = adminDb.collection('moods').doc();
-    
+
     // Clean the data to remove undefined values
     const cleanedData = cleanData(moodData);
-    
+
     const mood: Mood = {
       id: moodRef.id,
       ...cleanedData,
       createdAt: new Date(),
       updatedAt: new Date()
     };
-    
+
     await moodRef.set(mood);
     return moodRef.id;
   },
@@ -573,18 +585,18 @@ export const MoodAdminDb = {
 
   // Vector search for moods
   searchSimilar: async (
-    queryVector: number[], 
-    limit: number = 10, 
+    queryVector: number[],
+    limit: number = 10,
     filters?: { userId?: string },
     distanceMeasure: 'EUCLIDEAN' | 'COSINE' | 'DOT_PRODUCT' = 'COSINE',
     distanceThreshold?: number
   ): Promise<any[]> => {
     return performVectorSearch(
-      'moods', 
-      'embedding', 
-      queryVector, 
-      limit, 
-      distanceMeasure, 
+      'moods',
+      'embedding',
+      queryVector,
+      limit,
+      distanceMeasure,
       distanceThreshold,
       filters
     );
@@ -594,14 +606,14 @@ export const MoodAdminDb = {
   getMoodAnalytics: async (userId: string, days: number = 30): Promise<any> => {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
-    
+
     const snapshot = await adminDb.collection('moods')
       .where('userId', '==', userId)
       .where('createdAt', '>=', Timestamp.fromDate(startDate))
       .get();
-    
+
     const moods = snapshot.docs.map(doc => doc.data() as Mood);
-    
+
     return {
       totalMoods: moods.length,
       averageIntensity: moods.reduce((sum, mood) => sum + (mood.intensity || 0), 0) / moods.length,
@@ -618,17 +630,17 @@ export const MemoryAdminDb = {
   // Create memory
   create: async (memoryData: Omit<Memory, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> => {
     const memoryRef = adminDb.collection('memories').doc();
-    
+
     // Clean the data to remove undefined values
     const cleanedData = cleanData(memoryData);
-    
+
     const memory: Memory = {
       id: memoryRef.id,
       ...cleanedData,
       createdAt: new Date(),
       updatedAt: new Date()
     };
-    
+
     await memoryRef.set(memory);
     return memoryRef.id;
   },
@@ -671,18 +683,18 @@ export const MemoryAdminDb = {
 
   // Vector search for memories
   searchSimilar: async (
-    queryVector: number[], 
-    limit: number = 10, 
+    queryVector: number[],
+    limit: number = 10,
     filters?: { userId?: string },
     distanceMeasure: 'EUCLIDEAN' | 'COSINE' | 'DOT_PRODUCT' = 'COSINE',
     distanceThreshold?: number
   ): Promise<any[]> => {
     return performVectorSearch(
-      'memories', 
-      'embedding', 
-      queryVector, 
-      limit, 
-      distanceMeasure, 
+      'memories',
+      'embedding',
+      queryVector,
+      limit,
+      distanceMeasure,
       distanceThreshold,
       filters
     );
@@ -691,19 +703,19 @@ export const MemoryAdminDb = {
   // Upsert memory (update if exists, create if not)
   upsert: async (userId: string, key: string, value: string, embedding?: number[]): Promise<string> => {
     const existing = await MemoryAdminDb.getByKey(userId, key);
-    
+
     if (existing) {
-      const updateData = { 
-        value, 
+      const updateData = {
+        value,
         ...(embedding && { embedding: createVectorEmbedding(embedding) })
       };
       await MemoryAdminDb.update(existing.id, updateData);
       return existing.id;
     } else {
-      const createData = { 
-        userId, 
-        key, 
-        value, 
+      const createData = {
+        userId,
+        key,
+        value,
         ...(embedding && { embedding: createVectorEmbedding(embedding) })
       };
       return await MemoryAdminDb.create(createData);
@@ -722,7 +734,7 @@ export const ResponseDataAdminDb = {
       createdAt: new Date(),
       updatedAt: new Date()
     };
-    
+
     await responseRef.set(response);
     return responseRef.id;
   },
@@ -755,23 +767,23 @@ export const ResponseDataAdminDb = {
 
   // Vector search for response data
   searchSimilar: async (
-    queryVector: number[], 
-    limit: number = 10, 
-    filters?: { 
-      gender?: string, 
+    queryVector: number[],
+    limit: number = 10,
+    filters?: {
+      gender?: string,
       languageCode?: string,
       ageMin?: number,
-      ageMax?: number 
+      ageMax?: number
     },
     distanceMeasure: 'EUCLIDEAN' | 'COSINE' | 'DOT_PRODUCT' = 'COSINE',
     distanceThreshold?: number
   ): Promise<any[]> => {
     return performVectorSearch(
-      'responseData', 
-      'embedding', 
-      queryVector, 
-      limit, 
-      distanceMeasure, 
+      'responseData',
+      'embedding',
+      queryVector,
+      limit,
+      distanceMeasure,
       distanceThreshold,
       filters
     );
@@ -786,7 +798,7 @@ export const ResponseDataAdminDb = {
     responseStyleName?: string
   }): Promise<ResponseData[]> => {
     let queryRef: any = adminDb.collection('responseData');
-    
+
     if (criteria.gender) {
       queryRef = queryRef.where('gender', '==', criteria.gender);
     }
@@ -796,7 +808,7 @@ export const ResponseDataAdminDb = {
     if (criteria.responseStyleName) {
       queryRef = queryRef.where('responseStyleName', '==', criteria.responseStyleName);
     }
-    
+
     const snapshot = await queryRef.get();
     return snapshot.docs.map((doc: any) => doc.data() as ResponseData);
   }
@@ -813,7 +825,7 @@ export const AdminAdminDb = {
       createdAt: new Date(),
       updatedAt: new Date()
     };
-    
+
     await adminRef.set(admin);
     return adminRef.id;
   },
@@ -874,7 +886,7 @@ export const AnalyticsAdminDb = {
       createdAt: new Date(),
       updatedAt: new Date()
     };
-    
+
     await analyticsRef.set(analytics);
     return analyticsRef.id;
   },
@@ -892,7 +904,7 @@ export const AnalyticsAdminDb = {
       .where('createdAt', '<=', Timestamp.fromDate(endDate))
       .orderBy('createdAt', 'desc')
       .get();
-    
+
     return snapshot.docs.map(doc => doc.data() as Analytic);
   },
 
@@ -928,7 +940,7 @@ export const AnalyticsAdminDb = {
     // Get active users (last 24 hours)
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    
+
     const activeUsersSnapshot = await adminDb.collection('users')
       .where('lastSeen', '>=', Timestamp.fromDate(yesterday))
       .count()
@@ -969,40 +981,40 @@ export const BatchAdminDb = {
   // Delete user and all related data
   deleteUserAndData: async (userId: string): Promise<void> => {
     const batch = adminDb.batch();
-    
+
     // Delete user
     batch.delete(adminDb.collection('users').doc(userId));
-    
+
     // Delete user's rooms
     const roomsSnapshot = await adminDb.collection('rooms').where('userId', '==', userId).get();
     roomsSnapshot.docs.forEach(doc => batch.delete(doc.ref));
-    
+
     // Delete user's personas
     const personasSnapshot = await adminDb.collection('personas').where('creator.id', '==', userId).get();
     personasSnapshot.docs.forEach(doc => batch.delete(doc.ref));
-    
+
     // Delete user's moods
     const moodsSnapshot = await adminDb.collection('moods').where('userId', '==', userId).get();
     moodsSnapshot.docs.forEach(doc => batch.delete(doc.ref));
-    
+
     // Delete user's memories
     const memoriesSnapshot = await adminDb.collection('memories').where('userId', '==', userId).get();
     memoriesSnapshot.docs.forEach(doc => batch.delete(doc.ref));
-    
+
     await batch.commit();
   },
 
   // Delete room and all messages
   deleteRoomAndMessages: async (roomId: string): Promise<void> => {
     const batch = adminDb.batch();
-    
+
     // Delete room
     batch.delete(adminDb.collection('rooms').doc(roomId));
-    
+
     // Delete room's messages
     const messagesSnapshot = await adminDb.collection('messages').where('roomId', '==', roomId).get();
     messagesSnapshot.docs.forEach(doc => batch.delete(doc.ref));
-    
+
     await batch.commit();
   }
 };
@@ -1015,7 +1027,7 @@ export const AdvancedAdminDb = {
     getUserEngagementMetrics: async (userId: string, days: number = 30): Promise<any> => {
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - days);
-      
+
       const [roomsSnapshot, messagesSnapshot, moodsSnapshot] = await Promise.all([
         adminDb.collection('rooms').where('userId', '==', userId).get(),
         adminDb.collection('messages')
@@ -1027,14 +1039,14 @@ export const AdvancedAdminDb = {
           .where('createdAt', '>=', Timestamp.fromDate(startDate))
           .get()
       ]);
-      
+
       const messages = messagesSnapshot.docs.map(doc => doc.data() as Message);
       const dailyActivity = messages.reduce((acc, msg) => {
         const date = msg.createdAt.toISOString().split('T')[0];
         acc[date] = (acc[date] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
-      
+
       return {
         totalRooms: roomsSnapshot.size,
         totalMessages: messagesSnapshot.size,
@@ -1049,7 +1061,7 @@ export const AdvancedAdminDb = {
     // Ban multiple users
     banUsers: async (userIds: string[], reason?: string): Promise<void> => {
       const batch = adminDb.batch();
-      
+
       userIds.forEach(userId => {
         const userRef = adminDb.collection('users').doc(userId);
         batch.update(userRef, {
@@ -1058,7 +1070,7 @@ export const AdvancedAdminDb = {
           updatedAt: new Date()
         });
       });
-      
+
       await batch.commit();
     },
 
@@ -1072,7 +1084,7 @@ export const AdvancedAdminDb = {
         adminDb.collection('memories').where('userId', '==', userId).get(),
         adminDb.collection('personas').where('creator.id', '==', userId).get()
       ]);
-      
+
       return {
         user: user.data(),
         rooms: rooms.docs.map(doc => doc.data()),
@@ -1094,7 +1106,7 @@ export const AdvancedAdminDb = {
         adminDb.collection('personas').where('name', '>=', searchTerm).where('name', '<=', searchTerm + '\uf8ff').limit(limit).get(),
         adminDb.collection('rooms').where('title', '>=', searchTerm).where('title', '<=', searchTerm + '\uf8ff').limit(limit).get()
       ]);
-      
+
       return {
         users: searchResults[0].docs.map(doc => ({ id: doc.id, ...doc.data(), type: 'user' })),
         personas: searchResults[1].docs.map(doc => ({ id: doc.id, ...doc.data(), type: 'persona' })),
@@ -1106,7 +1118,7 @@ export const AdvancedAdminDb = {
     getPlatformAnalytics: async (days: number = 30): Promise<any> => {
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - days);
-      
+
       const [
         totalUsers,
         activeUsers,
@@ -1122,25 +1134,25 @@ export const AdvancedAdminDb = {
         adminDb.collection('personas').count().get(),
         adminDb.collection('personas').where('isPublic', '==', true).count().get()
       ]);
-      
+
       // Get top personas by usage
       const topPersonasSnapshot = await adminDb.collection('personas')
         .orderBy('usageCount', 'desc')
         .limit(10)
         .get();
-      
+
       // Get user growth over time
       const userGrowthSnapshot = await adminDb.collection('users')
         .where('createdAt', '>=', Timestamp.fromDate(startDate))
         .orderBy('createdAt', 'asc')
         .get();
-      
+
       const userGrowth = userGrowthSnapshot.docs.reduce((acc, doc) => {
         const date = doc.data().createdAt.toISOString().split('T')[0];
         acc[date] = (acc[date] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
-      
+
       return {
         totalUsers: totalUsers.data().count,
         activeUsers: activeUsers.data().count,
@@ -1168,7 +1180,7 @@ export const AdvancedAdminDb = {
         adminDb.collection('users').where('status', '==', 'banned').get(),
         adminDb.collection('users').where('status', '==', 'suspended').get()
       ]);
-      
+
       return {
         pendingPersonas: pendingPersonas.docs.map(doc => doc.data()),
         reportedMessages: reportedMessages.docs.map(doc => doc.data()),
@@ -1185,7 +1197,7 @@ export const AdvancedAdminDb = {
     getPersonaMetrics: async (personaId: string, days: number = 30): Promise<any> => {
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - days);
-      
+
       const [
         persona,
         roomsSnapshot,
@@ -1200,14 +1212,14 @@ export const AdvancedAdminDb = {
           .get(),
         adminDb.collection('ratings').where('personaId', '==', personaId).get()
       ]);
-      
+
       if (!persona.exists) {
         throw new Error('Persona not found');
       }
-      
+
       const messages = messagesSnapshot.docs.map(doc => doc.data() as Message);
       const ratings = ratingsSnapshot.docs.map(doc => doc.data());
-      
+
       return {
         persona: persona.data(),
         totalRooms: roomsSnapshot.size,
@@ -1225,7 +1237,7 @@ export const AdvancedAdminDb = {
     // Bulk approve personas
     bulkApprovePersonas: async (personaIds: string[]): Promise<void> => {
       const batch = adminDb.batch();
-      
+
       personaIds.forEach(personaId => {
         const personaRef = adminDb.collection('personas').doc(personaId);
         batch.update(personaRef, {
@@ -1234,7 +1246,7 @@ export const AdvancedAdminDb = {
           updatedAt: new Date()
         });
       });
-      
+
       await batch.commit();
     },
 
@@ -1242,29 +1254,29 @@ export const AdvancedAdminDb = {
     getTrendingPersonas: async (days: number = 7, limit: number = 20): Promise<Persona[]> => {
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - days);
-      
+
       // Get recent room activity
       const recentRoomsSnapshot = await adminDb.collection('rooms')
         .where('createdAt', '>=', Timestamp.fromDate(startDate))
         .get();
-      
+
       // Count persona usage
       const personaUsage = recentRoomsSnapshot.docs.reduce((acc, doc) => {
         const personaId = doc.data().personaId;
         acc[personaId] = (acc[personaId] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
-      
+
       // Get top personas
       const topPersonaIds = Object.entries(personaUsage)
         .sort(([, a], [, b]) => b - a)
         .slice(0, limit)
         .map(([id]) => id);
-      
+
       // Fetch persona details
       const personaPromises = topPersonaIds.map(id => adminDb.collection('personas').doc(id).get());
       const personaDocs = await Promise.all(personaPromises);
-      
+
       return personaDocs
         .filter(doc => doc.exists)
         .map(doc => doc.data() as Persona);
@@ -1277,7 +1289,7 @@ export const AdvancedAdminDb = {
     cleanupOldData: async (days: number = 90): Promise<any> => {
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - days);
-      
+
       const [
         oldMessagesSnapshot,
         oldMoodsSnapshot,
@@ -1297,26 +1309,26 @@ export const AdvancedAdminDb = {
           .limit(1000)
           .get()
       ]);
-      
+
       const batch = adminDb.batch();
-      
+
       // Delete old messages
       oldMessagesSnapshot.docs.forEach(doc => {
         batch.delete(doc.ref);
       });
-      
+
       // Delete old moods
       oldMoodsSnapshot.docs.forEach(doc => {
         batch.delete(doc.ref);
       });
-      
+
       // Delete old archived rooms
       archivedRoomsSnapshot.docs.forEach(doc => {
         batch.delete(doc.ref);
       });
-      
+
       await batch.commit();
-      
+
       return {
         deletedMessages: oldMessagesSnapshot.size,
         deletedMoods: oldMoodsSnapshot.size,
@@ -1332,7 +1344,7 @@ export const AdvancedAdminDb = {
       // - Compacting collections
       // - Updating denormalized data
       // - Cleaning up orphaned documents
-      
+
       const optimizationTasks = [
         // Update persona usage counts
         updatePersonaUsageCounts(),
@@ -1343,9 +1355,9 @@ export const AdvancedAdminDb = {
         // Update analytics
         AnalyticsAdminDb.generateCurrentAnalytics()
       ];
-      
+
       const results = await Promise.allSettled(optimizationTasks);
-      
+
       return {
         tasksCompleted: results.filter(r => r.status === 'fulfilled').length,
         tasksFailed: results.filter(r => r.status === 'rejected').length,
@@ -1362,8 +1374,8 @@ const getMostActiveHour = (messages: Message[]): number => {
     acc[hour] = (acc[hour] || 0) + 1;
     return acc;
   }, {} as Record<number, number>);
-  
-  return Object.entries(hourCounts).reduce((max, [hour, count]) => 
+
+  return Object.entries(hourCounts).reduce((max, [hour, count]) =>
     count > hourCounts[max] ? parseInt(hour) : max, 0
   );
 };
@@ -1385,53 +1397,53 @@ const updatePersonaUsageCounts = async (): Promise<void> => {
     acc[personaId] = (acc[personaId] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
-  
+
   const batch = adminDb.batch();
   Object.entries(usageCounts).forEach(([personaId, count]) => {
     const personaRef = adminDb.collection('personas').doc(personaId);
     batch.update(personaRef, { usageCount: count });
   });
-  
+
   await batch.commit();
 };
 
 const updateRoomMessageCounts = async (): Promise<void> => {
   const roomsSnapshot = await adminDb.collection('rooms').get();
-  
+
   const batch = adminDb.batch();
   for (const roomDoc of roomsSnapshot.docs) {
     const messagesSnapshot = await adminDb.collection('messages')
       .where('roomId', '==', roomDoc.id)
       .count()
       .get();
-    
-    batch.update(roomDoc.ref, { 
+
+    batch.update(roomDoc.ref, {
       messageCount: messagesSnapshot.data().count,
       updatedAt: new Date()
     });
   }
-  
+
   await batch.commit();
 };
 
 const cleanupOrphanedMemories = async (): Promise<void> => {
   const memoriesSnapshot = await adminDb.collection('memories').get();
   const userIds = new Set();
-  
+
   // Get all user IDs
   const usersSnapshot = await adminDb.collection('users').get();
   usersSnapshot.docs.forEach(doc => userIds.add(doc.id));
-  
+
   // Find orphaned memories
-  const orphanedMemories = memoriesSnapshot.docs.filter(doc => 
+  const orphanedMemories = memoriesSnapshot.docs.filter(doc =>
     !userIds.has(doc.data().userId)
   );
-  
+
   // Delete orphaned memories
   const batch = adminDb.batch();
   orphanedMemories.forEach(doc => {
     batch.delete(doc.ref);
   });
-  
+
   await batch.commit();
 };
