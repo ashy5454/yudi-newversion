@@ -27,7 +27,7 @@ env:
   - variable: NEXT_PUBLIC_FIREBASE_APP_ID
     value: 1:882569998626:web:4669942f4304a1f2fb757b
   - variable: NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
-    value: G-53L2NNJH0W
+    value: G-1WDBCQ7PG4
   - variable: FIREBASE_PROJECT_ID
     value: yudi-8bd6f
   - variable: NEXT_PUBLIC_BACKEND_URL

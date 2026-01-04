@@ -358,7 +358,7 @@ Current time: ${timeString} IST.
             const errorText = await response.text();
             console.error('Gemini API error:', errorText, 'Status:', response.status);
             return NextResponse.json(
-                { message: `Gemini API error` },
+                { message: `Gemini API error: ${errorText}` },
                 { status: response.status }
             );
         }
