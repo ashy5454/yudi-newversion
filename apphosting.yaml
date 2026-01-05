@@ -18,7 +18,7 @@ env:
     value: AIzaSyCJL0zm1lrejfzLQpZNiWExtjo_vT_l1zQ
   - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
     value: yudi-8bd6f.firebaseapp.com
-  - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+  - variable: FIREBASE_PROJECT_ID
     value: yudi-8bd6f
   - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
     value: yudi-8bd6f.firebasestorage.app
@@ -28,8 +28,6 @@ env:
     value: 1:882569998626:web:4669942f4304a1f2fb757b
   - variable: NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
     value: G-1WDBCQ7PG4
-  - variable: FIREBASE_PROJECT_ID
-    value: yudi-8bd6f
   - variable: NEXT_PUBLIC_BACKEND_URL
     value: https://yudi-newversion-882569998626.us-central1.run.app
   - variable: BACKEND_URL

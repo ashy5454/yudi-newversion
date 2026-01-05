@@ -150,46 +150,46 @@ export async function POST(req: NextRequest) {
         // ========== EMOTIONAL MEMORY RETRIEVAL (Pinecone) ==========
         let emotionalMemories: any[] = [];
         try {
-            const backendUrl = process.env.BACKEND_URL;
+            // Build robust memory query
+            const emotionQuery = personalityEngine.getEmotionalMemoryQuery(vibe);
+            const recentUserContent = history?.messages
+                ? history.messages
+                    .filter((m: Message) => m.senderType === 'user')
+                    .slice(-3)
+                    .map((m: Message) => m.content)
+                    .join(' ')
+                : text;
 
-            if (backendUrl) {
-                // Build robust memory query
-                const emotionQuery = personalityEngine.getEmotionalMemoryQuery(vibe);
-                const recentUserContent = history?.messages
-                    ? history.messages
-                        .filter((m: Message) => m.senderType === 'user')
-                        .slice(-3)
-                        .map((m: Message) => m.content)
-                        .join(' ')
-                    : text;
+            // Combine emotion with actual content for better memory retrieval
+            const memoryQuery = `${emotionQuery} ${recentUserContent}`.substring(0, 500);
 
-                // Combine emotion with actual content for better memory retrieval
-                const memoryQuery = `${emotionQuery} ${recentUserContent}`.substring(0, 500);
-
-                const memoryResponse = await fetch(
-                    `${backendUrl}/api/memories/${roomId}?query=${encodeURIComponent(memoryQuery)}&top_k=5`,
-                    {
-                        method: 'GET',
-                        headers: { 'Content-Type': 'application/json' },
-                        signal: AbortSignal.timeout(2000)
-                    }
-                );
-
-                if (memoryResponse.ok) {
-                    const memoryData = await memoryResponse.json();
-                    if (memoryData.memories && memoryData.memories.length > 0) {
-                        emotionalMemories = memoryData.memories;
-                        console.log(`[Soul Engine] ✅ Retrieved ${emotionalMemories.length} memories from Pinecone`);
-                        emotionalMemories.forEach((mem: any, idx: number) => {
-                            // Safe substring check
-                            console.log(`[Pinecone Memory ${idx + 1}]: "${(mem.user_message || '').substring(0, 60)}..."`);
-                        });
-                    } else {
-                        console.log(`[Soul Engine] ⚠️  Pinecone returned 0 memories.`);
-                    }
-                } else {
-                    console.warn(`[Soul Engine] ⚠️  Pinecone API returned status: ${memoryResponse.status}`);
+            // Construct the API URL - use Next.js API route
+            // Prefer environment variable, fallback to request origin
+            const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.BASE_URL || req.nextUrl.origin;
+            const memoryResponse = await fetch(
+                `${baseUrl}/api/memories/${roomId}?query=${encodeURIComponent(memoryQuery)}&top_k=5`,
+                {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' },
+                    signal: AbortSignal.timeout(5000) // Increased timeout for embedding generation
                 }
+            );
+
+            if (memoryResponse.ok) {
+                const memoryData = await memoryResponse.json();
+                if (memoryData.memories && memoryData.memories.length > 0) {
+                    emotionalMemories = memoryData.memories;
+                    console.log(`[Soul Engine] ✅ Retrieved ${emotionalMemories.length} memories from Pinecone`);
+                    emotionalMemories.forEach((mem: any, idx: number) => {
+                        // Safe substring check
+                        console.log(`[Pinecone Memory ${idx + 1}]: "${(mem.user_message || '').substring(0, 60)}..."`);
+                    });
+                } else {
+                    console.log(`[Soul Engine] ⚠️  Pinecone returned 0 memories.`);
+                }
+            } else {
+                const errorText = await memoryResponse.text().catch(() => 'Unknown error');
+                console.warn(`[Soul Engine] ⚠️  Memory API returned status: ${memoryResponse.status}, error: ${errorText}`);
             }
         } catch (memoryError) {
             console.warn("[Soul Engine] Pinecone memory retrieval failed:", memoryError);
@@ -327,16 +327,28 @@ Current time: ${timeString} IST.
             );
         }
 
-        // Build contents array with history
+        // Build contents array with history (SHORT-TERM MEMORY)
         const contents: Array<{ role: 'user' | 'model'; parts: Array<{ text: string }> }> = [];
 
         if (history?.messages && history.messages.length > 0) {
+            console.log(`[Memory] Building contents array from ${history.messages.length} history messages`);
             history.messages.forEach((m: Message) => {
+                // Map senderType: "user" -> "user", "persona" -> "model" (for Gemini API)
+                const role: 'user' | 'model' = m.senderType === 'user' ? 'user' : 'model';
                 contents.push({
-                    role: m.senderType === 'user' ? 'user' : 'model',
+                    role: role,
                     parts: [{ text: m.content }]
                 });
             });
+            console.log(`[Memory] ✅ Built contents array with ${contents.length} messages (${contents.filter(c => c.role === 'user').length} user, ${contents.filter(c => c.role === 'model').length} model)`);
+            
+            // Debug: Show last few messages for verification
+            const lastFew = contents.slice(-6);
+            console.log(`[Memory] Last ${lastFew.length} messages in contents array:`, 
+                lastFew.map(c => `${c.role}: ${c.parts[0].text.substring(0, 50)}...`).join('\n')
+            );
+        } else {
+            console.log(`[Memory] ⚠️  No history messages found - starting fresh conversation`);
         }
 
         // Add current user message
@@ -344,6 +356,7 @@ Current time: ${timeString} IST.
             role: 'user',
             parts: [{ text: textForAI }]
         });
+        console.log(`[Memory] Added current message. Total contents: ${contents.length}`);
 
         const modelName = persona.model?.textModel || process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp';
 
@@ -438,22 +451,32 @@ Current time: ${timeString} IST.
 
                     // --- Save to DB / Update Profile ---
                     if (fullResponseText) {
-                        // Save to Pinecone
+                        // Save to Pinecone using Next.js API route
                         try {
-                            const backendUrl = process.env.BACKEND_URL;
-                            if (backendUrl) {
-                                await fetch(`${backendUrl}/api/memories/store`, {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({
-                                        user_id: roomId,
-                                        user_message: text,
-                                        yudi_response: fullResponseText,
-                                        emotion: vibe.emotion
-                                    })
-                                });
+                            // Prefer environment variable, fallback to request origin
+                            const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.BASE_URL || req.nextUrl.origin;
+                            const storeResponse = await fetch(`${baseUrl}/api/memories/store`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    user_id: roomId,
+                                    user_message: text,
+                                    yudi_response: fullResponseText,
+                                    emotion: vibe.emotion
+                                }),
+                                signal: AbortSignal.timeout(10000) // Timeout for embedding + Pinecone upsert
+                            });
+                            
+                            if (storeResponse.ok) {
+                                const storeData = await storeResponse.json();
+                                console.log(`[Soul Engine] ✅ Memory stored successfully: ${storeData.memory_id || 'N/A'}`);
+                            } else {
+                                const errorText = await storeResponse.text().catch(() => 'Unknown error');
+                                console.warn(`[Soul Engine] ⚠️  Memory store failed: ${storeResponse.status}, ${errorText}`);
                             }
-                        } catch (e) { console.warn("Memory store failed", e); }
+                        } catch (e) { 
+                            console.warn("[Soul Engine] Memory store failed:", e instanceof Error ? e.message : e); 
+                        }
 
                         // Update Profile
                         if (isFirebaseEnabled && userProfile) {

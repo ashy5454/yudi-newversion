@@ -29,6 +29,7 @@ async function getEmbeddings(text: string) {
 
 export async function POST(req: NextRequest) {
     if (!PINECONE_API_KEY) {
+        console.warn("[Memory Store] PINECONE_API_KEY not configured");
         return NextResponse.json({ success: false, error: "Pinecone API Key missing" }, { status: 503 });
     }
 
@@ -36,12 +37,22 @@ export async function POST(req: NextRequest) {
         const body = await req.json();
         const { user_id, user_message, yudi_response, emotion } = body;
 
+        if (!user_id || !user_message || !yudi_response) {
+            console.warn("[Memory Store] Missing required fields:", { user_id: !!user_id, user_message: !!user_message, yudi_response: !!yudi_response });
+            return NextResponse.json({ success: false, error: "user_id, user_message, and yudi_response are required" }, { status: 400 });
+        }
+
+        console.log(`[Memory Store] Storing memory for user_id: ${user_id}, message: "${user_message.substring(0, 50)}..."`);
+
         // Create embedding for the USER message (that's what we search by)
         const vector = await getEmbeddings(user_message);
 
         if (!vector) {
+            console.error("[Memory Store] Failed to generate embedding");
             return NextResponse.json({ success: false, error: "Failed to generate embedding" }, { status: 500 });
         }
+
+        console.log(`[Memory Store] Generated embedding vector of length: ${vector.length}`);
 
         const uniqueId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
@@ -68,15 +79,16 @@ export async function POST(req: NextRequest) {
         });
 
         if (!pineconeResponse.ok) {
-            const errorText = await pineconeResponse.text();
-            console.error("Pinecone Store Error:", errorText);
+            const errorText = await pineconeResponse.text().catch(() => 'Unknown error');
+            console.error(`[Memory Store] Pinecone upsert failed: ${pineconeResponse.status} - ${errorText}`);
             return NextResponse.json({ success: false, error: `Pinecone error: ${errorText}` }, { status: 500 });
         }
 
+        console.log(`[Memory Store] ✅ Successfully stored memory with id: ${uniqueId}`);
         return NextResponse.json({ success: true, memory_id: uniqueId });
 
     } catch (error) {
-        console.error("Memory store error:", error);
+        console.error("[Memory Store] Error storing memory:", error instanceof Error ? error.message : error);
         return NextResponse.json({ success: false, error: "Internal Error" }, { status: 500 });
     }
 }

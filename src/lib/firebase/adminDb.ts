@@ -457,14 +457,42 @@ export const MessageAdminDb = {
     return doc.exists ? doc.data() as Message : null;
   },
 
-  // Get by room ID - Modified to sort in-memory to avoid missing index issues
+  // Get by room ID - Check subcollection first, then fallback to old structure
   getByRoomId: async (roomId: string, limit: number = 50, lastDoc?: any): Promise<{ messages: Message[], lastDoc: any }> => {
-    // REMOVED .orderBy('createdAt', 'desc') to prevent "Missing Index" errors
+    // Try NEW structure first: rooms/{roomId}/messages (subcollection)
+    try {
+      const subcollectionRef = adminDb.collection('rooms').doc(roomId).collection('messages');
+      const subcollectionSnapshot = await subcollectionRef.get();
+      
+      if (!subcollectionSnapshot.empty) {
+        let messages = subcollectionSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }) as Message);
+
+        // Sort in-memory (Descending: Newest first)
+        messages.sort((a, b) => {
+          const timeA = a.createdAt instanceof Timestamp ? a.createdAt.toDate().getTime() : new Date(a.createdAt as any).getTime();
+          const timeB = b.createdAt instanceof Timestamp ? b.createdAt.toDate().getTime() : new Date(b.createdAt as any).getTime();
+          return timeB - timeA;
+        });
+
+        // Limit after sorting
+        if (limit > 0 && messages.length > limit) {
+          messages = messages.slice(0, limit);
+        }
+
+        const lastDocument = subcollectionSnapshot.docs[subcollectionSnapshot.docs.length - 1];
+        console.log(`[AdminDb] ✅ Found ${messages.length} messages in subcollection for room: ${roomId}`);
+        return { messages, lastDoc: lastDocument };
+      }
+    } catch (subcollectionError) {
+      console.warn(`[AdminDb] Subcollection query failed, trying old structure:`, subcollectionError);
+    }
+
+    // Fall back to OLD structure: messages collection with roomId field
     let query = adminDb.collection('messages')
       .where('roomId', '==', roomId);
-
-    // Note: Pagination (startAfter) might behave unexpectedly without the orderBy in the query
-    // But for the Chat AI context (fetching last 50), this is safer.
 
     const snapshot = await query.get();
     let messages = snapshot.docs.map(doc => doc.data() as Message);
@@ -476,13 +504,14 @@ export const MessageAdminDb = {
       return timeB - timeA;
     });
 
-    const lastDocument = snapshot.docs[snapshot.docs.length - 1]; // This logic is slightly flawed without query ordering but acceptable for AI context
+    const lastDocument = snapshot.docs[snapshot.docs.length - 1];
 
     // Limit after sorting
     if (limit > 0 && messages.length > limit) {
       messages = messages.slice(0, limit);
     }
 
+    console.log(`[AdminDb] Found ${messages.length} messages in old collection structure for room: ${roomId}`);
     return { messages, lastDoc: lastDocument };
   },
 

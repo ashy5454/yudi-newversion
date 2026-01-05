@@ -37,18 +37,30 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ room
     const roomId = (await params).roomId;
     const { searchParams } = new URL(req.url);
     const query = searchParams.get('query');
+    const topK = Math.min(parseInt(searchParams.get('top_k') || '5', 10), 20); // Max 20 for safety
 
     if (!PINECONE_API_KEY) {
+        console.warn("[Memory API] PINECONE_API_KEY not configured - returning empty memories");
         return NextResponse.json({ memories: [] }, { status: 200 });
     }
 
-    // Ideally we need the Pinecone Host. Since I don't see it in env, I will try to infer or use a placeholder
-    // User might need to check logs.
     const PINECONE_HOST = process.env.PINECONE_HOST || "https://yudi-memories-e3sadus.svc.aped-4627-b74a.pinecone.io";
 
+    if (!query || query.trim().length === 0) {
+        console.warn("[Memory API] Empty query provided - returning empty memories");
+        return NextResponse.json({ memories: [] }, { status: 200 });
+    }
+
     try {
-        const vector = await getEmbeddings(query || "");
-        if (!vector) return NextResponse.json({ memories: [] });
+        console.log(`[Memory API] Retrieving memories for roomId: ${roomId}, query: "${query.substring(0, 50)}..."`);
+        
+        const vector = await getEmbeddings(query);
+        if (!vector) {
+            console.warn("[Memory API] Failed to generate embedding - returning empty memories");
+            return NextResponse.json({ memories: [] }, { status: 200 });
+        }
+
+        console.log(`[Memory API] Generated embedding vector of length: ${vector.length}`);
 
         const pineconeResponse = await fetch(`${PINECONE_HOST}/query`, {
             method: 'POST',
@@ -58,24 +70,27 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ room
             },
             body: JSON.stringify({
                 vector,
-                topK: 5,
+                topK: topK,
                 includeMetadata: true,
                 filter: { user_id: { "$eq": roomId } }
             })
         });
 
         if (!pineconeResponse.ok) {
-            console.error("Pinecone Error:", await pineconeResponse.text());
-            return NextResponse.json({ memories: [] });
+            const errorText = await pineconeResponse.text().catch(() => 'Unknown error');
+            console.error(`[Memory API] Pinecone query failed: ${pineconeResponse.status} - ${errorText}`);
+            return NextResponse.json({ memories: [] }, { status: 200 }); // Return empty instead of error
         }
 
         const data = await pineconeResponse.json();
         const memories = data.matches?.map((m: any) => m.metadata) || [];
-
+        
+        console.log(`[Memory API] ✅ Retrieved ${memories.length} memories from Pinecone for roomId: ${roomId}`);
+        
         return NextResponse.json({ memories });
 
     } catch (error) {
-        console.error("Memory fetch error:", error);
-        return NextResponse.json({ memories: [] });
+        console.error("[Memory API] Error retrieving memories:", error instanceof Error ? error.message : error);
+        return NextResponse.json({ memories: [] }, { status: 200 }); // Return empty instead of error
     }
 }
