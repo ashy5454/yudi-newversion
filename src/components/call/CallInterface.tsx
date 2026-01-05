@@ -253,7 +253,13 @@ export default function CallInterface({ room, persona }: CallInterfaceProps) {
                 }
 
                 // Add concise voice-specific instructions (keep short to prevent timeouts)
-                specificParts.push(`\nResponse: Casual=1-3 sentences. Advice=story(2-4s) + detailed(5-8s). Deep talks=8-12s. Always respond. Connection stays open.`);
+                specificParts.push(`\nResponse: Casual=1-3 sentences. Advice=story(2-4s) + detailed(5-8s). Deep talks=8-12s. Always respond. Connection stays open.
+                
+ASKING ABOUT PAST SITUATIONS FROM TEXT CHAT (MAKE IT FUNNY):
+- Reference text chat incidents naturally and make it funny.
+- Use PAST TENSE for past events: "Hey remember that day in text when you went outside? What did you do?" (past tense)
+- Don't ask immediately after discussing - wait for natural break.
+- Make it sound like you're remembering something funny from your text chats.`);
 
                 // Combine them: Antigravity Base + Specific Persona Details
                 // CRITICAL: Truncate total instruction to prevent oversized config

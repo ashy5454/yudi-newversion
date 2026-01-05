@@ -379,9 +379,9 @@ export default function ChatInput({ roomId, personaId, onMessageSent, onSynthesi
             const isMultiLine = lines.length > 1;
             const isLongMessage = fullBuffer.length > 150; // Definition of "Intense/Advice"
 
-            // 🛑 SPAM MODE LOGIC: More lenient to actually trigger
-            // Check for multiple lines (2+ is enough, not 3+)
-            const hasMultipleLines = lines.length >= 2;
+            // 🛑 SPAM MODE LOGIC: Require 3+ complete thoughts (increased from 2+)
+            // Check for multiple lines (3+ required for spam mode)
+            const hasMultipleLines = lines.length >= 3;
             // Check if lines are complete thoughts (more lenient: 8+ chars OR ends with punctuation)
             const hasCompleteThoughts = lines.every(line =>
                 line.trim().length >= 8 || line.match(/[.?!]$/) // Complete thought: either 8+ chars or ends with punctuation
