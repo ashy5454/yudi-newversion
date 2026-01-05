@@ -213,11 +213,23 @@ Use this context to show continuity and understanding.\n`;
         let locationMentions: string[] = [];
         let nameMentions: string[] = [];
         let aiQuestions: string[] = [];
+        
+        // Detect story time requests (check current message first, then history)
+        const currentUserMessage = text.toLowerCase();
+        const storyTriggers = ['story time', 'tell me a story', 'katha cheppu', 'story cheppu', 'ek story sunao', 'story sunao', 'tell story'];
+        let storyTimeRequest = storyTriggers.some(trigger => currentUserMessage.includes(trigger));
 
         if (history?.messages && history.messages.length > 0) {
             // Extract key information from recent messages (last 20)
             const recentMessages = history.messages.slice(-20);
             const userMessages = recentMessages.filter((m: Message) => m.senderType === 'user').map((m: Message) => m.content.toLowerCase());
+
+            // Also check history for story time requests
+            if (!storyTimeRequest) {
+                storyTimeRequest = storyTriggers.some(trigger => 
+                    userMessages.some(m => m.includes(trigger))
+                );
+            }
 
             // Extract specific details user mentioned
             clubbingMention = userMessages.some(m => m.includes('club') || m.includes('clubbing') || m.includes('club ki') || m.includes('clubbing veltuna') || m.includes('clubbing place'));
@@ -260,6 +272,11 @@ Use this context to show continuity and understanding.\n`;
             }
             if (aiQuestions.length > 0) {
                 extractedContext += `\n\n⚠️ QUESTIONS YOU ALREADY ASKED IN THIS CONVERSATION (DO NOT REPEAT):\n${aiQuestions.slice(-5).map((q, i) => `${i + 1}. "${q.substring(0, 60)}..."`).join('\n')}`;
+            }
+
+            // Add story time trigger if detected
+            if (storyTimeRequest) {
+                extractedContext += `\n\n📖 STORY TIME REQUEST DETECTED: User wants a story! Give a relatable Indian/local story (3-5 sentences). Make it personal, funny, or meaningful. Reference Indian colleges, cities, food, festivals naturally.`;
             }
 
             memoryContext = `\n\n=== CRITICAL MEMORY CONTEXT ===

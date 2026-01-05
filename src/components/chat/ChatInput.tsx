@@ -379,23 +379,29 @@ export default function ChatInput({ roomId, personaId, onMessageSent, onSynthesi
             const isMultiLine = lines.length > 1;
             const isLongMessage = fullBuffer.length > 150; // Definition of "Intense/Advice"
 
-            // 🛑 FIX: Be more conservative with spam format
-            // Only use spam if we have 3+ COMPLETE lines (not just 2 fragments)
-            const hasMultipleCompleteThoughts = lines.length >= 3 && lines.every(line =>
-                line.length > 10 || line.match(/[.?!]$/) // Complete thought: either long enough or ends with punctuation
+            // 🛑 SPAM MODE LOGIC: More lenient to actually trigger
+            // Check for multiple lines (2+ is enough, not 3+)
+            const hasMultipleLines = lines.length >= 2;
+            // Check if lines are complete thoughts (more lenient: 8+ chars OR ends with punctuation)
+            const hasCompleteThoughts = lines.every(line =>
+                line.trim().length >= 8 || line.match(/[.?!]$/) // Complete thought: either 8+ chars or ends with punctuation
             );
+            const hasMultipleCompleteThoughts = hasMultipleLines && hasCompleteThoughts;
 
             // 2. RANDOMIZATION LOGIC (The "Vibe" Check)
-            let spamChance = 0.3; // Default: 30% chance to spam (PREFER PARAGRAPH for coherence)
+            // Increased spam chance to make it actually happen
+            let spamChance = 0.5; // Default: 50% chance to spam (increased from 30%)
 
             if (isLongMessage && hasMultipleCompleteThoughts) {
-                // Only if it's long advice/intense AND has 3+ complete thoughts, allow more spam
-                spamChance = 0.5;
+                // If it's long advice/intense AND has 2+ complete thoughts, allow even more spam
+                spamChance = 0.7; // 70% chance for long messages with multiple thoughts
             }
 
             // 3. THE DECISION (Roll the dice)
-            // We only spam if it HAS 3+ complete lines AND the dice roll hits
+            // Spam if we have 2+ complete lines AND the dice roll hits
             const useSpamFormat = hasMultipleCompleteThoughts && Math.random() < spamChance;
+            
+            console.log(`[Spam Check] Lines: ${lines.length}, Complete: ${hasCompleteThoughts}, Chance: ${(spamChance * 100).toFixed(0)}%, Will spam: ${useSpamFormat}`);
 
             // =========================================================
             // 🛑 OPTION A: SPAM MODE (Separate Bubbles)

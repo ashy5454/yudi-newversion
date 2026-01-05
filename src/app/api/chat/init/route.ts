@@ -14,26 +14,23 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        // Check if room has any messages (including the initial greeting)
-        let hasMessages = false;
-        let hasInitialGreeting = false;
+        // Check if room has any messages at all (FIRST CONVERSATION CHECK)
+        let hasAnyMessages = false;
         if (isFirebaseEnabled) {
             try {
-                const history = await MessageAdminDb.getByRoomId(roomId, 10);
-                hasMessages = history.messages.length > 0;
-                // Check if initial greeting already exists
-                hasInitialGreeting = history.messages.some(m => 
-                    m.senderType === "persona" && 
-                    (m.content === "heyyyy how you doingg" || m.content === "heyyyyyy how you doinggg")
-                );
+                const history = await MessageAdminDb.getByRoomId(roomId, 1); // Only need to check if ANY messages exist
+                hasAnyMessages = history.messages.length > 0;
+                console.log(`[Init] Room ${roomId} has ${history.messages.length} messages. First conversation: ${!hasAnyMessages}`);
             } catch (error) {
                 console.error("Error checking messages:", error);
                 // If we can't check, assume no messages and send initial message
             }
         }
 
-        // If room has no messages OR initial greeting doesn't exist, send initial greeting
-        if (!hasMessages || !hasInitialGreeting) {
+        // ONLY send greeting if this is the FIRST conversation (no messages at all)
+        // If there are previous messages (even after 4 hours), DO NOT send greeting
+        // The 4-hour check-in will handle re-engagement with "where were you" style messages
+        if (!hasAnyMessages) {
             const initialMessage: Omit<Message, 'id' | 'createdAt' | 'updatedAt'> = {
                 roomId,
                 personaId,

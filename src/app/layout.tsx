@@ -27,7 +27,7 @@ const spaceMono = Space_Mono({
 
 // 3. KEEP YOUR METADATA & VIEWPORT
 export const metadata: Metadata = {
-  title: "Yudi - Your Mental Health Companion",
+  title: "Yudi",
   description: "Yudi - Your Indian college companion for mental health support",
   icons: {
     icon: "/yudi.svg",
