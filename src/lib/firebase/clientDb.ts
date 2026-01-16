@@ -1,12 +1,12 @@
 import { db } from './firebase';
-import { 
-  User, 
-  Persona, 
-  Room, 
-  Message, 
-  Mood, 
-  Memory, 
-  AiModel 
+import {
+  User,
+  Persona,
+  Room,
+  Message,
+  Mood,
+  Memory,
+  AiModel
 } from './dbTypes';
 import {
   collection,
@@ -62,7 +62,7 @@ const logFirestoreError = (error: unknown, operation: string, context?: {
   if (error instanceof FirestoreError) {
     errorInfo.code = error.code;
     errorInfo.message = error.message;
-    
+
     // Don't log permission errors or not-found errors as they're expected in some cases
     if (error.code === 'permission-denied' || error.code === 'not-found') {
       return errorInfo;
@@ -91,11 +91,11 @@ const getDocWithSource = async <T>(docRef: any): Promise<{ data: T | null; fromC
     };
   } catch (error) {
     // Handle permission errors and not-found errors gracefully
-    if (error instanceof FirestoreError && 
-        (error.code === 'permission-denied' || error.code === 'not-found')) {
+    if (error instanceof FirestoreError &&
+      (error.code === 'permission-denied' || error.code === 'not-found')) {
       return { data: null, fromCache: false };
     }
-    
+
     logFirestoreError(error, 'getDocWithSource', {
       collection: docRef.parent.id,
       documentId: docRef.id
@@ -113,11 +113,11 @@ const getDocsWithSource = async <T>(query: any): Promise<{ data: T[]; fromCache:
     };
   } catch (error) {
     // Handle permission errors and not-found errors gracefully
-    if (error instanceof FirestoreError && 
-        (error.code === 'permission-denied' || error.code === 'not-found')) {
+    if (error instanceof FirestoreError &&
+      (error.code === 'permission-denied' || error.code === 'not-found')) {
       return { data: [], fromCache: false };
     }
-    
+
     logFirestoreError(error, 'getDocsWithSource', {
       collection: query._query.path.segments[0]
     });
@@ -128,22 +128,22 @@ const getDocsWithSource = async <T>(query: any): Promise<{ data: T[]; fromCache:
 // Helper function to serialize Firestore data for Client Components
 const serializeFirestoreData = (data: any): any => {
   if (data === null || data === undefined) return data;
-  
+
   // Handle Firestore Timestamp (has .toDate function)
   if (data.toDate && typeof data.toDate === 'function') {
     // Convert Firestore Timestamp to Date
     return data.toDate();
   }
-  
+
   // Handle Firestore Timestamp (has .seconds property) - fallback for edge cases
   if (data.seconds !== undefined && typeof data.seconds === 'number') {
     return new Date(data.seconds * 1000 + (data.nanoseconds || 0) / 1000000);
   }
-  
+
   if (Array.isArray(data)) {
     return data.map(item => serializeFirestoreData(item));
   }
-  
+
   if (typeof data === 'object' && data.constructor === Object) {
     const serialized: any = {};
     for (const key in data) {
@@ -153,7 +153,7 @@ const serializeFirestoreData = (data: any): any => {
     }
     return serialized;
   }
-  
+
   return data;
 };
 
@@ -175,17 +175,17 @@ const createListenerWithMetadata = <T>(
   return onSnapshot(query, { includeMetadataChanges: true }, (snapshot: QuerySnapshot) => {
     const data = snapshot.docs.map((doc: any) => doc.data() as T);
     const fromCache = snapshot.metadata.fromCache;
-    
+
     logDataSource(fromCache, operation);
     callback(data, fromCache);
   }, (error) => {
     // Handle permission errors and not-found errors gracefully
-    if (error instanceof FirestoreError && 
-        (error.code === 'permission-denied' || error.code === 'not-found')) {
+    if (error instanceof FirestoreError &&
+      (error.code === 'permission-denied' || error.code === 'not-found')) {
       console.warn(`Permission denied or not found for ${operation}, this may be expected`);
       return;
     }
-    
+
     logFirestoreError(error, operation);
   });
 };
@@ -202,7 +202,7 @@ export const UserClientDb = {
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       };
-      
+
       await setDoc(userRef, user);
       return uid;
     } catch (error) {
@@ -276,12 +276,12 @@ export const UserClientDb = {
         callback(doc.exists() ? doc.data() as User : null);
       }, (error) => {
         // Handle permission errors and not-found errors gracefully
-        if (error instanceof FirestoreError && 
-            (error.code === 'permission-denied' || error.code === 'not-found')) {
+        if (error instanceof FirestoreError &&
+          (error.code === 'permission-denied' || error.code === 'not-found')) {
           console.warn('Permission denied or not found for user change listener, this may be expected');
           return;
         }
-        
+
         logFirestoreError(error, 'UserClientDb.onUserChange', {
           collection: 'users',
           documentId: userId,
@@ -359,12 +359,12 @@ export const AiModelClientDb = {
         callback(models);
       }, (error) => {
         // Handle permission errors and not-found errors gracefully
-        if (error instanceof FirestoreError && 
-            (error.code === 'permission-denied' || error.code === 'not-found')) {
+        if (error instanceof FirestoreError &&
+          (error.code === 'permission-denied' || error.code === 'not-found')) {
           console.warn('Permission denied or not found for active models listener, this may be expected');
           return;
         }
-        
+
         logFirestoreError(error, 'AiModelClientDb.onActiveModelsChange', {
           collection: 'aiModels'
         });
@@ -390,7 +390,7 @@ export const PersonaClientDb = {
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       };
-      
+
       await setDoc(personaRef, persona);
       return personaRef.id;
     } catch (error) {
@@ -428,21 +428,21 @@ export const PersonaClientDb = {
         orderBy('createdAt', 'desc'),
         limit(limitCount)
       );
-      
+
       if (lastDoc) {
         q = query(q, startAfter(lastDoc));
       }
-      
+
       const snapshot = await getDocs(q);
       const personas = snapshot.docs.map(doc => ({
         id: doc.id,
         ...serializeFirestoreData(doc.data())
       })) as Persona[];
-      
+
       const lastDocument = snapshot.docs[snapshot.docs.length - 1] || null;
-      
+
       logDataSource(snapshot.metadata.fromCache, 'Persona getPublic');
-      
+
       return { personas, lastDoc: lastDocument };
     } catch (error) {
       logFirestoreError(error, 'PersonaClientDb.getPublic', {
@@ -462,21 +462,21 @@ export const PersonaClientDb = {
         orderBy('createdAt', 'desc'),
         limit(limitCount)
       );
-      
+
       if (lastDoc) {
         q = query(q, startAfter(lastDoc));
       }
-      
+
       const snapshot = await getDocs(q);
       const personas = snapshot.docs.map(doc => ({
         id: doc.id,
         ...serializeFirestoreData(doc.data())
       })) as Persona[];
-      
+
       const lastDocument = snapshot.docs[snapshot.docs.length - 1] || null;
-      
+
       logDataSource(snapshot.metadata.fromCache, 'Persona getAll');
-      
+
       return { personas, lastDoc: lastDocument };
     } catch (error) {
       logFirestoreError(error, 'PersonaClientDb.getAll', {
@@ -489,9 +489,19 @@ export const PersonaClientDb = {
   // Get by creator
   getByCreator: async (creatorId: string): Promise<Persona[]> => {
     try {
-      const q = query(collection(db, 'personas'), where('creator.id', '==', creatorId));
+      // Try creatorId field first (correct field name)
+      const q = query(collection(db, 'personas'), where('creatorId', '==', creatorId));
       const snapshot = await getDocs(q);
-      return snapshot.docs.map(doc => ({
+      if (snapshot.docs.length > 0) {
+        return snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...serializeFirestoreData(doc.data())
+        })) as Persona[];
+      }
+      // Fallback to creator.id if no results (for backward compatibility)
+      const q2 = query(collection(db, 'personas'), where('creator.id', '==', creatorId));
+      const snapshot2 = await getDocs(q2);
+      return snapshot2.docs.map(doc => ({
         id: doc.id,
         ...serializeFirestoreData(doc.data())
       })) as Persona[];
@@ -568,17 +578,17 @@ export const PersonaClientDb = {
         where('isActive', '==', true),
         limit(limitCount * 2) // Get more to filter
       );
-      
+
       const { data, fromCache } = await getDocsWithSource<Persona>(q);
       logDataSource(fromCache, 'Persona searchByText');
-      
-      const filtered = data.filter(persona => 
+
+      const filtered = data.filter(persona =>
         persona.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         persona.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         persona.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         persona.tags?.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
       );
-      
+
       return filtered.slice(0, limitCount);
     } catch (error) {
       logFirestoreError(error, 'PersonaClientDb.searchByText', {
@@ -598,44 +608,44 @@ export const PersonaClientDb = {
   }): Promise<Persona[]> => {
     try {
       const { searchTerm, category, tags, creatorId, limitCount = 20 } = criteria;
-      
+
       let q = query(
         collection(db, 'personas'),
         where('isActive', '==', true)
       );
-      
+
       if (category) {
         q = query(q, where('category', '==', category));
       }
-      
+
       if (creatorId) {
         q = query(q, where('creator.id', '==', creatorId));
       } else {
         q = query(q, where('isPublic', '==', true));
       }
-      
+
       q = query(q, orderBy('createdAt', 'desc'), limit(limitCount * 2));
-      
+
       const { data, fromCache } = await getDocsWithSource<Persona>(q);
       logDataSource(fromCache, 'Persona searchByCriteria');
-      
+
       let filtered = data;
-      
+
       if (searchTerm) {
-        filtered = filtered.filter(persona => 
+        filtered = filtered.filter(persona =>
           persona.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           persona.description?.toLowerCase().includes(searchTerm.toLowerCase())
         );
       }
-      
+
       if (tags && tags.length > 0) {
-        filtered = filtered.filter(persona => 
-          persona.tags?.some(tag => 
+        filtered = filtered.filter(persona =>
+          persona.tags?.some(tag =>
             tags.some(searchTag => tag.toLowerCase().includes(searchTag.toLowerCase()))
           )
         );
       }
-      
+
       return filtered.slice(0, limitCount);
     } catch (error) {
       logFirestoreError(error, 'PersonaClientDb.searchByCriteria', {
@@ -657,12 +667,12 @@ export const PersonaClientDb = {
         callback(personas);
       }, (error) => {
         // Handle permission errors and not-found errors gracefully
-        if (error instanceof FirestoreError && 
-            (error.code === 'permission-denied' || error.code === 'not-found')) {
+        if (error instanceof FirestoreError &&
+          (error.code === 'permission-denied' || error.code === 'not-found')) {
           console.warn('Permission denied or not found for user personas listener, this may be expected');
           return;
         }
-        
+
         logFirestoreError(error, 'PersonaClientDb.onUserPersonasChange', {
           collection: 'personas',
           userId: creatorId
@@ -695,12 +705,12 @@ export const PersonaClientDb = {
         callback(personas);
       }, (error) => {
         // Handle permission errors and not-found errors gracefully
-        if (error instanceof FirestoreError && 
-            (error.code === 'permission-denied' || error.code === 'not-found')) {
+        if (error instanceof FirestoreError &&
+          (error.code === 'permission-denied' || error.code === 'not-found')) {
           console.warn('Permission denied or not found for public personas listener, this may be expected');
           return;
         }
-        
+
         logFirestoreError(error, 'PersonaClientDb.onPublicPersonasChange', {
           collection: 'personas'
         });
@@ -762,7 +772,7 @@ export const RoomClientDb = {
         // orderBy('lastMessageAt', 'desc'),
         limit(limitCount)
       );
-      
+
       const { data, fromCache } = await getDocsWithSource<Room>(q);
       logDataSource(fromCache, 'Room getByUserId');
       return data;
@@ -784,7 +794,7 @@ export const RoomClientDb = {
         where('isArchived', '==', true),
         orderBy('lastMessageAt', 'desc')
       );
-      
+
       const snapshot = await getDocs(q);
       return snapshot.docs.map(doc => doc.data() as Room);
     } catch (error) {
@@ -890,18 +900,18 @@ export const RoomClientDb = {
         orderBy('lastMessageAt', 'desc'),
         limit(50)
       );
-      
+
       return onSnapshot(q, (snapshot) => {
         const rooms = snapshot.docs.map(doc => doc.data() as Room);
         callback(rooms);
       }, (error) => {
         // Handle permission errors and not-found errors gracefully
-        if (error instanceof FirestoreError && 
-            (error.code === 'permission-denied' || error.code === 'not-found')) {
+        if (error instanceof FirestoreError &&
+          (error.code === 'permission-denied' || error.code === 'not-found')) {
           console.warn('Permission denied or not found for user rooms listener, this may be expected');
           return;
         }
-        
+
         logFirestoreError(error, 'RoomClientDb.onUserRoomsChange', {
           collection: 'rooms',
           userId: userId
@@ -924,12 +934,12 @@ export const RoomClientDb = {
         callback(doc.exists() ? doc.data() as Room : null);
       }, (error) => {
         // Handle permission errors and not-found errors gracefully
-        if (error instanceof FirestoreError && 
-            (error.code === 'permission-denied' || error.code === 'not-found')) {
+        if (error instanceof FirestoreError &&
+          (error.code === 'permission-denied' || error.code === 'not-found')) {
           console.warn('Permission denied or not found for room change listener, this may be expected');
           return;
         }
-        
+
         logFirestoreError(error, 'RoomClientDb.onRoomChange', {
           collection: 'rooms',
           documentId: roomId
@@ -975,11 +985,11 @@ export const MessageClientDb = {
           orderBy('createdAt', 'desc'),
           limit(limitCount)
         );
-        
+
         if (lastDoc) {
           q = query(q, startAfter(lastDoc));
         }
-        
+
         const snapshot = await getDocs(q);
         if (snapshot.docs.length > 0) {
           const messages = snapshot.docs.map(doc => ({
@@ -1001,18 +1011,18 @@ export const MessageClientDb = {
         orderBy('createdAt', 'desc'),
         limit(limitCount)
       );
-      
+
       if (lastDoc) {
         q = query(q, startAfter(lastDoc));
       }
-      
+
       const snapshot = await getDocs(q);
       const messages = snapshot.docs.map(doc => ({
         id: doc.id,
         ...serializeFirestoreData(doc.data())
       }) as Message);
       const lastDocument = snapshot.docs[snapshot.docs.length - 1] || null;
-      
+
       return { messages, lastDoc: lastDocument };
     } catch (error) {
       logFirestoreError(error, 'MessageClientDb.getByRoomId', {
@@ -1063,19 +1073,19 @@ export const MessageClientDb = {
     }
 
     try {
-      const timestamp = customTimestamp 
+      const timestamp = customTimestamp
         ? (customTimestamp instanceof Date ? customTimestamp : new Date(customTimestamp))
         : new Date();
-      
+
       // 2. THE CORRECT PATH: rooms -> [ROOM_ID] -> messages
       const messagesRef = collection(db, "rooms", messageData.roomId, "messages");
       const messageRef = doc(messagesRef);
-      
+
       // Convert Date to Firestore Timestamp explicitly to ensure proper storage and retrieval
       // Firestore will convert JavaScript Date objects automatically, but using Timestamp explicitly
       // ensures consistent behavior and proper serialization back to Date objects
       const firestoreTimestamp = Timestamp.fromDate(timestamp instanceof Date ? timestamp : new Date(timestamp));
-      
+
       // Use 'any' type here because Firestore expects Timestamp, but our Message interface uses Date
       // serializeFirestoreData will convert Timestamp back to Date when reading
       const message: any = {
@@ -1084,7 +1094,7 @@ export const MessageClientDb = {
         createdAt: firestoreTimestamp,
         updatedAt: firestoreTimestamp
       };
-      
+
       await setDoc(messageRef, message);
       console.log(`✅ Saved to Room [${messageData.roomId}]: ${messageData.content.substring(0, 50)}...`);
       return messageRef.id;
@@ -1150,12 +1160,13 @@ export const MessageClientDb = {
       // 1. Listen to NEW structure: rooms/{roomId}/messages (subcollection)
       // 🛑 CRITICAL FIX: Use 'desc' order to get MOST RECENT messages, not oldest
       // This ensures new messages (including check-ins) are always included
+      // ⚡ PERFORMANCE: Reduced limit from 1000 to 100 for faster loading
       const newQ = query(
         collection(db, 'rooms', roomId, 'messages'),
         orderBy('createdAt', 'desc'),
         limit(100)
       );
-      
+
       const unsubscribeNew = onSnapshot(newQ, (snapshot) => {
         // Messages come in DESC order (newest first), so reverse to get chronological order
         newMessages = snapshot.docs.map(doc => ({
@@ -1177,13 +1188,14 @@ export const MessageClientDb = {
 
       // 2. Listen to OLD structure: messages collection with roomId field (for backward compatibility)
       // Use 'desc' order to get most recent messages
+      // ⚡ PERFORMANCE: Reduced limit from 1000 to 100 for faster loading
       const oldQ = query(
         collection(db, 'messages'),
         where('roomId', '==', roomId),
         orderBy('createdAt', 'desc'),
         limit(100)
       );
-      
+
       const unsubscribeOld = onSnapshot(oldQ, (snapshot) => {
         // Messages come in DESC order (newest first), so reverse to get chronological order
         oldMessages = snapshot.docs.map(doc => ({
@@ -1194,8 +1206,8 @@ export const MessageClientDb = {
         mergeAndCallback();
       }, (error) => {
         // Handle permission errors gracefully
-        if (error instanceof FirestoreError && 
-            (error.code === 'permission-denied' || error.code === 'not-found')) {
+        if (error instanceof FirestoreError &&
+          (error.code === 'permission-denied' || error.code === 'not-found')) {
           console.warn('Permission denied or not found for old messages collection, this may be expected');
           return;
         }
@@ -1228,7 +1240,7 @@ export const MessageClientDb = {
         orderBy('createdAt', 'desc'),
         limit(1)
       );
-      
+
       return onSnapshot(q, (snapshot) => {
         snapshot.docChanges().forEach((change) => {
           if (change.type === 'added') {
@@ -1241,12 +1253,12 @@ export const MessageClientDb = {
         });
       }, (error) => {
         // Handle permission errors and not-found errors gracefully
-        if (error instanceof FirestoreError && 
-            (error.code === 'permission-denied' || error.code === 'not-found')) {
+        if (error instanceof FirestoreError &&
+          (error.code === 'permission-denied' || error.code === 'not-found')) {
           console.warn('Permission denied or not found for new messages listener, this may be expected');
           return;
         }
-        
+
         logFirestoreError(error, 'MessageClientDb.onNewMessagesInRoom', {
           collection: 'messages'
         });
@@ -1272,7 +1284,7 @@ export const MoodClientDb = {
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       };
-      
+
       await setDoc(moodRef, mood);
       return moodRef.id;
     } catch (error) {
@@ -1308,7 +1320,7 @@ export const MoodClientDb = {
         orderBy('createdAt', 'desc'),
         limit(limitCount)
       );
-      
+
       const snapshot = await getDocs(q);
       return snapshot.docs.map(doc => doc.data() as Mood);
     } catch (error) {
@@ -1325,14 +1337,14 @@ export const MoodClientDb = {
     try {
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - days);
-      
+
       const q = query(
         collection(db, 'moods'),
         where('userId', '==', userId),
         where('createdAt', '>=', Timestamp.fromDate(startDate)),
         orderBy('createdAt', 'desc')
       );
-      
+
       const snapshot = await getDocs(q);
       return snapshot.docs.map(doc => doc.data() as Mood);
     } catch (error) {
@@ -1384,18 +1396,18 @@ export const MoodClientDb = {
         orderBy('createdAt', 'desc'),
         limit(50)
       );
-      
+
       return onSnapshot(q, (snapshot) => {
         const moods = snapshot.docs.map(doc => doc.data() as Mood);
         callback(moods);
       }, (error) => {
         // Handle permission errors and not-found errors gracefully
-        if (error instanceof FirestoreError && 
-            (error.code === 'permission-denied' || error.code === 'not-found')) {
+        if (error instanceof FirestoreError &&
+          (error.code === 'permission-denied' || error.code === 'not-found')) {
           console.warn('Permission denied or not found for user moods listener, this may be expected');
           return;
         }
-        
+
         logFirestoreError(error, 'MoodClientDb.onUserMoodsChange', {
           collection: 'moods',
           userId: userId
@@ -1414,7 +1426,7 @@ export const MoodClientDb = {
   getMoodStats: async (userId: string, days: number = 30): Promise<any> => {
     try {
       const moods = await MoodClientDb.getRecentByUserId(userId, days);
-      
+
       const stats = {
         totalMoods: moods.length,
         averageIntensity: moods.reduce((sum, mood) => sum + (mood.intensity || 0), 0) / moods.length || 0,
@@ -1428,7 +1440,7 @@ export const MoodClientDb = {
           intensity: mood.intensity || 0
         }))
       };
-      
+
       return stats;
     } catch (error) {
       logFirestoreError(error, 'MoodClientDb.getMoodStats', {
@@ -1457,7 +1469,7 @@ export const MemoryClientDb = {
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       };
-      
+
       await setDoc(memoryRef, memory);
       return memoryRef.id;
     } catch (error) {
@@ -1492,7 +1504,7 @@ export const MemoryClientDb = {
         where('userId', '==', userId),
         orderBy('createdAt', 'desc')
       );
-      
+
       const snapshot = await getDocs(q);
       return snapshot.docs.map(doc => doc.data() as Memory);
     } catch (error) {
@@ -1513,7 +1525,7 @@ export const MemoryClientDb = {
         where('key', '==', key),
         limit(1)
       );
-      
+
       const snapshot = await getDocs(q);
       return snapshot.empty ? null : snapshot.docs[0].data() as Memory;
     } catch (error) {
@@ -1564,18 +1576,18 @@ export const MemoryClientDb = {
         where('userId', '==', userId),
         orderBy('createdAt', 'desc')
       );
-      
+
       return onSnapshot(q, (snapshot) => {
         const memories = snapshot.docs.map(doc => doc.data() as Memory);
         callback(memories);
       }, (error) => {
         // Handle permission errors and not-found errors gracefully
-        if (error instanceof FirestoreError && 
-            (error.code === 'permission-denied' || error.code === 'not-found')) {
+        if (error instanceof FirestoreError &&
+          (error.code === 'permission-denied' || error.code === 'not-found')) {
           console.warn('Permission denied or not found for user memories listener, this may be expected');
           return;
         }
-        
+
         logFirestoreError(error, 'MemoryClientDb.onUserMemoriesChange', {
           collection: 'memories',
           userId: userId
@@ -1627,7 +1639,7 @@ export const ClientUtils = {
     try {
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - days);
-      
+
       const [rooms, messages, moods] = await Promise.all([
         RoomClientDb.getByUserId(userId),
         // Note: This would need to be optimized for large datasets
@@ -1638,14 +1650,14 @@ export const ClientUtils = {
         )),
         MoodClientDb.getRecentByUserId(userId, days)
       ]);
-      
+
       return {
         totalRooms: rooms.length,
         totalMessages: messages.size,
         totalMoods: moods.length,
         averageMoodIntensity: moods.reduce((sum, mood) => sum + (mood.intensity || 0), 0) / moods.length || 0,
-        mostActiveRoom: rooms.reduce((max, room) => 
-          (room.messageCount || 0) > (max.messageCount || 0) ? room : max, 
+        mostActiveRoom: rooms.reduce((max, room) =>
+          (room.messageCount || 0) > (max.messageCount || 0) ? room : max,
           rooms[0] || null
         )
       };
@@ -1672,14 +1684,14 @@ export const AdvancedClientDb = {
     getConversationSummary: async (roomId: string, messageCount: number = 100): Promise<any> => {
       try {
         const { messages } = await MessageClientDb.getByRoomId(roomId, messageCount);
-        
+
         if (messages.length === 0) {
           return null;
         }
-        
+
         const userMessages = messages.filter(msg => msg.senderType === 'user');
         const personaMessages = messages.filter(msg => msg.senderType === 'persona');
-        
+
         return {
           totalMessages: messages.length,
           userMessages: userMessages.length,
@@ -1715,16 +1727,16 @@ export const AdvancedClientDb = {
     // Smart message suggestions
     getMessageSuggestions: async (roomId: string, currentMessage: string): Promise<string[]> => {
       const { messages } = await MessageClientDb.getByRoomId(roomId, 50);
-      
+
       // Simple implementation - in production, you'd use AI/ML
       const suggestions = [];
-      
+
       // Find similar past messages
-      const similarMessages = messages.filter(msg => 
-        msg.senderType === 'user' && 
+      const similarMessages = messages.filter(msg =>
+        msg.senderType === 'user' &&
         msg.content.toLowerCase().includes(currentMessage.toLowerCase())
       );
-      
+
       // Extract common follow-up patterns
       for (const msg of similarMessages) {
         const msgIndex = messages.findIndex(m => m.id === msg.id);
@@ -1732,7 +1744,7 @@ export const AdvancedClientDb = {
           suggestions.push(messages[msgIndex - 1].content);
         }
       }
-      
+
       return [...new Set(suggestions)].slice(0, 3);
     },
 
@@ -1740,17 +1752,17 @@ export const AdvancedClientDb = {
     exportConversation: async (roomId: string, format: 'json' | 'text' = 'json'): Promise<any> => {
       const room = await RoomClientDb.getById(roomId);
       const { messages } = await MessageClientDb.getByRoomId(roomId, 1000);
-      
+
       if (format === 'text') {
         return {
           title: room?.title || 'Conversation',
-          content: messages.reverse().map(msg => 
+          content: messages.reverse().map(msg =>
             `${msg.senderType === 'user' ? 'You' : 'AI'}: ${msg.content}`
           ).join('\n'),
           exportedAt: new Date().toISOString()
         };
       }
-      
+
       return {
         room,
         messages: messages.reverse(),
@@ -1769,27 +1781,27 @@ export const AdvancedClientDb = {
           MoodClientDb.getByUserId(userId, 50),
           PersonaClientDb.getPublic(100)
         ]);
-        
+
         // Get user's preferred categories
         const usedPersonaIds = userRooms.map(room => room.personaId);
         const usedPersonas = await Promise.all(
           usedPersonaIds.map(id => PersonaClientDb.getById(id))
         );
-        
+
         const preferredCategories = usedPersonas
           .filter(p => p !== null)
           .map(p => p!.category)
           .filter((category): category is string => category !== undefined);
-        
+
         // Get recent mood patterns
         const recentMoodTypes = userMoods.slice(0, 10).map(mood => mood.moodType);
-        
+
         // Score personas based on user preferences
         const scoredPersonas = allPersonas.personas.map(persona => ({
           persona,
           score: calculatePersonaScore(persona, preferredCategories, recentMoodTypes, usedPersonaIds)
         }));
-        
+
         return scoredPersonas
           .sort((a, b) => b.score - a.score)
           .slice(0, limit)
@@ -1808,11 +1820,11 @@ export const AdvancedClientDb = {
         PersonaClientDb.getById(personaId),
         PersonaClientDb.getPublic(100)
       ]);
-      
+
       if (!targetPersona) {
         return [];
       }
-      
+
       const similarPersonas = allPersonas.personas
         .filter(p => p.id !== personaId)
         .map(persona => ({
@@ -1822,14 +1834,14 @@ export const AdvancedClientDb = {
         .sort((a, b) => b.similarity - a.similarity)
         .slice(0, limit)
         .map(item => item.persona);
-      
+
       return similarPersonas;
     },
 
     // Get trending personas
     getTrendingPersonas: async (limit: number = 10): Promise<Persona[]> => {
       const { personas } = await PersonaClientDb.getPublic(100);
-      
+
       return personas
         .sort((a, b) => (b.usageCount || 0) - (a.usageCount || 0))
         .slice(0, limit);
@@ -1842,23 +1854,23 @@ export const AdvancedClientDb = {
     getMoodInsights: async (userId: string, days: number = 30): Promise<any> => {
       try {
         const moods = await MoodClientDb.getRecentByUserId(userId, days);
-        
+
         if (moods.length === 0) {
           return null;
         }
-        
+
         const moodCounts = moods.reduce((acc, mood) => {
           acc[mood.moodType] = (acc[mood.moodType] || 0) + 1;
           return acc;
         }, {} as Record<string, number>);
-        
+
         const moodTrend = analyzeMoodTrend(moods);
         const moodPatterns = findMoodPatterns(moods);
-        
+
         return {
           totalMoods: moods.length,
           moodDistribution: moodCounts,
-          dominantMood: Object.entries(moodCounts).reduce((max, [mood, count]) => 
+          dominantMood: Object.entries(moodCounts).reduce((max, [mood, count]) =>
             count > moodCounts[max[0]] ? [mood, count] : max
           )[0],
           averageIntensity: moods.reduce((sum, mood) => sum + (mood.intensity || 0), 0) / moods.length,
@@ -1877,24 +1889,24 @@ export const AdvancedClientDb = {
     // Predict mood
     predictMood: async (userId: string): Promise<any> => {
       const recentMoods = await MoodClientDb.getRecentByUserId(userId, 7);
-      
+
       if (recentMoods.length < 3) {
         return null;
       }
-      
+
       // Simple mood prediction based on recent patterns
       const recentTrend = recentMoods.slice(0, 3);
       const averageIntensity = recentTrend.reduce((sum, mood) => sum + (mood.intensity || 0), 0) / recentTrend.length;
-      
+
       const moodFrequency = recentMoods.reduce((acc, mood) => {
         acc[mood.moodType] = (acc[mood.moodType] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
-      
-      const likelyMood = Object.entries(moodFrequency).reduce((max, [mood, count]) => 
+
+      const likelyMood = Object.entries(moodFrequency).reduce((max, [mood, count]) =>
         count > moodFrequency[max[0]] ? [mood, count] : max
       )[0];
-      
+
       return {
         predictedMood: likelyMood,
         confidence: (moodFrequency[likelyMood] / recentMoods.length) * 100,
@@ -1911,13 +1923,13 @@ export const AdvancedClientDb = {
     getRelevantMemories: async (userId: string, context: string, limit: number = 5): Promise<Memory[]> => {
       try {
         const allMemories = await MemoryClientDb.getByUserId(userId);
-        
+
         // Simple relevance scoring based on keyword matching
         const scoredMemories = allMemories.map(memory => ({
           memory,
           relevance: calculateMemoryRelevance(memory, context)
         }));
-        
+
         return scoredMemories
           .sort((a, b) => b.relevance - a.relevance)
           .slice(0, limit)
@@ -1933,7 +1945,7 @@ export const AdvancedClientDb = {
     // Auto-categorize memories
     categorizeMemories: async (userId: string): Promise<{ [category: string]: Memory[] }> => {
       const memories = await MemoryClientDb.getByUserId(userId);
-      
+
       const categories = {
         personal: [] as Memory[],
         preferences: [] as Memory[],
@@ -1942,7 +1954,7 @@ export const AdvancedClientDb = {
         goals: [] as Memory[],
         other: [] as Memory[]
       };
-      
+
       memories.forEach(memory => {
         const category = categorizeMemory(memory);
         if (category in categories) {
@@ -1951,7 +1963,7 @@ export const AdvancedClientDb = {
           categories.other.push(memory);
         }
       });
-      
+
       return categories;
     },
 
@@ -1959,7 +1971,7 @@ export const AdvancedClientDb = {
     getMemoryInsights: async (userId: string): Promise<any> => {
       const memories = await MemoryClientDb.getByUserId(userId);
       const categorizedMemories = await AdvancedClientDb.memoryManager.categorizeMemories(userId);
-      
+
       return {
         totalMemories: memories.length,
         categories: Object.entries(categorizedMemories).map(([category, mems]) => ({
@@ -1984,17 +1996,17 @@ export const AdvancedClientDb = {
         MoodClientDb.getRecentByUserId(userId, 7),
         PersonaClientDb.getByCreator(userId)
       ]);
-      
+
       const notifications = [];
-      
+
       // Check for inactive rooms
       const inactiveRooms = rooms.filter(room => {
         const lastActivity = room.lastMessageAt;
-        const daysSinceActivity = lastActivity ? 
+        const daysSinceActivity = lastActivity ?
           (Date.now() - lastActivity.getTime()) / (1000 * 60 * 60 * 24) : 999;
         return daysSinceActivity > 7;
       });
-      
+
       if (inactiveRooms.length > 0) {
         notifications.push({
           type: 'inactive_rooms',
@@ -2004,14 +2016,14 @@ export const AdvancedClientDb = {
           actionable: true
         });
       }
-      
+
       // Check mood patterns
       if (moods.length > 0) {
         const recentMoods = moods.slice(0, 3);
-        const negativeCount = recentMoods.filter(mood => 
+        const negativeCount = recentMoods.filter(mood =>
           ['sad', 'angry', 'anxious', 'depressed'].includes(mood.moodType)
         ).length;
-        
+
         if (negativeCount >= 2) {
           notifications.push({
             type: 'mood_alert',
@@ -2022,12 +2034,12 @@ export const AdvancedClientDb = {
           });
         }
       }
-      
+
       // Check persona performance
-      const underperformingPersonas = personas.filter(persona => 
+      const underperformingPersonas = personas.filter(persona =>
         persona.usageCount < 5 && persona.isPublic
       );
-      
+
       if (underperformingPersonas.length > 0) {
         notifications.push({
           type: 'persona_performance',
@@ -2037,7 +2049,7 @@ export const AdvancedClientDb = {
           actionable: true
         });
       }
-      
+
       return notifications;
     }
   },
@@ -2066,13 +2078,13 @@ export const AdvancedClientDb = {
       get: (key: string): any => {
         const cached = AdvancedClientDb.performanceUtils.cacheManager.cache.get(key);
         if (!cached) return null;
-        
+
         const now = Date.now();
         if (now - cached.timestamp > cached.ttl) {
           AdvancedClientDb.performanceUtils.cacheManager.cache.delete(key);
           return null;
         }
-        
+
         return cached.data;
       },
 
@@ -2083,52 +2095,52 @@ export const AdvancedClientDb = {
 
     // Optimized data fetching
     optimizedFetch: {
-          // Get user dashboard data efficiently
-    getUserDashboard: async (userId: string): Promise<any> => {
-      try {
-        const cacheKey = AdvancedClientDb.performanceUtils.cacheManager.getCacheKey('dashboard', userId);
-        const cached = AdvancedClientDb.performanceUtils.cacheManager.get(cacheKey);
-        
-        if (cached) {
-          return cached;
+      // Get user dashboard data efficiently
+      getUserDashboard: async (userId: string): Promise<any> => {
+        try {
+          const cacheKey = AdvancedClientDb.performanceUtils.cacheManager.getCacheKey('dashboard', userId);
+          const cached = AdvancedClientDb.performanceUtils.cacheManager.get(cacheKey);
+
+          if (cached) {
+            return cached;
+          }
+
+          const [user, rooms, recentMoods, activity] = await Promise.all([
+            UserClientDb.getById(userId),
+            RoomClientDb.getByUserId(userId, 10),
+            MoodClientDb.getRecentByUserId(userId, 7),
+            ClientUtils.getActivitySummary(userId, 7)
+          ]);
+
+          const dashboardData = {
+            user,
+            rooms,
+            recentMoods,
+            activity,
+            timestamp: new Date().toISOString()
+          };
+
+          AdvancedClientDb.performanceUtils.cacheManager.set(cacheKey, dashboardData, 300000); // 5 minutes
+          return dashboardData;
+        } catch (error) {
+          logFirestoreError(error, 'AdvancedClientDb.performanceUtils.optimizedFetch.getUserDashboard', {
+            userId: userId
+          });
+          return {
+            user: null,
+            rooms: [],
+            recentMoods: [],
+            activity: {
+              totalRooms: 0,
+              totalMessages: 0,
+              totalMoods: 0,
+              averageMoodIntensity: 0,
+              mostActiveRoom: null
+            },
+            timestamp: new Date().toISOString()
+          };
         }
-        
-        const [user, rooms, recentMoods, activity] = await Promise.all([
-          UserClientDb.getById(userId),
-          RoomClientDb.getByUserId(userId, 10),
-          MoodClientDb.getRecentByUserId(userId, 7),
-          ClientUtils.getActivitySummary(userId, 7)
-        ]);
-        
-        const dashboardData = {
-          user,
-          rooms,
-          recentMoods,
-          activity,
-          timestamp: new Date().toISOString()
-        };
-        
-        AdvancedClientDb.performanceUtils.cacheManager.set(cacheKey, dashboardData, 300000); // 5 minutes
-        return dashboardData;
-      } catch (error) {
-        logFirestoreError(error, 'AdvancedClientDb.performanceUtils.optimizedFetch.getUserDashboard', {
-          userId: userId
-        });
-        return {
-          user: null,
-          rooms: [],
-          recentMoods: [],
-          activity: {
-            totalRooms: 0,
-            totalMessages: 0,
-            totalMoods: 0,
-            averageMoodIntensity: 0,
-            mostActiveRoom: null
-          },
-          timestamp: new Date().toISOString()
-        };
       }
-    }
     }
   }
 };
@@ -2136,27 +2148,27 @@ export const AdvancedClientDb = {
 // Helper functions for advanced client operations
 const calculateAverageResponseTime = (messages: Message[]): number => {
   if (messages.length < 2) return 0;
-  
+
   const responseTimes = [];
   for (let i = 0; i < messages.length - 1; i++) {
     const current = messages[i];
     const next = messages[i + 1];
-    
+
     if (current.senderType !== next.senderType) {
       const timeDiff = current.createdAt.getTime() - next.createdAt.getTime();
       responseTimes.push(timeDiff);
     }
   }
-  
+
   return responseTimes.reduce((sum, time) => sum + time, 0) / responseTimes.length;
 };
 
 const calculateConversationLength = (messages: Message[]): number => {
   if (messages.length < 2) return 0;
-  
+
   const start = messages[messages.length - 1].createdAt.getTime();
   const end = messages[0].createdAt.getTime();
-  
+
   return end - start; // in milliseconds
 };
 
@@ -2168,9 +2180,9 @@ const extractTopEmotions = (messages: Message[]): string[] => {
     angry: ['angry', 'mad', 'frustrated', 'annoyed', 'furious'],
     anxious: ['anxious', 'worried', 'nervous', 'stressed', 'concerned']
   };
-  
+
   const emotionCounts = {} as Record<string, number>;
-  
+
   messages.forEach(msg => {
     const content = msg.content.toLowerCase();
     Object.entries(emotionKeywords).forEach(([emotion, keywords]) => {
@@ -2181,7 +2193,7 @@ const extractTopEmotions = (messages: Message[]): string[] => {
       });
     });
   });
-  
+
   return Object.entries(emotionCounts)
     .sort(([, a], [, b]) => b - a)
     .slice(0, 3)
@@ -2192,16 +2204,16 @@ const extractKeyTopics = (messages: Message[]): string[] => {
   // Simple topic extraction - in production, use NLP
   const allText = messages.map(msg => msg.content).join(' ').toLowerCase();
   const words = allText.split(/\s+/);
-  
+
   const stopWords = new Set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'i', 'you', 'he', 'she', 'it', 'we', 'they', 'me', 'him', 'her', 'us', 'them', 'my', 'your', 'his', 'her', 'its', 'our', 'their']);
-  
+
   const wordCounts = words
     .filter(word => word.length > 3 && !stopWords.has(word))
     .reduce((acc, word) => {
       acc[word] = (acc[word] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
-  
+
   return Object.entries(wordCounts)
     .sort(([, a], [, b]) => b - a)
     .slice(0, 5)
@@ -2210,27 +2222,27 @@ const extractKeyTopics = (messages: Message[]): string[] => {
 
 const calculatePersonaScore = (persona: Persona, preferredCategories: string[], recentMoods: string[], usedPersonaIds: string[]): number => {
   let score = 0;
-  
+
   // Category preference
   if (preferredCategories.includes(persona.category || '')) {
     score += 50;
   }
-  
+
   // Mood compatibility
   const moodCompatibility = getMoodCompatibility(persona.category || '', recentMoods);
   score += moodCompatibility * 30;
-  
+
   // Popularity
   score += Math.min(persona.usageCount || 0, 100) * 0.1;
-  
+
   // Rating
   score += (persona.rating || 0) * 10;
-  
+
   // Novelty (not used before)
   if (!usedPersonaIds.includes(persona.id)) {
     score += 20;
   }
-  
+
   return score;
 };
 
@@ -2241,46 +2253,46 @@ const getMoodCompatibility = (personaCategory: string, recentMoods: string[]): n
     'tutor': ['curious', 'motivated', 'confused'],
     'coach': ['motivated', 'goal-oriented', 'ambitious']
   };
-  
+
   const compatibleMoods = moodCategoryMap[personaCategory.toLowerCase() as keyof typeof moodCategoryMap] || [];
   const matches = recentMoods.filter(mood => compatibleMoods.includes(mood)).length;
-  
+
   return matches / recentMoods.length;
 };
 
 const calculatePersonaSimilarity = (persona1: Persona, persona2: Persona): number => {
   let similarity = 0;
-  
+
   // Category similarity
   if (persona1.category === persona2.category) {
     similarity += 40;
   }
-  
+
   // Language similarity
   if (persona1.language === persona2.language) {
     similarity += 20;
   }
-  
+
   // Tag similarity
   const tags1 = persona1.tags || [];
   const tags2 = persona2.tags || [];
   const commonTags = tags1.filter(tag => tags2.includes(tag));
   similarity += (commonTags.length / Math.max(tags1.length, tags2.length)) * 40;
-  
+
   return similarity;
 };
 
 const analyzeMoodTrend = (moods: Mood[]): string => {
   if (moods.length < 3) return 'insufficient_data';
-  
+
   const recentMoods = moods.slice(0, 3);
   const averageIntensity = recentMoods.reduce((sum, mood) => sum + (mood.intensity || 0), 0) / recentMoods.length;
-  
+
   const olderMoods = moods.slice(3, 6);
   const olderAverageIntensity = olderMoods.reduce((sum, mood) => sum + (mood.intensity || 0), 0) / olderMoods.length;
-  
+
   const difference = averageIntensity - olderAverageIntensity;
-  
+
   if (difference > 1) return 'improving';
   if (difference < -1) return 'declining';
   return 'stable';
@@ -2292,50 +2304,50 @@ const findMoodPatterns = (moods: Mood[]): any => {
     dayOfWeek: {} as Record<string, number>,
     triggers: {} as Record<string, number>
   };
-  
+
   moods.forEach(mood => {
     const date = mood.createdAt;
     const hour = date.getHours();
     const dayOfWeek = date.getDay();
-    
+
     // Time of day patterns
     const timeSlot = hour < 6 ? 'night' : hour < 12 ? 'morning' : hour < 18 ? 'afternoon' : 'evening';
     patterns.timeOfDay[timeSlot] = (patterns.timeOfDay[timeSlot] || 0) + 1;
-    
+
     // Day of week patterns
     const dayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][dayOfWeek];
     patterns.dayOfWeek[dayName] = (patterns.dayOfWeek[dayName] || 0) + 1;
-    
+
     // Trigger patterns
     if (mood.triggerThought) {
       patterns.triggers[mood.triggerThought] = (patterns.triggers[mood.triggerThought] || 0) + 1;
     }
   });
-  
+
   return patterns;
 };
 
 const generateMoodRecommendations = (moods: Mood[]): string[] => {
   const recommendations = [];
-  
+
   const moodCounts = moods.reduce((acc, mood) => {
     acc[mood.moodType] = (acc[mood.moodType] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
-  
-  const dominantMood = Object.entries(moodCounts).reduce((max, [mood, count]) => 
+
+  const dominantMood = Object.entries(moodCounts).reduce((max, [mood, count]) =>
     count > moodCounts[max[0]] ? [mood, count] : max
   )[0];
-  
+
   const moodRecommendations = {
     sad: ['Consider talking to a therapist persona', 'Try some uplifting activities', 'Connect with friends'],
     anxious: ['Practice meditation', 'Talk to a calming persona', 'Try breathing exercises'],
     happy: ['Share your joy with others', 'Engage in creative activities', 'Help someone else'],
     angry: ['Try anger management techniques', 'Talk to a counselor persona', 'Exercise to release tension']
   };
-  
+
   recommendations.push(...(moodRecommendations[dominantMood as keyof typeof moodRecommendations] || []));
-  
+
   return recommendations;
 };
 
@@ -2346,21 +2358,21 @@ const getMoodRecommendation = (mood: string, intensity: number): string => {
     happy: 'Share your positive energy with others',
     angry: intensity > 7 ? 'Take a break and cool down' : 'Try to understand what triggered this'
   };
-  
+
   return recommendations[mood as keyof typeof recommendations] || 'Take care of yourself';
 };
 
 const calculateMemoryRelevance = (memory: Memory, context: string): number => {
   const memoryWords = memory.value.toLowerCase().split(/\s+/);
   const contextWords = context.toLowerCase().split(/\s+/);
-  
+
   const matches = memoryWords.filter(word => contextWords.includes(word)).length;
   return matches / Math.max(memoryWords.length, contextWords.length);
 };
 
 const categorizeMemory = (memory: Memory): string => {
   const value = memory.value.toLowerCase();
-  
+
   if (value.includes('like') || value.includes('prefer') || value.includes('enjoy')) {
     return 'preferences';
   }
@@ -2376,19 +2388,19 @@ const categorizeMemory = (memory: Memory): string => {
   if (value.includes('name') || value.includes('age') || value.includes('job') || value.includes('live')) {
     return 'personal';
   }
-  
+
   return 'other';
 };
 
 const calculateMemoryGrowthRate = (memories: Memory[]): number => {
   if (memories.length < 2) return 0;
-  
+
   const now = new Date();
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-  
-  const recentMemories = memories.filter(memory => 
+
+  const recentMemories = memories.filter(memory =>
     memory.createdAt >= thirtyDaysAgo
   );
-  
+
   return recentMemories.length / 30; // memories per day
 };

@@ -20,6 +20,8 @@ interface ChatWindowProps {
 export default function ChatWindow({ messages, loading, error, isGenerating }: ChatWindowProps) {
     const messagesEndRef = useRef<null | HTMLDivElement>(null);
     const { user } = useAuth();
+    
+    // Typing indicator state managed by isGenerating prop
 
     // params and useMessage hooks are removed as data is passed via props
 
@@ -133,24 +135,7 @@ export default function ChatWindow({ messages, loading, error, isGenerating }: C
         new Map(messages.map(msg => [msg.id, msg])).values()
     );
     
-    // DEBUG: Log check-in messages in ChatWindow
-    const checkInMessages = uniqueMessages.filter(m => m.senderType === 'persona' && m.content && m.content.includes('ekkada sachav'));
-    if (checkInMessages.length > 0) {
-        console.log(`🖥️ [ChatWindow] Rendering ${checkInMessages.length} check-in messages:`, 
-            checkInMessages.map(m => ({ 
-                id: m.id, 
-                content: m.content.substring(0, 50),
-                timestamp: m.createdAt,
-                index: uniqueMessages.findIndex(msg => msg.id === m.id)
-            }))
-        );
-        console.log(`📋 [ChatWindow] Total messages: ${uniqueMessages.length}, Check-in message positions:`, 
-            checkInMessages.map(m => {
-                const idx = uniqueMessages.findIndex(msg => msg.id === m.id);
-                return `Message ${m.id.substring(0, 8)} at position ${idx}/${uniqueMessages.length - 1}`;
-            })
-        );
-    }
+    // Messages are filtered and rendered below
 
     return (
         <>
@@ -164,21 +149,17 @@ export default function ChatWindow({ messages, loading, error, isGenerating }: C
                         ) : (
                             <>
                                 {uniqueMessages.map((message, index) => {
-                                    // DEBUG: Log check-in messages when rendering
-                                    if (message.senderType === 'persona' && message.content && message.content.includes('ekkada sachav')) {
-                                        console.log(`🎨 [ChatWindow] Rendering check-in message at index ${index}:`, {
-                                            id: message.id,
-                                            content: message.content.substring(0, 50),
-                                            hasContent: !!message.content,
-                                            contentLength: message.content?.length || 0,
-                                            createdAt: message.createdAt,
-                                            formattedTime: formatTime(message.createdAt)
-                                        });
-                                    }
-                                    
                                     // Skip messages with no content
                                     if (!message.content || message.content.trim() === '') {
-                                        console.warn(`⚠️ [ChatWindow] Skipping message ${message.id} - no content`);
+                                        return null;
+                                    }
+                                    
+                                    // 🛡️ SAFETY: Ensure content is a string (handle edge cases)
+                                    const displayContent = typeof message.content === 'string' 
+                                        ? message.content 
+                                        : String(message.content || '');
+                                    
+                                    if (!displayContent || displayContent.trim() === '') {
                                         return null;
                                     }
                                     
@@ -187,13 +168,13 @@ export default function ChatWindow({ messages, loading, error, isGenerating }: C
                                         {message.senderType === "persona" ? (
                                             leftChatBubble({
                                                 id: message.id,
-                                                content: message.content,
+                                                content: displayContent, // Use safe displayContent
                                                 time: formatTime(message.createdAt)
                                             })
                                         ) : (
                                             rightChatBubble({
                                                 id: message.id,
-                                                content: message.content,
+                                                content: displayContent, // Use safe displayContent
                                                 time: formatTime(message.createdAt),
                                                 isSent: message.isSent || false
                                             })
@@ -201,12 +182,14 @@ export default function ChatWindow({ messages, loading, error, isGenerating }: C
                                     </div>
                                     );
                                 })}
-                                {/* Typing Indicator */}
+                                {/* Typing Indicator - Show three bubbles when AI is generating */}
                                 {isGenerating && (
-                                    leftChatBubble({
-                                        id: "typing-indicator",
-                                        isTyping: true
-                                    })
+                                    <div key="typing-indicator" className="flex flex-col">
+                                        {leftChatBubble({
+                                            id: "typing-indicator",
+                                            isTyping: true
+                                        })}
+                                    </div>
                                 )}
                             </>
                         )}

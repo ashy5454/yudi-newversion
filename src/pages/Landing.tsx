@@ -81,7 +81,7 @@ export default function Landing() {
     // Show loading state while checking
     if (checkingFirstTime) {
         return (
-            <div className="w-full min-h-screen bg-[#0B0F19] flex items-center justify-center">
+            <div className="dark w-full min-h-screen bg-[#0B0F19] flex items-center justify-center">
                 <div className="text-white">Loading...</div>
             </div>
         );
@@ -93,7 +93,7 @@ export default function Landing() {
     }
 
     return (
-        <div className="w-full min-h-screen bg-[#0B0F19]">
+        <div className="dark w-full min-h-screen bg-[#0B0F19]">
             <Header handleEarlyAccess={handleEarlyAccess} />
 
             <main className="w-full">

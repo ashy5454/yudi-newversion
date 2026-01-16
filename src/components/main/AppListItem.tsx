@@ -5,17 +5,31 @@ import { Room } from "@/lib/firebase/dbTypes";
 import { formatRelativeTime } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { PhoneIcon } from "lucide-react";
+import { useTyping } from "@/contexts/TypingContext";
 
 interface AppListItemProps {
     room: Room;
+    showOnline?: boolean; // Whether to show "online" status (dynamically shuffled)
 }
 
-export default function AppListItem({ room }: AppListItemProps) {
+function AppListItem({ room, showOnline = false }: AppListItemProps) {
     const router = useRouter();
+    const { isTyping } = useTyping();
+    const typing = isTyping(room.id);
 
     const handleChatClick = () => {
         router.push(`/m/${room.id}/chat`);
-    }
+    };
+
+    const handleCallClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        router.push(`/m/${room.id}/call`);
+    };
+    
+    // Show online/typing for selected personas (dynamically shuffled), last message for others
+    const statusText = showOnline 
+        ? (typing ? 'typing...' : 'online')
+        : (room.lastMessageContent || 'No messages yet...');
 
     return (
         <>
@@ -40,7 +54,7 @@ export default function AppListItem({ room }: AppListItemProps) {
                             {room.title || `Chat ${room.id.slice(0, 8)}`}
                         </div>
                         <span className="opacity-50 text-sm font-serif">
-                            {room.lastMessageContent || 'No messages yet...'}
+                            {statusText}
                         </span>
                     </div>
                 </div>
@@ -63,7 +77,7 @@ export default function AppListItem({ room }: AppListItemProps) {
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8 rounded-full hover:bg-primary/20"
-                            onClick={() => router.push(`/m/${room.id}/call`)}
+                            onClick={handleCallClick}
                         >
                             <PhoneIcon className="w-4 h-4" />
                         </Button>
@@ -73,3 +87,5 @@ export default function AppListItem({ room }: AppListItemProps) {
         </>
     );
 }
+
+export default AppListItem;

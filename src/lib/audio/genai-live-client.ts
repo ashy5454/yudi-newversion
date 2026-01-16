@@ -623,6 +623,18 @@ export class GenAILiveClient extends EventEmitter<LiveClientEventTypes> {
     const description = closeCodeDescriptions[e.code] || `⚠️ Unknown close code: ${e.code}`;
     console.log(description);
 
+    // 🚨 Specific error handling for 1008 (Policy violation)
+    if (e.code === 1008) {
+      console.error('❌ ERROR 1008: Policy violation - API key has referrer restrictions!');
+      console.error('🔧 FIX: Go to Google Cloud Console → APIs & Services → Credentials');
+      console.error('   → Edit your NEXT_PUBLIC_GEMINI_API_KEY');
+      console.error('   → Under "Application restrictions", select "None" OR add:');
+      console.error('      - localhost:3000/*');
+      console.error('      - localhost:*/*');
+      console.error('      - Your production domain (e.g., yourdomain.com/*)');
+      console.error('   → Save and try again');
+    }
+
     this._status = 'disconnected';
     let reason = e.reason || '';
 

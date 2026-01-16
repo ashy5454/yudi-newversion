@@ -11,11 +11,11 @@ export default function Faqs() {
                 <div className="flex flex-col gap-10 md:flex-row md:gap-16">
                     <div className="md:w-1/3">
                         <div className="sticky top-20">
-                            <h2 className="mt-4 text-3xl md:text-4xl lg:text-5xl text-white">{EN_FAQS.title}</h2>
-                            <div className="text-white/70 mt-4 space-y-2">
-                                <p className="text-lg">heyy! contact us now :)</p>
-                                <p className="text-lg">8369490053</p>
-                                <p className="text-lg">7993276033</p>
+                            <h2 className="mt-4 text-3xl md:text-4xl lg:text-5xl text-gray-900 dark:text-white">{EN_FAQS.title}</h2>
+                            <div className="text-gray-700 dark:text-white/70 mt-4 space-y-3">
+                                <p className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">heyy! contact us now :)</p>
+                                <p className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">8369490053</p>
+                                <p className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">7993276033</p>
                             </div>
                         </div>
                     </div>
@@ -34,15 +34,15 @@ export default function Faqs() {
                                             <div className="flex size-6">
                                                 <DynamicIcon
                                                     name={item.icon as IconName}
-                                                    className="m-auto size-4"
+                                                    className="m-auto size-4 text-gray-700 dark:text-white"
                                                 />
                                             </div>
-                                            <span className="text-base text-white">{item.question}</span>
+                                            <span className="text-base text-gray-900 dark:text-white">{item.question}</span>
                                         </div>
                                     </AccordionTrigger>
                                     <AccordionContent className="pb-5">
                                         <div className="px-9">
-                                            <p className="text-base text-white/70">{item.answer}</p>
+                                            <p className="text-base text-gray-700 dark:text-white/70">{item.answer}</p>
                                         </div>
                                     </AccordionContent>
                                 </AccordionItem>

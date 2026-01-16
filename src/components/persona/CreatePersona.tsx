@@ -251,7 +251,7 @@ export default function CreatePersona() {
         })
         if (!roomId) throw new Error("Failed to create room")
       }
-      router.replace(`/m/${roomId}/call`)
+      router.replace(`/m/${roomId}/chat`)
     } catch (err: any) {
       toast.error(err?.message || "Failed to start conversation")
     }

@@ -12,6 +12,7 @@ import { useAuth } from "@/components/AuthContext";
 import { useRoom } from "@/hooks/useRoom";
 import { toast } from "sonner";
 import { Skeleton } from "../ui/skeleton";
+import { PersonaClientDb } from "@/lib/firebase/clientDb";
 
 export default function PersonaCard({ personaId, persona }: { personaId: string, persona: Persona }) {
     const router = useRouter();
@@ -30,6 +31,7 @@ export default function PersonaCard({ personaId, persona }: { personaId: string,
             toast.error("You must be logged in to start a conversation.");
             return;
         }
+
         setActionLoading(true);
         try {
             let room = findRoomForPersona();

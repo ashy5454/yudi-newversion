@@ -16,6 +16,9 @@ export interface User {
     lastSeen?: Date;
     createdAt: Date;
     updatedAt?: Date;
+    accessLevel?: 'trial' | 'approved'; // Waitlist system: trial or approved access
+    trialStartedAt?: Date; // When text chat trial started
+    voiceTrialStartedAt?: Date; // When voice call trial started
 }
 
 export interface Credit {

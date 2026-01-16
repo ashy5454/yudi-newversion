@@ -4,6 +4,8 @@ import { Plus_Jakarta_Sans, Poppins, Space_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "@/components/AuthContext";
+import { TypingProvider } from "@/contexts/TypingContext";
+import AccessControlWrapper from "@/components/AccessControlWrapper";
 import { Toaster } from "@/components/ui/sonner";
 import AnalyticsListener from "@/components/AnalyticsListener";
 
@@ -91,8 +93,12 @@ export default async function RootLayout({
         >
           <AnalyticsListener />
           <AuthProvider>
-            {children}
-            <Toaster />
+            <TypingProvider>
+              <AccessControlWrapper>
+                {children}
+              </AccessControlWrapper>
+              <Toaster />
+            </TypingProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

@@ -40,23 +40,25 @@ const Hero = ({ handleEarlyAccess }: { handleEarlyAccess?: MouseEventHandler<HTM
                 <p className="mt-6 text-white/80 text-center" style={{ fontSize: "clamp(1rem, 2vw, 1.5rem)" }}>
                     {EN_HERO.description}
                 </p>
-                <motion.button
-                    style={{
-                        border,
-                        boxShadow,
-                    }}
-                    whileHover={{
-                        scale: 1.015,
-                    }}
-                    whileTap={{
-                        scale: 0.985,
-                    }}
-                    onClick={handleEarlyAccess}
-                    className="group relative flex w-fit items-center gap-1.5 rounded-full bg-gray-800/10 px-8 py-4 mt-8 text-lg font-semibold text-gray-50 transition-colors hover:bg-gray-950/50"
-                >
-                    {EN_HERO.cta.text}
-                    <ArrowRight className="transition-transform group-hover:-rotate-45 group-active:-rotate-12" />
-                </motion.button>
+                <div className="flex flex-col sm:flex-row gap-4 mt-8 items-center justify-center">
+                    <motion.button
+                        style={{
+                            border,
+                            boxShadow,
+                        }}
+                        whileHover={{
+                            scale: 1.015,
+                        }}
+                        whileTap={{
+                            scale: 0.985,
+                        }}
+                        onClick={handleEarlyAccess}
+                        className="group relative flex w-fit items-center gap-1.5 rounded-full bg-gray-800/10 px-8 py-4 text-lg font-semibold text-gray-50 transition-colors hover:bg-gray-950/50"
+                    >
+                        {EN_HERO.cta.text}
+                        <ArrowRight className="transition-transform group-hover:-rotate-45 group-active:-rotate-12" />
+                    </motion.button>
+                </div>
             </div>
         </motion.section>
     );

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useCallback, useState, useRef } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useRoom } from "@/hooks/useRoom";
 import { useAuth } from "@/components/AuthContext";
@@ -10,12 +10,20 @@ import AppHeader from "./AppHeader";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
 
+// Helper function extracted outside component to avoid recreation
+const getTimestamp = (date: any): number => {
+    if (!date) return 0;
+    if (date instanceof Date) return date.getTime();
+    if (date.toDate && typeof date.toDate === 'function') return date.toDate().getTime();
+    if (date.seconds) return date.seconds * 1000;
+    return 0;
+};
+
 export default function AppList() {
     const router = useRouter();
     const isMobile = useIsMobile();
     const { user } = useAuth();
     const { rooms, loading, error, fetchUserRooms, subscribeToUserRooms, clearRooms } = useRoom();
-    const [filteredRooms, setFilteredRooms] = useState<Room[]>(rooms);
 
     // Fetch user rooms on component mount
     useEffect(() => {
@@ -35,18 +43,8 @@ export default function AppList() {
         }
     }, [user?.uid, subscribeToUserRooms, clearRooms]);
 
-    // Update filtered rooms when rooms change - show only latest room per persona
-    useEffect(() => {
-        // Helper to get timestamp from Date or Firestore Timestamp
-        const getTimestamp = (date: any): number => {
-            if (!date) return 0;
-            if (date instanceof Date) return date.getTime();
-            if (date.toDate && typeof date.toDate === 'function') return date.toDate().getTime();
-            if (date.seconds) return date.seconds * 1000;
-            return 0;
-        };
-
-        // Group rooms by personaId and keep only the most recent one
+    // Memoize unique rooms computation (grouped by personaId)
+    const uniqueRooms = useMemo(() => {
         const roomsByPersona = new Map<string, Room>();
         
         rooms.forEach(room => {
@@ -57,7 +55,6 @@ export default function AppList() {
             if (!existingRoom) {
                 roomsByPersona.set(personaId, room);
             } else {
-                // Compare timestamps - use lastMessageAt or createdAt
                 const roomTime = getTimestamp(room.lastMessageAt) || getTimestamp(room.createdAt);
                 const existingTime = getTimestamp(existingRoom.lastMessageAt) || getTimestamp(existingRoom.createdAt);
                 
@@ -67,71 +64,72 @@ export default function AppList() {
             }
         });
         
-        // Convert map to array and sort by most recent activity
-        const uniqueRooms = Array.from(roomsByPersona.values()).sort((a, b) => {
+        return Array.from(roomsByPersona.values()).sort((a, b) => {
             const timeA = getTimestamp(a.lastMessageAt) || getTimestamp(a.createdAt);
             const timeB = getTimestamp(b.lastMessageAt) || getTimestamp(b.createdAt);
             return timeB - timeA;
         });
-        
-        setFilteredRooms(uniqueRooms);
     }, [rooms]);
 
-    // Handle search - search through unique rooms only
-    const handleSearch = (searchTerm: string) => {
-        // Helper to get timestamp from Date or Firestore Timestamp
-        const getTimestamp = (date: any): number => {
-            if (!date) return 0;
-            if (date instanceof Date) return date.getTime();
-            if (date.toDate && typeof date.toDate === 'function') return date.toDate().getTime();
-            if (date.seconds) return date.seconds * 1000;
-            return 0;
+    const [searchTerm, setSearchTerm] = useState('');
+    
+    // 🎲 Dynamic "Online" Status - Shuffles between personas to look human
+    const [onlineRoomIds, setOnlineRoomIds] = useState<Set<string>>(new Set());
+    const shuffleIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Memoize filtered rooms based on search term
+    const filteredRooms = useMemo(() => {
+        if (!searchTerm.trim()) {
+            return uniqueRooms;
+        }
+        
+        const lowerSearch = searchTerm.toLowerCase();
+        return uniqueRooms.filter(room =>
+            room.title?.toLowerCase().includes(lowerSearch) ||
+            room.lastMessageContent?.toLowerCase().includes(lowerSearch) ||
+            room.id.toLowerCase().includes(lowerSearch)
+        );
+    }, [uniqueRooms, searchTerm]);
+
+    // 🎲 Shuffle "online" status between personas dynamically (human-like behavior)
+    useEffect(() => {
+        if (filteredRooms.length === 0) return;
+
+        // Initial shuffle
+        const shuffleOnlineStatus = () => {
+            // Randomly select 2-4 personas to show "online" (not always 3)
+            const onlineCount = Math.floor(Math.random() * 3) + 2; // 2, 3, or 4
+            const shuffled = [...filteredRooms].sort(() => Math.random() - 0.5);
+            const selected = shuffled.slice(0, Math.min(onlineCount, filteredRooms.length));
+            setOnlineRoomIds(new Set(selected.map(room => room.id)));
         };
 
-        // Get unique rooms first
-        const roomsByPersona = new Map<string, Room>();
-        
-        rooms.forEach(room => {
-            const personaId = room.personaId;
-            if (!personaId) return;
-            
-            const existingRoom = roomsByPersona.get(personaId);
-            if (!existingRoom) {
-                roomsByPersona.set(personaId, room);
-            } else {
-                const roomTime = getTimestamp(room.lastMessageAt) || getTimestamp(room.createdAt);
-                const existingTime = getTimestamp(existingRoom.lastMessageAt) || getTimestamp(existingRoom.createdAt);
-                
-                if (roomTime > existingTime) {
-                    roomsByPersona.set(personaId, room);
-                }
-            }
-        });
-        
-        const uniqueRooms = Array.from(roomsByPersona.values());
-        
-        // Apply search filter
-        if (!searchTerm.trim()) {
-            setFilteredRooms(uniqueRooms.sort((a, b) => {
-                const timeA = getTimestamp(a.lastMessageAt) || getTimestamp(a.createdAt);
-                const timeB = getTimestamp(b.lastMessageAt) || getTimestamp(b.createdAt);
-                return timeB - timeA;
-            }));
-            return;
-        }
+        // Shuffle immediately
+        shuffleOnlineStatus();
 
-        const filtered = uniqueRooms.filter(room =>
-            room.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            room.lastMessageContent?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            room.id.toLowerCase().includes(searchTerm.toLowerCase())
-        ).sort((a, b) => {
-            const timeA = getTimestamp(a.lastMessageAt) || getTimestamp(a.createdAt);
-            const timeB = getTimestamp(b.lastMessageAt) || getTimestamp(b.createdAt);
-            return timeB - timeA;
-        });
-        
-        setFilteredRooms(filtered);
-    };
+        // Shuffle every 15-25 seconds (random interval for human-like behavior)
+        const scheduleNextShuffle = () => {
+            const delay = Math.floor(Math.random() * 10000) + 15000; // 15-25 seconds
+            shuffleIntervalRef.current = setTimeout(() => {
+                shuffleOnlineStatus();
+                scheduleNextShuffle();
+            }, delay);
+        };
+
+        scheduleNextShuffle();
+
+        // Cleanup
+        return () => {
+            if (shuffleIntervalRef.current) {
+                clearTimeout(shuffleIntervalRef.current);
+            }
+        };
+    }, [filteredRooms]);
+
+    // Handle search - memoized callback for performance
+    const handleSearch = useCallback((term: string) => {
+        setSearchTerm(term);
+    }, []);
 
     return (
         <>
@@ -168,7 +166,7 @@ export default function AppList() {
                                 </div>
                             ) : (
                                 filteredRooms.map((room: Room) => (
-                                    <AppListItem key={room.id} room={room} />
+                                    <AppListItem key={room.id} room={room} showOnline={onlineRoomIds.has(room.id)} />
                                 ))
                             )}
                         </ScrollArea>
@@ -207,7 +205,7 @@ export default function AppList() {
                                 </div>
                             ) : (
                                 filteredRooms.map((room: Room) => (
-                                    <AppListItem key={room.id} room={room} />
+                                    <AppListItem key={room.id} room={room} showOnline={onlineRoomIds.has(room.id)} />
                                 ))
                             )}
                         </ScrollArea>

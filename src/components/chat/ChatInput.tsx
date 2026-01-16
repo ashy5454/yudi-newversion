@@ -4,13 +4,20 @@ import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import AI_Input_Search from "../kokonutui/ai-input-search";
 import { MessageClientDb } from "@/lib/firebase/clientDb";
+import { toast } from "sonner";
+import { useAuth } from "@/components/AuthContext";
+import { startTextTrial, useAccessControl } from "@/hooks/useAccessControl";
 
-export default function ChatInput({ roomId, personaId, onMessageSent, onSynthesizing, onMessageStream, lastMessageTime }: { roomId: string; personaId: string; onMessageSent?: (message: any) => void; onSynthesizing?: (isSynthesizing: boolean) => void; onMessageStream?: (id: string, chunk: string) => void; lastMessageTime?: Date | number }) {
+export default function ChatInput({ roomId, personaId, onMessageSent, onSynthesizing, onMessageStream, lastMessageTime, onUserTyping }: { roomId: string; personaId: string; onMessageSent?: (message: any) => void; onSynthesizing?: (isSynthesizing: boolean) => void; onMessageStream?: (id: string, chunk: string) => void; lastMessageTime?: Date | number; onUserTyping?: () => void }) {
     const router = useRouter();
+    const { user } = useAuth();
+    const { isTextTrialExpired, isApproved } = useAccessControl();
     const [isTyping, setIsTyping] = useState(false);
     const isSendingRef = useRef(false); // 🛑 Prevent double-fire
+    const hasStartedTrialRef = useRef(false); // Track if we've started the trial
 
     const handleSend = async (text: string) => {
+
         // 🛑 Prevent double-fire: If already sending, ignore this call
         if (isSendingRef.current) {
             console.log("[ChatInput] Ignoring duplicate send request");
@@ -21,10 +28,33 @@ export default function ChatInput({ roomId, personaId, onMessageSent, onSynthesi
             return;
         }
 
+        // 🛑 Block if text trial is expired (unless approved)
+        if (isTextTrialExpired && !isApproved) {
+            toast.error("Your 4-minute trial has expired. Join the waitlist for more access!");
+            return;
+        }
+
         isSendingRef.current = true; // Mark as sending
 
+        // 🛡️ KILL SWITCH: Notify parent that user is sending a message (abort check-in if active)
+        if (onUserTyping) {
+            onUserTyping();
+        }
+
+        // 🎯 Show typing indicator IMMEDIATELY before API call
         setIsTyping(true);
-        if (onSynthesizing) onSynthesizing(true);
+        if (onSynthesizing) {
+            onSynthesizing(true);
+            console.log("💬 [ChatInput] Typing indicator ON - showing bubbles before AI response");
+        }
+
+        // ⏰ Start text chat trial timer when user sends first message
+        if (user && !hasStartedTrialRef.current) {
+            hasStartedTrialRef.current = true;
+            startTextTrial(user.uid).catch((error) => {
+                console.error('Error starting text trial:', error);
+            });
+        }
 
         // 🛑 Lock user timestamp NOW to prevent jumping (prevents sandwich effect)
         const userMsgTime = Date.now();
@@ -138,14 +168,61 @@ export default function ChatInput({ roomId, personaId, onMessageSent, onSynthesi
             const decoder = new TextDecoder();
             let done = false;
             let fullBuffer = ''; // Buffer ALL chunks first
+            let lineBuffer = '';
 
-            // First, read the ENTIRE stream into buffer
+            // ⚡ OPTIMIZED: Process chunks as they arrive for faster response
             while (!done) {
                 const { value, done: doneReading } = await reader.read();
                 done = doneReading;
                 if (value) {
                     const chunkValue = decoder.decode(value, { stream: !done });
                     fullBuffer += chunkValue;
+                    lineBuffer += chunkValue;
+                    
+                    // Process complete lines immediately for faster UI updates
+                    const lines = lineBuffer.split('\n');
+                    lineBuffer = lines.pop() || ''; // Keep incomplete line in buffer
+                    
+                    // Process complete SSE lines as they arrive
+                    for (const line of lines) {
+                        const trimmedLine = line.trim();
+                        if (!trimmedLine || trimmedLine === 'data: [DONE]' || trimmedLine === '[DONE]') continue;
+                        
+                        if (trimmedLine.startsWith('data:')) {
+                            const jsonStr = trimmedLine.replace(/^data:\s*/, '').trim();
+                            if (jsonStr === '[DONE]' || jsonStr === '') continue;
+                            
+                            try {
+                                    const data = JSON.parse(jsonStr);
+                                    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                                    if (text && typeof text === 'string' && onMessageStream) {
+                                        // Stream chunks to UI immediately for faster display
+                                        onMessageStream(aiMsgId, text);
+                                        // ⚡ Keep typing indicator ON during streaming (don't hide it yet)
+                                        // It will be hidden after the message is fully saved to DB
+                                    }
+                            } catch (e) {
+                                // Continue processing
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Process remaining buffer
+            if (lineBuffer.trim()) {
+                const trimmedLine = lineBuffer.trim();
+                if (trimmedLine.startsWith('data:')) {
+                    const jsonStr = trimmedLine.replace(/^data:\s*/, '').trim();
+                    try {
+                        const data = JSON.parse(jsonStr);
+                        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                        if (text && typeof text === 'string' && onMessageStream) {
+                            onMessageStream(aiMsgId, text);
+                        }
+                    } catch (e) {
+                        // Ignore parse errors
+                    }
                 }
             }
 
@@ -312,8 +389,17 @@ export default function ChatInput({ roomId, personaId, onMessageSent, onSynthesi
 
             // 🛑 THE "ONE QUESTION" RULE
             // Allow unlimited statements/jokes/roasts, but maximum ONE question per response
+            // EXCEPTION: If response is very short (<10 words) or contains exclamation, disable chopper
             const cleanLines: string[] = [];
             let questionCount = 0;
+            
+            // Calculate total word count of all lines to check if response is very short
+            const totalWords = rawLines.join(' ').split(/\s+/).filter(w => w.length > 0).length;
+            const hasExclamation = rawLines.some(line => line.includes('!'));
+            const isVeryShortResponse = totalWords < 10;
+            
+            // DISABLE chopper for very short responses or responses with exclamations (punchy replies)
+            const shouldDisableChopper = isVeryShortResponse || hasExclamation;
 
             // List of "Generic/Annoying" question triggers to block if they appear 2nd+
             const genericTriggers = [
@@ -335,6 +421,12 @@ export default function ChatInput({ roomId, personaId, onMessageSent, onSynthesi
                 if (isQuestion) {
                     questionCount++;
 
+                    // If chopper is disabled (short/exclamatory response), allow all questions
+                    if (shouldDisableChopper) {
+                        cleanLines.push(trimmedLine);
+                        continue;
+                    }
+
                     // If this is the 2nd (or 3rd+) question AND it's generic -> KILL IT.
                     if (questionCount > 1 && isGeneric) {
                         console.log(`🔪 Chopping repetitive question #${questionCount}:`, trimmedLine);
@@ -342,7 +434,6 @@ export default function ChatInput({ roomId, personaId, onMessageSent, onSynthesi
                     }
 
                     // STRICT: Only allow ONE question per response (even if not generic)
-                    // Uncomment this if you want to block ALL 2nd+ questions:
                     if (questionCount > 1) {
                         console.log(`🔪 Chopping 2nd question (ONE QUESTION RULE):`, trimmedLine);
                         continue;
@@ -401,7 +492,6 @@ export default function ChatInput({ roomId, personaId, onMessageSent, onSynthesi
             // Spam if we have 2+ complete lines AND the dice roll hits
             const useSpamFormat = hasMultipleCompleteThoughts && Math.random() < spamChance;
             
-            console.log(`[Spam Check] Lines: ${lines.length}, Complete: ${hasCompleteThoughts}, Chance: ${(spamChance * 100).toFixed(0)}%, Will spam: ${useSpamFormat}`);
 
             // =========================================================
             // 🛑 OPTION A: SPAM MODE (Separate Bubbles)
@@ -436,12 +526,21 @@ export default function ChatInput({ roomId, personaId, onMessageSent, onSynthesi
                                 messageType: "text",
                                 isSent: true,
                             }, new Date(explicitTime));
+                            
+                            // ⚡ Keep typing indicator ON for spam mode - it will be hidden when subscription receives the last message
+                            // Don't hide it here - let the subscription handle it
+                            if (i === lines.length - 1) {
+                                console.log(`✅ [ChatInput] Last spam message saved, keeping typing indicator until subscription confirms`);
+                            }
                         } catch (dbError) {
                             console.error("Failed to save spam message to DB:", dbError);
                             // Don't throw - continue with other messages even if one fails
                         }
                     }, i * 1200); // 1.2s delay between messages
                 }
+                
+                // ⚡ Keep typing indicator ON during spam mode - it will be hidden when subscription receives all messages
+                // Don't hide it here - let the subscription handle it
 
                 // 🛑 CRITICAL RETURN: Stops the function here. 
                 // The code below this line will NEVER run.
@@ -488,8 +587,11 @@ export default function ChatInput({ roomId, personaId, onMessageSent, onSynthesi
             // Remove the placeholder message if error? Or show error state?
             // For now keep as is.
         } finally {
-            setIsTyping(false);
-            if (onSynthesizing) onSynthesizing(false);
+            // ⚡ Keep typing indicator ON until message is fully saved to DB
+            // The subscription will handle hiding it when the message appears from DB
+            // Only hide if there was an error or if message saving failed
+            // setIsTyping(false); // Don't hide here - let subscription handle it
+            // if (onSynthesizing) onSynthesizing(false); // Don't hide here - let subscription handle it
             isSendingRef.current = false; // 🛑 Reset sending flag
         }
     };
@@ -499,7 +601,8 @@ export default function ChatInput({ roomId, personaId, onMessageSent, onSynthesi
             <div className="bg-background/80 rounded-2xl flex flex-row w-full h-full drop-shadow-2xl">
                 <AI_Input_Search
                     handleSend={handleSend}
-                    isTyping={isTyping} // if your component supports this
+                    isTyping={isTyping}
+                    onTyping={onUserTyping} // 🛡️ KILL SWITCH: Notify when user starts typing
                 />
             </div>
         </div>

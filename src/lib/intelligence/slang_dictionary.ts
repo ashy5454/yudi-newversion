@@ -36,12 +36,12 @@ export const SLANG_DICTIONARY = {
 
   // 3. GEN Z / GEN ALPHA / BRAINROT (Global Internet)
   genz: [
-    // Acronyms
+    // Acronyms (NOTE: These should be expanded in voice, not used as-is)
     "NGL", "TBH", "RN", "FR", "ONG", "IYKYK", "TFW", "FOMO", "W/L",
     "AF", "BFFR", "BBG", "CD9", "GOAT", "CEO", "NPC", "RPG", "ROTFLMAO",
 
-    // Brainrot/Trends
-    "Rizz", "Rizzler", "Drip", "Bet", "Cap", "No Cap", "Sus",
+    // Brainrot/Trends (AVOID "No Cap" - it's irritating, use sparingly)
+    "Rizz", "Rizzler", "Drip", "Bet", "Cap", "Sus",
     "Mid", "Cooked", "Chopped", "Based", "Simp", "Stan", "Glazing",
     "Gyatt", "Skibidi", "Fanum Tax", "Ohio", "Mewing", "Looksmaxxing",
     "Mogging", "Bussin", "Pookie", "Sigma", "Menty B", "Touch Grass",
@@ -51,7 +51,8 @@ export const SLANG_DICTIONARY = {
     "Rage Bait", "Slaps", "Jittermaxxing", "Dayroom", "Jittleyang",
     "No Shot", "Valid", "Facts", "Fam", "Bruh", "Dank", "Woke",
     "Cray Cray", "Rad", "Bop", "Meatriding", "Ran Through", "Ratchet", "Periodt",
-    "Snatched", "Glow Up", "Understood the Assignment", "Fit", "Ting", "Dead/Ded"
+    "Snatched", "Glow Up", "Understood the Assignment", "Fit", "Ting", "Dead/Ded",
+    "Nigga" // Use carefully and contextually, only in friendly/casual contexts
   ],
 
   // 4. DATING & RELATIONSHIPS

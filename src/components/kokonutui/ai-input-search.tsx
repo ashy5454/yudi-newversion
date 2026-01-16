@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { useAutoResizeTextarea } from "@/hooks/use-auto-resize-textarea";
-export default function AI_Input_Search({ handleSend, isTyping }: { handleSend: (s: string) => void, isTyping?: boolean }) {
+export default function AI_Input_Search({ handleSend, isTyping, onTyping }: { handleSend: (s: string) => void, isTyping?: boolean, onTyping?: () => void }) {
     const [value, setValue] = useState("");
     const { textareaRef, adjustHeight } = useAutoResizeTextarea({
         minHeight: 52,
@@ -91,6 +91,10 @@ export default function AI_Input_Search({ handleSend, isTyping }: { handleSend: 
                             onChange={(e) => {
                                 setValue(e.target.value);
                                 adjustHeight();
+                                // 🛡️ KILL SWITCH: Notify parent when user starts typing
+                                if (e.target.value.trim().length > 0 && onTyping) {
+                                    onTyping();
+                                }
                             }}
                         />
                     </div>

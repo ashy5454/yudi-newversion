@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { SearchIcon, TelescopeIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -11,16 +11,36 @@ interface AppHeaderProps {
 export default function AppHeader({ onSearch }: AppHeaderProps) {
     const isMobile = useIsMobile();
     const [searchTerm, setSearchTerm] = useState('');
+    const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Debounced search for better performance
+    const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setSearchTerm(value);
-        onSearch?.(value);
-    };
+        
+        // Clear existing timer
+        if (debounceTimerRef.current) {
+            clearTimeout(debounceTimerRef.current);
+        }
+        
+        // Debounce search to avoid excessive filtering
+        debounceTimerRef.current = setTimeout(() => {
+            onSearch?.(value);
+        }, 150); // 150ms debounce
+    }, [onSearch]);
 
-    const handleSearchClick = () => {
+    const handleSearchClick = useCallback(() => {
         onSearch?.(searchTerm);
-    };
+    }, [onSearch, searchTerm]);
+
+    // Cleanup timer on unmount
+    useEffect(() => {
+        return () => {
+            if (debounceTimerRef.current) {
+                clearTimeout(debounceTimerRef.current);
+            }
+        };
+    }, []);
 
     return (
         <>

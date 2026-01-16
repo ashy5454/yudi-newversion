@@ -32,13 +32,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const existingUser = await UserClientDb.getById(firebaseUser.uid);
       
       if (!existingUser) {
-        // Create new user document
+        // Create new user document with trial access
         const userData = {
           id: firebaseUser.uid,
           displayName: firebaseUser.displayName || 'Anonymous User',
           email: firebaseUser.email || '',
           avatarUrl: firebaseUser.photoURL || '',
-
           credit: {
             amount: 100, // Default credit balance
             totalCredits: 100,
@@ -47,11 +46,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             createdAt: new Date(),
             updatedAt: new Date()
           },
-          status: 'active'
+          status: 'active',
+          accessLevel: 'trial' as const, // Default to trial access
         };
         
         await UserClientDb.create(userData, firebaseUser.uid);
-        console.log('User document created successfully');
+        console.log('User document created successfully with trial access');
       }
     } catch (error) {
       console.error('Error creating user document:', error);

@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useRouter } from "next/navigation";
 import { Room } from "@/lib/firebase/dbTypes";
 import { formatRelativeTime } from "@/lib/utils";
+import { useTyping } from "@/contexts/TypingContext";
 
 interface CallHeaderProps {
     room: Room;
@@ -13,6 +14,8 @@ interface CallHeaderProps {
 export default function CallHeader({ room }: CallHeaderProps) {
     const isMobile = useIsMobile();
     const router = useRouter();
+    const { isTyping } = useTyping();
+    const typing = isTyping(room.id);
 
     const handleBackClick = () => {
         if (isMobile) {
@@ -55,7 +58,7 @@ export default function CallHeader({ room }: CallHeaderProps) {
                                 {room.title || `Chat ${room.id.slice(0, 8)}`}
                             </div>
                             <span className="opacity-50 text-xs font-serif">
-                                {room.lastMessageContent || 'No messages yet...'}
+                                {typing ? 'typing...' : 'online'}
                             </span>
                         </div>
                     </div>

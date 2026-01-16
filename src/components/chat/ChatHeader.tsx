@@ -6,6 +6,7 @@ import { ChevronLeftIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useRouter } from "next/navigation";
 import { Room } from "@/lib/firebase/dbTypes";
+import { useTyping } from "@/contexts/TypingContext";
 
 interface ChatHeaderProps {
     room: Room;
@@ -14,6 +15,8 @@ interface ChatHeaderProps {
 export default function ChatHeader({ room }: ChatHeaderProps) {
     const isMobile = useIsMobile();
     const router = useRouter();
+    const { isTyping } = useTyping();
+    const typing = isTyping(room.id);
 
     const handleBackClick = () => {
         if (isMobile) {
@@ -58,7 +61,7 @@ export default function ChatHeader({ room }: ChatHeaderProps) {
                             {room.title || `Chat ${room.id.slice(0, 8)}`}
                         </div>
                         <span className="opacity-50 text-xs font-serif">
-                            {room.lastMessageContent || "No messages yet..."}
+                            {typing ? 'typing...' : 'online'}
                         </span>
                     </div>
                 </div>

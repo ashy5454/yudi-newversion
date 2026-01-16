@@ -12,10 +12,10 @@ export default function Faqs() {
                     <div className="md:w-1/3">
                         <div className="sticky top-20">
                             <h2 className="mt-4 text-3xl md:text-4xl lg:text-5xl">{EN_FAQS.title}</h2>
-                            <div className="text-muted-foreground mt-4 space-y-2">
-                                <p className="text-lg">heyy! contact us now :)</p>
-                                <p className="text-lg">8369490053</p>
-                                <p className="text-lg">7993276033</p>
+                            <div className="text-muted-foreground mt-4 space-y-3">
+                                <p className="text-2xl md:text-3xl font-bold">heyy! contact us now :)</p>
+                                <p className="text-2xl md:text-3xl font-bold">8369490053</p>
+                                <p className="text-2xl md:text-3xl font-bold">7993276033</p>
                             </div>
                         </div>
                     </div>

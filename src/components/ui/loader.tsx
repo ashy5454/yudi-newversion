@@ -8,48 +8,54 @@ export const LoaderOne = () => {
       duration: 0.6,
       repeat: Infinity,
       repeatType: "loop" as const,
-      delay: x * 0.15,
+      delay: x * 0.2,
       ease: "easeInOut",
     };
   };
   
   return (
-    <div className="flex items-center gap-1.5 rounded-md bg-white/10 px-2 py-1">
+    <div className="flex items-center gap-1.5 rounded-md bg-white/10 px-3 py-2">
       <motion.div
         initial={{
           y: 0,
           scale: 1,
+          opacity: 0.4,
         }}
         animate={{
-          y: [0, -6, 0],
-          scale: [1, 1.1, 1],
+          y: [0, -8, 0],
+          scale: [1, 1.3, 1],
+          opacity: [0.4, 1, 0.4],
         }}
         transition={transition(0) as Transition}
-        className="h-1.5 w-1.5 rounded-full bg-white"
+        className="h-2 w-2 rounded-full bg-white"
       />
       <motion.div
         initial={{
           y: 0,
           scale: 1,
+          opacity: 0.4,
         }}
         animate={{
-          y: [0, -6, 0],
-          scale: [1, 1.1, 1],
+          y: [0, -8, 0],
+          scale: [1, 1.3, 1],
+          opacity: [0.4, 1, 0.4],
         }}
         transition={transition(1) as Transition}
-        className="h-1.5 w-1.5 rounded-full bg-white"
+        className="h-2 w-2 rounded-full bg-white"
       />
       <motion.div
         initial={{
           y: 0,
           scale: 1,
+          opacity: 0.4,
         }}
         animate={{
-          y: [0, -6, 0],
-          scale: [1, 1.1, 1],
+          y: [0, -8, 0],
+          scale: [1, 1.3, 1],
+          opacity: [0.4, 1, 0.4],
         }}
         transition={transition(2) as Transition}
-        className="h-1.5 w-1.5 rounded-full bg-white"
+        className="h-2 w-2 rounded-full bg-white"
       />
     </div>
   );

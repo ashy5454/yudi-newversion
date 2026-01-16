@@ -23,7 +23,7 @@ export default function CallInterface({ room, persona }: CallInterfaceProps) {
     const router = useRouter();
     const params = useParams();
     const roomId = params?.roomId as string;
-    const { connected, client, setConfig } = useLiveAPIContext();
+    const { connected, client, setConfig, disconnect } = useLiveAPIContext();
     const videoRef = useRef<HTMLVideoElement>(null);
 
     const { user } = useAuth();
@@ -281,35 +281,52 @@ ASKING ABOUT PAST SITUATIONS FROM TEXT CHAT (MAKE IT FUNNY):
                 // Voice names determine timbre/character: warmer, clearer, deeper, etc.
                 // DO NOT use: Achernar, Achird, Algenib, Algieba, Alnilam, Leda (not available)
 
-                // Voice selection for more natural, less robotic sound:
-                // - Callirrhoe: Warmer, more natural female voice (best for Indian English)
-                // - Aoede: Clearer, more articulate female voice
-                // - Kore: Softer, gentler female voice
+                // Voice selection for more natural, less robotic sound (Indian accent optimized):
+                // - Callirrhoe: Warmer, more natural female voice (best for Indian English - less robotic)
+                // - Aoede: Clearer, more articulate female voice (good for Indian accent)
+                // - Kore: Softer, gentler female voice (natural for Indian accent)
                 // - Fenrir: Clear, natural male voice (best for Indian English - less robotic)
                 // - Charon: Deeper, more dramatic male voice (use sparingly)
-                const femaleVoices = ["Callirrhoe", "Aoede", "Kore"]; // Prioritize Callirrhoe for warmer, more natural sound
-                const maleVoices = ["Fenrir", "Charon"]; // Prioritize Fenrir for clearer, less robotic sound
+                // - Puck: Neutral, safe default (works well with Indian accent)
+                const femaleVoices = ["Callirrhoe", "Aoede", "Kore"]; // Prioritize Indian accent-friendly voices
+                const maleVoices = ["Fenrir", "Charon"]; // Prioritize Indian accent-friendly voices
                 const neutralVoices = ["Puck", "Kore"]; // Puck is safest default
 
-                // Determine voice based on persona gender
+                // 🎯 CRITICAL: Assign consistent voice per persona (not random each time)
+                // Use persona.id to hash and assign a voice, so each persona always has the same voice
+                // This ensures variety across personas but consistency for each persona
                 let voiceName = "Puck"; // Safest default - always available
                 const gender = persona.gender?.toLowerCase();
 
+                // Hash persona.id to get a consistent index for voice selection
+                const hashPersonaId = (id: string): number => {
+                    let hash = 0;
+                    for (let i = 0; i < id.length; i++) {
+                        const char = id.charCodeAt(i);
+                        hash = ((hash << 5) - hash) + char;
+                        hash = hash & hash; // Convert to 32-bit integer
+                    }
+                    return Math.abs(hash);
+                };
+
+                const personaHash = hashPersonaId(persona.id || persona.name || 'default');
+
                 if (gender === 'female') {
-                    // Use Callirrhoe more often (warmer, more natural for Indian accent)
-                    // 50% Callirrhoe, 30% Aoede, 20% Kore
-                    const rand = Math.random();
-                    voiceName = rand < 0.5 ? "Callirrhoe" : (rand < 0.8 ? "Aoede" : "Kore");
+                    // Assign consistent voice per persona (use hash to pick from array)
+                    const voiceIndex = personaHash % femaleVoices.length;
+                    voiceName = femaleVoices[voiceIndex];
                 } else if (gender === 'male') {
-                    // Use Fenrir more often (clearer, less robotic, better for Indian English)
-                    // 85% Fenrir, 15% Charon for variety
-                    voiceName = Math.random() < 0.85 ? "Fenrir" : "Charon";
+                    // Assign consistent voice per persona (use hash to pick from array)
+                    const voiceIndex = personaHash % maleVoices.length;
+                    voiceName = maleVoices[voiceIndex];
                 } else {
-                    voiceName = neutralVoices[Math.floor(Math.random() * neutralVoices.length)];
+                    // Assign consistent voice per persona (use hash to pick from array)
+                    const voiceIndex = personaHash % neutralVoices.length;
+                    voiceName = neutralVoices[voiceIndex];
                 }
 
                 const selectedLanguageCode = getSupportedLanguage(persona.language);
-                console.log(`Selected voice: ${voiceName} for gender: ${persona.gender || 'neutral'} with language: ${selectedLanguageCode} (accent comes from language code - Indian accent when using en-IN, hi-IN, etc.)`);
+                console.log(`Selected voice: ${voiceName} for gender: ${persona.gender || 'neutral'} with language: ${selectedLanguageCode} (accent comes from language code - Indian accent when using en-IN, hi-IN, te-IN, ta-IN)`);
 
                 // FIXED: Use correct Gemini Live API config format
                 // CRITICAL: Only include valid LiveConnectConfig properties (prevents 1007 error)

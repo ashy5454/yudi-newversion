@@ -5,6 +5,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useRoom } from "@/hooks/useRoom";
 import { usePersona } from "@/hooks/usePersona";
 import { useAuth } from "@/components/AuthContext";
+import { useTyping } from "@/contexts/TypingContext";
 import { Room, Persona, Message } from "@/lib/firebase/dbTypes";
 import ChatHeader from "./ChatHeader";
 import ChatInput from "./ChatInput";
@@ -14,7 +15,7 @@ import { Button } from "../ui/button";
 import { PhoneIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMessage } from "@/hooks/useMessage";
-import { MessageClientDb } from "@/lib/firebase/clientDb";
+import { MessageClientDb, RoomClientDb } from "@/lib/firebase/clientDb";
 
 // 1. UNBREAKABLE TIMESTAMP HELPER FUNCTION
 // Handles all possible timestamp formats (Firestore Timestamps, JavaScript Dates, Numbers, Strings)
@@ -69,6 +70,7 @@ export default function ChatInterface() {
     const { fetchPersona } = usePersona();
 
     const { messages, loading: messagesLoading, error: messagesError, fetchMessagesByRoom, subscribeToRoomMessages, setMessages } = useMessage();
+    const { setTyping } = useTyping();
     const [room, setRoom] = useState<Room | null>(null);
     const [persona, setPersona] = useState<Persona | null>(null);
     const [loading, setLoading] = useState(true);
@@ -78,8 +80,17 @@ export default function ChatInterface() {
     const localMessageIdsRef = useRef<Set<string>>(new Set()); // Track locally created message IDs to prevent subscription overwriting
     const hasCheckedInRef = useRef<Set<string>>(new Set()); // Track which rooms already got 4-hour check-in
     const messagesLoadedRef = useRef<Set<string>>(new Set()); // Track which rooms have loaded messages
+    const abortCheckInRef = useRef<Map<string, boolean>>(new Map()); // 🛡️ KILL SWITCH: Track if user typed during check-in
 
     const roomId = params?.roomId as string;
+
+    // Helper function to update both local state and typing context
+    const updateGeneratingState = (generating: boolean) => {
+        setIsGenerating(generating);
+        if (roomId) {
+            setTyping(roomId, generating);
+        }
+    };
 
     // 2. UNBREAKABLE SORTING FUNCTION
     // Uses the robust getMessageTime helper to handle all timestamp formats
@@ -117,10 +128,29 @@ export default function ChatInterface() {
     }
 
     // 🔔 4-HOUR CHECK-IN: Auto-message when user opens app after being away
+    // 🧠 "FRESH START" PROTOCOL: Ignore old history, send welcome back message
     useEffect(() => {
         // 🛑 SAFETY CHECK: Don't run if no messages exist or already checked in
         if (!roomId || sortedMessages.length === 0 || hasCheckedInRef.current.has(roomId)) {
             return;
+        }
+
+        // 🛡️ DUPLICATE PREVENTION: Only prevent if check-in was sent in the last 30 seconds (prevent rapid duplicates on refresh)
+        // BUT: Always allow check-in after 4+ hours, NO EXCEPTIONS - user explicitly wants this
+        const welcomeBackKey = `welcomeBack_${roomId}`;
+        const lastCheckInTime = typeof window !== 'undefined' ? sessionStorage.getItem(`${welcomeBackKey}_time`) : null;
+        if (lastCheckInTime) {
+            const timeSinceLastCheckIn = Date.now() - parseInt(lastCheckInTime, 10);
+            // Only skip if check-in was sent less than 30 seconds ago (prevent rapid duplicates on refresh)
+            // After 30 seconds, always allow check-in if 4+ hours have passed
+            if (timeSinceLastCheckIn < 30000) {
+                console.log(`[Check-in] Skipping: Check-in sent ${Math.floor(timeSinceLastCheckIn / 1000)}s ago (too recent, preventing duplicate)`);
+                return;
+            }
+            // If more than 30 seconds have passed, clear the lock and allow check-in
+            if (typeof window !== 'undefined') {
+                sessionStorage.removeItem(`${welcomeBackKey}_time`);
+            }
         }
 
         const lastMsg = sortedMessages[sortedMessages.length - 1];
@@ -132,105 +162,147 @@ export default function ChatInterface() {
         // Calculate gap
         const hoursSinceLastMsg = (now - lastMsgTime) / (1000 * 60 * 60);
 
+        // 🛑 HARD FIX #1: STRICTLY DISABLE check-in if last message is less than 4 hours old
+        // This stops 'Ghost' messages from appearing in the AI's history
+        if (hoursSinceLastMsg < 4) {
+            console.log(`[Check-in] Skipping: Last message is only ${hoursSinceLastMsg.toFixed(2)} hours old (need 4+ hours)`);
+            return;
+        }
+
         // 🛑 SANITY CHECK: 
         // If the gap is massive (> 1 year), it's a bug (1970 issue). Ignore it.
         // Only trigger if gap is > 4 hours AND < 500 hours (approx 20 days)
         if (hoursSinceLastMsg > 4 && hoursSinceLastMsg < 500) {
             hasCheckedInRef.current.add(roomId); // Mark as done so it doesn't spam on re-renders
 
-            // Generate check-in message via AI
-            const currentTime = new Date();
-            const timeString = currentTime.toLocaleTimeString('en-IN', {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: true,
-                timeZone: 'Asia/Kolkata'
-            });
+            // Set session lock with timestamp to prevent rapid duplicates (but allow after 4+ hours)
+            if (typeof window !== 'undefined') {
+                sessionStorage.setItem(`${welcomeBackKey}_time`, Date.now().toString());
+            }
 
-            const silentCheckInPrompt = `[System Event: It has been ${Math.floor(hoursSinceLastMsg)} hours since you last spoke.]
-[Current Time: ${timeString} IST]
-[Task: Send a short, casual check-in message to the user. Ask what's up or if they are okay. Use slang like "Emaindi ra? Silent aipoyav?", "Alive eh na?", or "Em doing?". Keep it brief and nonchalant - 1-2 sentences max.]`;
+            // 🛡️ Initialize kill switch for this room
+            abortCheckInRef.current.set(roomId, false);
 
-            // ✅ Trigger AI response using HIDDEN prompt (system event, no user message saved)
-            // We send this as a hidden system message - NO user message bubble created
             const personaIdForCheckIn = room?.personaId || (sortedMessages.length > 0 && sortedMessages[0].personaId ? sortedMessages[0].personaId : '');
             if (!personaIdForCheckIn) {
                 console.warn("Cannot send check-in: No personaId available");
                 return;
             }
 
-            console.log("⏰ Triggering Silent 4-Hour Check-in...");
+            // Clear any cached greeting data before generating new check-in
+            if (typeof window !== 'undefined') {
+                const cacheKey = `yudi_cached_welcome_${roomId}`;
+                localStorage.removeItem(cacheKey);
+            }
 
-            // ✅ WRAPPED IN 5s DELAY TO PREVENT 405 COLLISIONS
-            const checkInTimer = setTimeout(() => {
-                console.log("🚀 Triggering Delayed Silent 4-Hour Check-in...");
+            // TYPING INDICATOR: Show typing bubble immediately before message appears
+            updateGeneratingState(true);
+            console.log("💬 [Preset] Showing typing indicator before check-in message");
 
-                fetch("/api/chat", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        text: '',
-                        hiddenPrompt: silentCheckInPrompt,
-                        roomId,
-                        personaId: personaIdForCheckIn,
-                        senderType: 'system',
-                    }),
-                })
-                    .then(async (response) => {
-                        if (!response.ok) {
-                            throw new Error("Check-in failed");
-                        }
-                        if (!response.body) throw new Error("No response body");
+            // 🎲 USE PRESET GREETING: No API call needed
+            // ⏱️ Add minimal delay (500ms) to show typing indicator before message appears
+            setTimeout(() => {
+                import('@/lib/presets/welcomeGreetings').then(({ getRandomWelcomeGreeting }) => {
+                    // 🛡️ KILL SWITCH CHECK: If user typed while we were waiting, abort
+                    if (abortCheckInRef.current.get(roomId)) {
+                        console.log("🛑 [Kill Switch] User typed during check-in wait - aborting check-in message");
+                        updateGeneratingState(false);
+                        return;
+                    }
 
-                        const reader = response.body.getReader();
-                        const decoder = new TextDecoder();
-                        let done = false;
-                        let fullBuffer = '';
+                    const checkInContent = getRandomWelcomeGreeting();
+                    console.log(`🎲 [Preset] Selected random welcome greeting: "${checkInContent}"`);
 
-                        // Read entire response
-                        while (!done) {
-                            const { value, done: doneReading } = await reader.read();
-                            done = doneReading;
-                            if (value) {
-                                const chunkValue = decoder.decode(value, { stream: !done });
-                                fullBuffer += chunkValue;
-                            }
-                        }
-
-                        // ✅ Create check-in message (AI response only, no user message bubble)
-                        const checkInContent = fullBuffer.trim().replace(/\n+/g, ' ');
-                        if (checkInContent.length > 0) {
                             // Use Date.now() to ensure we get a proper timestamp (milliseconds)
                             const checkInTimestamp = Date.now();
-                            console.log(`💾 Saving check-in message with timestamp: ${checkInTimestamp} (${new Date(checkInTimestamp).toISOString()})`);
-
-                            // 🛑 CRITICAL CHANGE: 
-                            // We REMOVED 'handleManualMessage' (local bubble creation).
-                            // We ONLY save to DB. The Listener in ChatInterface will handle the UI.
-                            // This guarantees 1 message = 1 bubble (no duplicates possible).
-                            try {
-                                const messageId = await MessageClientDb.create({
+                    
+                    // Save to database immediately
+                    const checkInMessageData = {
                                     roomId,
                                     personaId: personaIdForCheckIn,
-                                    senderType: "persona",
+                        senderType: "persona" as const,
                                     content: checkInContent,
-                                    messageType: "text",
+                        messageType: "text" as const,
                                     isSent: true,
-                                }, new Date(checkInTimestamp));
-                                console.log(`✅ Check-in message saved with ID: ${messageId}`);
-                            } catch (dbError) {
-                                console.error("❌ Failed to save check-in message to DB:", dbError);
-                                // Don't throw - continue even if save fails
-                            }
-                        }
-                    })
-                    .catch((error) => {
-                        console.error("Error sending 4-hour check-in:", error);
-                        // Don't mark as failed, let it retry next time if needed
-                        hasCheckedInRef.current.delete(roomId);
+                    };
+                    
+                    console.log(`💾 [Preset] Saving preset check-in message to DB:`, {
+                        ...checkInMessageData,
+                        contentPreview: checkInContent.substring(0, 50),
+                        timestamp: checkInTimestamp
                     });
-            }, 5000);
-            return () => clearTimeout(checkInTimer);
+                    
+                    MessageClientDb.create(checkInMessageData, new Date(checkInTimestamp))
+                        .then(async (messageId) => {
+                            console.log(`✅ [Preset] Check-in message saved with ID: ${messageId}`);
+                            
+                            // Update room's last message to move chat to top
+                            await RoomClientDb.updateLastMessage(roomId, checkInContent);
+                            console.log(`✅ [Preset] Room last message updated for check-in`);
+                            
+                            // IMMEDIATE REFRESH: Force re-fetch to ensure message appears (optimized for speed)
+                            try {
+                                const immediateResult = await MessageClientDb.getByRoomId(roomId, 50);
+                                console.log(`🔄 [Preset] Immediate re-fetch: ${immediateResult.messages?.length || 0} messages`);
+                                if (immediateResult.messages) {
+                                    const sorted = sortMessagesByTime(immediateResult.messages);
+                                    setMessages(sorted);
+                                    
+                                    // Check if our message is in the list
+                                    const hasOurMessage = sorted.some(m => 
+                                        m.id === messageId || 
+                                        (m.senderType === 'persona' && m.content === checkInContent)
+                                    );
+                                    
+                                    if (hasOurMessage) {
+                                        console.log(`✅ [Preset] Message confirmed in immediate refresh - hiding typing indicator`);
+                                        updateGeneratingState(false);
+                                    } else {
+                                        console.warn(`⚠️ [Preset] Message NOT found in immediate refresh, will retry...`);
+                                    }
+                                }
+                            } catch (immediateError) {
+                                console.error("❌ [Preset] Error in immediate refresh:", immediateError);
+                                updateGeneratingState(false);
+                            }
+                            
+                            // Second refresh: After 150ms (for DB propagation - optimized for speed)
+                            setTimeout(async () => {
+                                try {
+                                    const result = await MessageClientDb.getByRoomId(roomId, 50);
+                                    if (result.messages) {
+                                        const sorted = sortMessagesByTime(result.messages);
+                                        setMessages(sorted);
+                                        
+                                        const hasOurMessage = sorted.some(m => 
+                                            m.id === messageId || 
+                                            (m.senderType === 'persona' && m.content === checkInContent)
+                                        );
+                                        
+                                        if (hasOurMessage) {
+                                            console.log(`✅ [Preset] Message confirmed in delayed refresh - hiding typing indicator`);
+                                            updateGeneratingState(false);
+                                        } else {
+                                            updateGeneratingState(false); // Hide anyway to prevent stuck typing indicator
+                                        }
+                                    }
+                                } catch (refreshError) {
+                                    console.error("❌ [Preset] Error refreshing messages:", refreshError);
+                                    updateGeneratingState(false);
+                                }
+                            }, 150); // Optimized: Reduced from 300ms to 150ms for faster response
+                        })
+                        .catch((dbError) => {
+                            console.error("❌ [Preset] Failed to save check-in message to DB:", dbError);
+                            updateGeneratingState(false);
+                            hasCheckedInRef.current.delete(roomId); // Allow retry
+                        });
+                }).catch((importError) => {
+                    console.error("❌ [Preset] Failed to import welcome greetings:", importError);
+                    updateGeneratingState(false);
+                    hasCheckedInRef.current.delete(roomId); // Allow retry
+                });
+            }, 500); // 500ms delay for typing indicator (fast check-in)
         }
     }, [sortedMessages, roomId, room]); // Runs when messages change or component loads
 
@@ -242,15 +314,43 @@ export default function ChatInterface() {
             setMessages([]);
             localMessageIdsRef.current.clear();
             messagesLoadedRef.current.delete(roomId); // Allow messages to reload for this room
+            abortCheckInRef.current.delete(roomId); // Clear kill switch for new room
+            updateGeneratingState(false); // Clear typing state when switching rooms
         }
-    }, [roomId]);
+        
+        // Cleanup: Clear typing state when component unmounts or room changes
+        return () => {
+            if (roomId) {
+                setTyping(roomId, false);
+            }
+        };
+    }, [roomId, setTyping]);
 
     // Initial message fetch and subscribe to real-time message updates
     useEffect(() => {
         if (roomId && user?.uid && room) {
+            // Explicitly fetch messages first to ensure they load
+            const loadInitialMessages = async () => {
+                if (!messagesLoadedRef.current.has(roomId)) {
+                    try {
+                        // Optimize: Fetch fewer messages initially for faster load (last 50 messages)
+                        const result = await MessageClientDb.getByRoomId(roomId, 50);
+                        if (result.messages && result.messages.length > 0) {
+                            console.log(`✅ [Initial Load] Fetched ${result.messages.length} messages for room: ${roomId}`);
+                            setMessages(sortMessagesByTime(result.messages));
+                            messagesLoadedRef.current.add(roomId);
+                        }
+                    } catch (error) {
+                        console.warn("Error fetching initial messages:", error);
+                    }
+                }
+            };
+            
+            loadInitialMessages();
+
             // Subscribe to real-time updates - this fires immediately with existing messages
             const unsubscribe = MessageClientDb.onRoomMessagesChange(roomId, (updatedMessages) => {
-                console.log(`📨 [Subscription] Received ${updatedMessages.length} messages from subscription for room: ${roomId}`);
+                // Subscription received messages
 
                 setMessages(prev => {
                     // If this is the first time we're loading messages for this room, use all subscription messages
@@ -262,13 +362,22 @@ export default function ChatInterface() {
                     }
 
                     // After initial load, only add NEW messages (deduplicate)
+                    // 🛑 HARD FIX #2: Track processed message IDs to prevent duplicate processing
+                    const processedIds = new Set<string>();
+                    
                     const filteredBackendMessages = updatedMessages.filter(newMessage => {
-                        // A. BLOCK ID DUPLICATES (Standard)
+                        // A. BLOCK ID DUPLICATES (Standard) - Check both prev messages and processed set
                         // If we already have a message with this ID locally, skip it
                         const existingById = prev.some(m => m.id === newMessage.id);
-                        if (existingById || localMessageIdsRef.current.has(newMessage.id)) {
+                        if (existingById || localMessageIdsRef.current.has(newMessage.id) || processedIds.has(newMessage.id)) {
+                            // Silently block duplicates - no logging needed
                             return false;
                         }
+                        
+                        // Mark as processed to prevent duplicate processing in same filter run
+                        processedIds.add(newMessage.id);
+                        
+                        // Note: We'll hide typing indicator in useEffect when messages change
 
                         // B. BLOCK "USER" ECHO (Aggressive) - Only user messages have local copies for instant feedback
                         // This prevents the "User Message Sandwich" where user message appears twice
@@ -290,7 +399,11 @@ export default function ChatInterface() {
                             });
 
                             if (isUserDuplicate) {
+                                // Only log once per unique message to prevent spam
+                                if (!processedIds.has(`duplicate_${newMessage.id}`)) {
                                 console.log("🛡️ Blocked duplicate user message from DB");
+                                    processedIds.add(`duplicate_${newMessage.id}`);
+                                }
                                 return false; // Block the DB echo of user message
                             }
                         }
@@ -304,12 +417,9 @@ export default function ChatInterface() {
                     const merged = [...prev, ...filteredBackendMessages];
                     const sorted = sortMessagesByTime(merged);
 
-                    // DEBUG: Log if check-in messages are in the final sorted array
-                    const checkInMessages = sorted.filter(m => m.senderType === 'persona' && m.content.includes('ekkada sachav'));
-                    if (checkInMessages.length > 0) {
-                        console.log(`✅ [Subscription] Check-in messages in final array: ${checkInMessages.length}`,
-                            checkInMessages.map(m => ({ id: m.id, content: m.content.substring(0, 30), timestamp: getMessageTime(m) }))
-                        );
+                    // Message merge completed
+                    if (filteredBackendMessages.length > 0) {
+                        console.log(`📊 [Subscription] Added ${filteredBackendMessages.length} new messages`);
                     }
 
                     return sorted;
@@ -319,7 +429,39 @@ export default function ChatInterface() {
         }
     }, [roomId, user?.uid, room]);
 
+    // Hide typing indicator when new AI messages arrive (after render, not during)
+    // DELAY: Wait a bit to ensure message is fully rendered before hiding typing indicator
+    useEffect(() => {
+        if (!roomId || messages.length === 0 || !isGenerating) return;
+        
+        // Check if the last message is from the persona (AI) and has substantial content
+        const lastMessage = messages[messages.length - 1];
+        if (lastMessage && lastMessage.senderType === 'persona' && lastMessage.content && lastMessage.content.trim().length > 10) {
+            // Small delay to ensure message is fully rendered and visible before hiding typing indicator
+            const hideTimer = setTimeout(() => {
+                console.log(`✅ [useEffect] New AI message detected - hiding typing indicator after delay`);
+                updateGeneratingState(false);
+            }, 150); // Optimized: Reduced from 300ms to 150ms for faster response
+            
+            return () => clearTimeout(hideTimer);
+        }
+    }, [messages, roomId, isGenerating, updateGeneratingState]);
+
+
     const handleManualMessage = (message: any) => {
+        // 🛡️ KILL SWITCH: If user sends a message while check-in is loading, abort it
+        if (abortCheckInRef.current.has(roomId || '')) {
+            abortCheckInRef.current.set(roomId || '', true);
+            updateGeneratingState(false); // Hide typing indicator immediately
+            console.log("🛑 [Kill Switch] User sent message - aborting check-in for room:", roomId);
+        }
+
+        // Clear any cached greeting data when user sends a message
+        if (typeof window !== 'undefined' && roomId) {
+            const cacheKey = `yudi_cached_welcome_${roomId}`;
+            localStorage.removeItem(cacheKey);
+        }
+
         // Mark this message as locally created to prevent subscription from overwriting
         localMessageIdsRef.current.add(message.id);
 
@@ -364,10 +506,9 @@ export default function ChatInterface() {
         setMessages(prev => prev.map(msg =>
             msg.id === id ? { ...msg, content: (msg.content || "") + chunk } : msg
         ));
-        // Hide typing indicator once content starts arriving
-        if (chunk && chunk.trim().length > 0) {
-            setIsGenerating(false);
-        }
+        // Keep typing indicator ON during streaming
+        // It will be hidden when the subscription receives the complete message from DB
+        // Don't hide it here - let the subscription handle it
     };
 
     useEffect(() => {
@@ -434,12 +575,11 @@ export default function ChatInterface() {
                         }
                     }
 
-                    // Check if this is a new room and send initial message after 3 seconds
+                    // Check if this is a new room and send initial message after 1 second
                     // Prevent duplicate calls using ref
                     if (!initMessageSentRef.current.has(roomId)) {
                         initMessageSentRef.current.add(roomId);
 
-                        // Wait 3 seconds before showing initial message
                         setTimeout(async () => {
                             try {
                                 const initResponse = await fetch('/api/chat/init', {
@@ -481,7 +621,7 @@ export default function ChatInterface() {
                                 // Remove from set on error so it can retry if needed
                                 initMessageSentRef.current.delete(roomId);
                             }
-                        }, 3000); // 3 second delay
+                        }, 1000); // 1-second delay for fast initial greeting
                     }
                 }
             } catch (err) {
@@ -571,9 +711,17 @@ export default function ChatInterface() {
                         roomId={roomId}
                         personaId={room.personaId}
                         onMessageSent={handleManualMessage}
-                        onSynthesizing={setIsGenerating}
+                        onSynthesizing={(isSynthesizing) => updateGeneratingState(isSynthesizing)}
                         onMessageStream={handleStreamAppend}
                         lastMessageTime={sortedMessages.length > 0 ? sortedMessages[sortedMessages.length - 1].createdAt : undefined}
+                        onUserTyping={() => {
+                            // 🛡️ KILL SWITCH: If user starts typing during check-in, abort it
+                            if (abortCheckInRef.current.has(roomId)) {
+                                abortCheckInRef.current.set(roomId, true);
+                                updateGeneratingState(false);
+                                console.log("🛑 [Kill Switch] User started typing - aborting check-in");
+                            }
+                        }}
                     />
                 </div>
             ) : (
@@ -602,9 +750,17 @@ export default function ChatInterface() {
                         roomId={roomId}
                         personaId={room.personaId}
                         onMessageSent={handleManualMessage}
-                        onSynthesizing={setIsGenerating}
+                        onSynthesizing={(isSynthesizing) => updateGeneratingState(isSynthesizing)}
                         onMessageStream={handleStreamAppend}
                         lastMessageTime={sortedMessages.length > 0 ? sortedMessages[sortedMessages.length - 1].createdAt : undefined}
+                        onUserTyping={() => {
+                            // 🛡️ KILL SWITCH: If user starts typing during check-in, abort it
+                            if (abortCheckInRef.current.has(roomId)) {
+                                abortCheckInRef.current.set(roomId, true);
+                                updateGeneratingState(false);
+                                console.log("🛑 [Kill Switch] User started typing - aborting check-in");
+                            }
+                        }}
                     />
                 </div>
             )}
