@@ -20,20 +20,6 @@ const Index = () => {
     document.body.appendChild(script);
 
     return () => {
-      if (document.body.contains(script)) {
-        document.body.removeChild(script);
-      }
-    };
-  }, []);
-
-const Index = () => {
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://tally.so/widgets/embed.js";
-    script.async = true;
-    document.body.appendChild(script);
-
-    return () => {
       document.body.removeChild(script);
     };
   }, []);
