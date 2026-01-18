@@ -14,9 +14,39 @@ export default function AdminDashboard() {
     // 🔒 SECURITY
     const [inputPassword, setInputPassword] = useState("");
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isAdminVerified, setIsAdminVerified] = useState(false);
+    const [checkingAdmin, setCheckingAdmin] = useState(false);
 
+    // Check admin status in Firestore
     useEffect(() => {
         if (!isAuthenticated || !user) return;
+        
+        const checkAdminStatus = async () => {
+            try {
+                setCheckingAdmin(true);
+                const adminRef = doc(db, "admins", user.uid);
+                const adminSnap = await getDoc(adminRef);
+                
+                if (adminSnap.exists()) {
+                    setIsAdminVerified(true);
+                    console.log("✅ Admin verified in Firestore");
+                } else {
+                    setIsAdminVerified(false);
+                    console.warn("⚠️ User not found in admins collection");
+                }
+            } catch (error) {
+                console.error("Error checking admin status:", error);
+                setIsAdminVerified(false);
+            } finally {
+                setCheckingAdmin(false);
+            }
+        };
+        
+        checkAdminStatus();
+    }, [isAuthenticated, user]);
+
+    useEffect(() => {
+        if (!isAuthenticated || !user || !isAdminVerified) return;
 
         const fetchAllChats = async () => {
             try {
@@ -181,7 +211,7 @@ export default function AdminDashboard() {
         };
 
         fetchAllChats();
-    }, [isAuthenticated, user]);
+    }, [isAuthenticated, user, isAdminVerified]);
 
     // 🔒 AUTHENTICATION CHECK
     if (authLoading) {
@@ -252,6 +282,79 @@ export default function AdminDashboard() {
                         if (e.target.value === "yudi123") setIsAuthenticated(true);
                     }}
                 />
+            </div>
+        );
+    }
+
+    // ADMIN VERIFICATION SCREEN
+    if (checkingAdmin) {
+        return (
+            <div className="min-h-screen bg-black text-white flex items-center justify-center">
+                <div>Verifying admin access...</div>
+            </div>
+        );
+    }
+
+    if (!isAdminVerified) {
+        const userId = user.uid;
+        return (
+            <div className="min-h-screen bg-black flex flex-col items-center justify-center text-white space-y-4 p-8">
+                <h1 className="text-2xl font-bold text-red-400">⚠️ Admin Access Required</h1>
+                <p className="text-gray-400 text-center max-w-md">
+                    You've entered the password, but your account is not registered as an admin in Firestore.
+                </p>
+                
+                <div className="bg-gray-900 border border-yellow-600 rounded-md p-6 max-w-2xl w-full space-y-4">
+                    <h2 className="text-lg font-semibold text-yellow-400">How to Grant Admin Access:</h2>
+                    
+                    <div className="space-y-3 text-sm">
+                        <div>
+                            <p className="text-gray-300 font-medium mb-2">Step 1: Copy Your User ID</p>
+                            <div className="flex items-center gap-2">
+                                <code className="flex-1 bg-black p-2 rounded text-sm text-green-400 break-all">
+                                    {userId}
+                                </code>
+                                <button
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(userId);
+                                        alert("Copied to clipboard!");
+                                    }}
+                                    className="px-3 py-2 bg-blue-600 hover:bg-blue-700 rounded text-xs"
+                                >
+                                    Copy
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <p className="text-gray-300 font-medium mb-2">Step 2: Go to Firebase Console</p>
+                            <ol className="list-decimal list-inside space-y-1 text-gray-400 ml-2">
+                                <li>Open <a href="https://console.firebase.google.com" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">Firebase Console</a></li>
+                                <li>Select your project</li>
+                                <li>Go to <strong>Firestore Database</strong></li>
+                                <li>Find or create the <code className="bg-black px-1 rounded">admins</code> collection</li>
+                                <li>Click <strong>"Add document"</strong></li>
+                                <li>Set the <strong>Document ID</strong> to your User ID (paste the copied ID)</li>
+                                <li>Add a field: <code className="bg-black px-1 rounded">userId</code> (type: string) = your User ID</li>
+                                <li>Add a field: <code className="bg-black px-1 rounded">email</code> (type: string) = {user.email || "your-email@example.com"}</li>
+                                <li>Add a field: <code className="bg-black px-1 rounded">createdAt</code> (type: timestamp) = current time</li>
+                                <li>Click <strong>"Save"</strong></li>
+                            </ol>
+                        </div>
+                        
+                        <div>
+                            <p className="text-gray-300 font-medium mb-2">Step 3: Refresh This Page</p>
+                            <p className="text-gray-400 text-xs">After adding yourself to the admins collection, refresh this page to verify access.</p>
+                        </div>
+                    </div>
+                    
+                    <button
+                        onClick={() => window.location.reload()}
+                        className="mt-4 w-full px-4 py-2 bg-green-600 hover:bg-green-700 rounded-md transition-colors"
+                    >
+                        🔄 Refresh to Check Admin Status
+                    </button>
+                </div>
             </div>
         );
     }

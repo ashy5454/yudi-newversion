@@ -58,6 +58,54 @@ const Hero = ({ handleEarlyAccess }: { handleEarlyAccess?: MouseEventHandler<HTM
                         {EN_HERO.cta.text}
                         <ArrowRight className="transition-transform group-hover:-rotate-45 group-active:-rotate-12" />
                     </motion.button>
+                    <motion.button
+                        whileHover={{
+                            scale: 1.015,
+                        }}
+                        whileTap={{
+                            scale: 0.985,
+                        }}
+                        onClick={() => {
+                            if (typeof window !== 'undefined' && !window.Tally) {
+                                const script = document.createElement("script");
+                                script.src = "https://tally.so/widgets/embed.js";
+                                script.async = true;
+                                document.body.appendChild(script);
+                                setTimeout(() => {
+                                    if (window.Tally) {
+                                        window.Tally.openPopup("nrQAB2", {
+                                            layout: "modal",
+                                            width: 500,
+                                            overlay: true,
+                                            emoji: {
+                                                text: "🚀",
+                                                animation: "tada",
+                                            },
+                                            autoClose: false,
+                                        });
+                                    } else {
+                                        window.open("https://tally.so/r/nrQAB2", "_blank");
+                                    }
+                                }, 500);
+                            } else if (window.Tally) {
+                                window.Tally.openPopup("nrQAB2", {
+                                    layout: "modal",
+                                    width: 500,
+                                    overlay: true,
+                                    emoji: {
+                                        text: "🚀",
+                                        animation: "tada",
+                                    },
+                                    autoClose: false,
+                                });
+                            } else {
+                                window.open("https://tally.so/r/nrQAB2", "_blank");
+                            }
+                        }}
+                        className="group relative flex w-fit items-center gap-1.5 rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 hover:from-purple-600 hover:via-pink-600 hover:to-red-600 px-8 py-4 text-lg font-semibold text-white transition-colors shadow-2xl hover:shadow-purple-500/25"
+                    >
+                        Join Waitlist
+                    </motion.button>
                 </div>
             </div>
         </motion.section>

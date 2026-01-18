@@ -160,9 +160,14 @@ export default function AppList() {
                             ) : filteredRooms.length === 0 ? (
                                 <div className="text-center text-muted-foreground p-4">
                                     <p className="mb-2">No rooms match your search.</p>
-                                    <Button variant="secondary" onClick={() => router.push("/m/persona")}>
-                                        Explore Personas
-                                    </Button>
+                                    <div className="flex flex-col gap-2 items-center">
+                                        <Button variant="secondary" onClick={() => router.push("/m/persona")} className="w-full max-w-xs">
+                                            Explore Personas
+                                        </Button>
+                                        <Button variant="secondary" onClick={() => router.push("/m/persona/create")} className="w-full max-w-xs">
+                                            Create Persona
+                                        </Button>
+                                    </div>
                                 </div>
                             ) : (
                                 filteredRooms.map((room: Room) => (

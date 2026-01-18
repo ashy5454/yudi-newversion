@@ -114,20 +114,18 @@ const Index = () => {
                 >
                   <span className="relative z-10 flex items-center gap-2">
                     <Check className="w-5 h-5" />
-                    Join Yudi
+                    Try Yudi
                   </span>
                   <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                 </Button>
                 <Button
                   size="lg"
                   onClick={() => {
-                    // Load Tally script if not already loaded
                     if (typeof window !== 'undefined' && !window.Tally) {
                       const script = document.createElement("script");
                       script.src = "https://tally.so/widgets/embed.js";
                       script.async = true;
                       document.body.appendChild(script);
-                      // Wait a bit for script to load
                       setTimeout(() => {
                         if (window.Tally) {
                           window.Tally.openPopup("nrQAB2", {
@@ -141,7 +139,6 @@ const Index = () => {
                             autoClose: false,
                           });
                         } else {
-                          // Fallback: open in new tab
                           window.open("https://tally.so/r/nrQAB2", "_blank");
                         }
                       }, 500);
@@ -157,23 +154,15 @@ const Index = () => {
                         autoClose: false,
                       });
                     } else {
-                      // Fallback: open in new tab
                       window.open("https://tally.so/r/nrQAB2", "_blank");
                     }
                   }}
                   className="bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 hover:from-purple-600 hover:via-pink-600 hover:to-red-600 text-white px-8 py-6 text-lg font-heading font-semibold rounded-xl shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-[1.02] border-0 relative overflow-hidden group"
                 >
                   <span className="relative z-10 flex items-center gap-2">
-                    Join the Waitlist!
+                    Join Waitlist
                   </span>
                   <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                </Button>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="border-2 border-slate-600 text-slate-300 hover:bg-slate-800 hover:text-white hover:border-slate-500 px-8 py-6 text-lg font-heading font-semibold rounded-xl bg-transparent transition-all duration-300 hover:shadow-xl backdrop-blur-sm"
-                >
-                  Watch Demo
                 </Button>
               </div>
             </div>
@@ -527,17 +516,69 @@ const Index = () => {
           <p className="font-heading text-xl text-blue-100 mb-12 font-normal leading-relaxed max-w-3xl mx-auto">
             Join thousands of users who've found meaningful connections and personal growth with Yudi
           </p>
-          <Button
-            size="lg"
-            onClick={handleEarlyAccess}
-            className="bg-gradient-to-r from-[#428DFF] via-blue-500 to-purple-500 hover:from-[#3b7ce6] hover:via-blue-600 hover:to-purple-600 text-white px-8 py-6 text-lg font-heading font-semibold rounded-xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-[1.02] border-0 relative overflow-hidden group"
-          >
-            <span className="relative z-10 flex items-center gap-2">
-              <Check className="w-5 h-5" />
-              Join Yudi
-            </span>
-            <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button
+              size="lg"
+              onClick={handleEarlyAccess}
+              className="bg-gradient-to-r from-[#428DFF] via-blue-500 to-purple-500 hover:from-[#3b7ce6] hover:via-blue-600 hover:to-purple-600 text-white px-8 py-6 text-lg font-heading font-semibold rounded-xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-[1.02] border-0 relative overflow-hidden group"
+            >
+                  <span className="relative z-10 flex items-center gap-2">
+                    <Check className="w-5 h-5" />
+                    Try Yudi
+                  </span>
+              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+            </Button>
+            <Button
+              size="lg"
+              onClick={() => {
+                // Load Tally script if not already loaded
+                if (typeof window !== 'undefined' && !window.Tally) {
+                  const script = document.createElement("script");
+                  script.src = "https://tally.so/widgets/embed.js";
+                  script.async = true;
+                  document.body.appendChild(script);
+                  // Wait a bit for script to load
+                  setTimeout(() => {
+                    if (window.Tally) {
+                      window.Tally.openPopup("nrQAB2", {
+                        layout: "modal",
+                        width: 500,
+                        overlay: true,
+                        emoji: {
+                          text: "🚀",
+                          animation: "tada",
+                        },
+                        autoClose: false,
+                      });
+                    } else {
+                      // Fallback: open in new tab
+                      window.open("https://tally.so/r/nrQAB2", "_blank");
+                    }
+                  }, 500);
+                } else if (window.Tally) {
+                  window.Tally.openPopup("nrQAB2", {
+                    layout: "modal",
+                    width: 500,
+                    overlay: true,
+                    emoji: {
+                      text: "🚀",
+                      animation: "tada",
+                    },
+                    autoClose: false,
+                  });
+                } else {
+                  // Fallback: open in new tab
+                  window.open("https://tally.so/r/nrQAB2", "_blank");
+                }
+              }}
+              className="bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 hover:from-purple-600 hover:via-pink-600 hover:to-red-600 text-white px-8 py-6 text-lg font-heading font-semibold rounded-xl shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-[1.02] border-0 relative overflow-hidden group"
+            >
+              <span className="relative z-10 flex items-center gap-2">
+                Join Waitlist
+              </span>
+              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+            </Button>
+          </div>
         </div>
       </section>
 
