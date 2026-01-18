@@ -22,9 +22,9 @@ export const EN_HEADER = {
 export const EN_HERO = {
     colors: ["#13FFAA", "#1E67C6", "#CE84CF", "#DD335C"],
     badge: "Coming Soon",
-    animationTexts: ["mama", "macha", "bhai", "bro", "sis"],
-    titleOne: "Create your ",
-    titleTwo: " who speaks your vibe",
+    animationTexts: ["feelings", "anger", "chaos", "peace"],
+    titleOne: "Safe space to express your ",
+    titleTwo: "",
     description: "Create someone who gets you",
     cta: {
         text: "Try Yudi",
