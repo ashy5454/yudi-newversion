@@ -8,7 +8,7 @@ import { HourglassIcon, MicIcon, MicOffIcon, PauseIcon, PlayIcon, XIcon } from '
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/AuthContext';
-import { startVoiceTrial, useAccessControl } from '@/hooks/useAccessControl';
+import { useAccessControl } from '@/hooks/useAccessControl';
 
 export type ControlTrayProps = {
   children?: ReactNode;
@@ -18,7 +18,7 @@ export type ControlTrayProps = {
 function ControlTray({ children, roomId }: ControlTrayProps) {
   const { client, connected, connect, disconnect, isConnecting, config, initializeAudio } = useLiveAPIContext();
   const { user } = useAuth();
-  const { isVoiceTrialExpired, isApproved } = useAccessControl();
+  const { } = useAccessControl();
   const [muted, setMuted] = useState(false);
   const [audioReceived, setAudioReceived] = useState(false);
   const [setupComplete, setSetupComplete] = useState(false);
@@ -32,7 +32,6 @@ function ControlTray({ children, roomId }: ControlTrayProps) {
   const silenceCheckIntervalRef = useRef<NodeJS.Timeout | null>(null); // Interval for checking silence
   const isRecordingLockedRef = useRef(false); // 🛡️ SAFETY LOCK: Prevents stopping during immunity period
   const safetyLockTimeoutRef = useRef<NodeJS.Timeout | null>(null); // Timeout to release safety lock
-  const hasStartedVoiceTrialRef = useRef(false); // Track if we've started the voice trial
   const router = useRouter();
 
   // Constants for recording behavior
@@ -113,11 +112,6 @@ function ControlTray({ children, roomId }: ControlTrayProps) {
       return;
     }
 
-    // 🛑 Block if voice trial is expired (unless approved)
-    if (isVoiceTrialExpired && !isApproved) {
-      alert("Your 4-minute voice trial has expired. Join the waitlist for more access!");
-      return;
-    }
 
     // CRITICAL: Request microphone permission FIRST, before connecting
     console.log('🔄 Connect button clicked - Requesting microphone permission first...');
@@ -135,14 +129,6 @@ function ControlTray({ children, roomId }: ControlTrayProps) {
     } catch (error) {
       console.warn('⚠️ Could not initialize audio context:', error);
       // Continue anyway, audio context might be initialized elsewhere
-    }
-
-    // ⏰ Start voice call trial timer when user clicks play button
-    if (user && !hasStartedVoiceTrialRef.current) {
-      hasStartedVoiceTrialRef.current = true;
-      startVoiceTrial(user.uid).catch((error) => {
-        console.error('Error starting voice trial:', error);
-      });
     }
 
     // Now connect (permission is granted)

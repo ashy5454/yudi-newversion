@@ -6,15 +6,14 @@ import AI_Input_Search from "../kokonutui/ai-input-search";
 import { MessageClientDb } from "@/lib/firebase/clientDb";
 import { toast } from "sonner";
 import { useAuth } from "@/components/AuthContext";
-import { startTextTrial, useAccessControl } from "@/hooks/useAccessControl";
+import { useAccessControl } from "@/hooks/useAccessControl";
 
 export default function ChatInput({ roomId, personaId, onMessageSent, onSynthesizing, onMessageStream, lastMessageTime, onUserTyping }: { roomId: string; personaId: string; onMessageSent?: (message: any) => void; onSynthesizing?: (isSynthesizing: boolean) => void; onMessageStream?: (id: string, chunk: string) => void; lastMessageTime?: Date | number; onUserTyping?: () => void }) {
     const router = useRouter();
     const { user } = useAuth();
-    const { isTextTrialExpired, isApproved } = useAccessControl();
+    const { } = useAccessControl();
     const [isTyping, setIsTyping] = useState(false);
     const isSendingRef = useRef(false); // 🛑 Prevent double-fire
-    const hasStartedTrialRef = useRef(false); // Track if we've started the trial
 
     const handleSend = async (text: string) => {
 
@@ -28,11 +27,6 @@ export default function ChatInput({ roomId, personaId, onMessageSent, onSynthesi
             return;
         }
 
-        // 🛑 Block if text trial is expired (unless approved)
-        if (isTextTrialExpired && !isApproved) {
-            toast.error("Your 4-minute trial has expired. Join the waitlist for more access!");
-            return;
-        }
 
         isSendingRef.current = true; // Mark as sending
 
@@ -48,13 +42,6 @@ export default function ChatInput({ roomId, personaId, onMessageSent, onSynthesi
             console.log("💬 [ChatInput] Typing indicator ON - showing bubbles before AI response");
         }
 
-        // ⏰ Start text chat trial timer when user sends first message
-        if (user && !hasStartedTrialRef.current) {
-            hasStartedTrialRef.current = true;
-            startTextTrial(user.uid).catch((error) => {
-                console.error('Error starting text trial:', error);
-            });
-        }
 
         // 🛑 Lock user timestamp NOW to prevent jumping (prevents sandwich effect)
         const userMsgTime = Date.now();
