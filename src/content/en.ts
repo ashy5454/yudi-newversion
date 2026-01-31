@@ -45,24 +45,30 @@ export const EN_FEATURE_ONE = {
     features: [
         {
             step: "Step 1",
-            title: "Instant Familiarity",
-            content: "Chat like you normally do — no learning curve. Same familiar interface, but with an AI friend who truly gets you.",
-            image: "/chat.png"
+            title: "Talk like you actually text",
+            content: "Hinglish, Telugu, Tamil, pure Hindi, full English, or cursed meme slang — Yudi doesn't just \"understand\", it replies like that one friend who always gets your vibe.",
+            image: "https://images.unsplash.com/photo-1751809998824-9ebe2585118f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1ODh8MHwxfHNlYXJjaHwzfHxnZW4lMjB6JTIwZnJpZW5kcyUyMHRleHRpbmclMjBzbWFydHBob25lfGVufDB8fHx8MTc2OTg1MzI3OHww&ixlib=rb-4.1.0&q=85&w=600"
         },
         {
             step: "Step 2",
-            title: "Full Customization",
-            content: "Build your own AI friend\nPick the name, personality, and language—Yudi morphs into your perfect bhai, anna, didi or bestie.",
-            image: "/ai.png"
+            title: "Gen Z brain, not textbook AI",
+            content: "Inside jokes, emojis, \"fr?\", \"no cap\", \"scene kya hai?\" — Yudi talks like your hostel group chat, not a boring school counselor.",
+            image: "https://images.unsplash.com/photo-1758520388316-416b732104f1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzh8MHwxfHNlYXJjaHwzfHx5b3VuZyUyMHBlb3BsZSUyMGxhdWdoaW5nJTIwY2FzdWFsJTIwY29udmVyc2F0aW9ufGVufDB8fHx8MTc2OTg1MzI4M3ww&ixlib=rb-4.1.0&q=85&w=600"
         },
         {
             step: "Step 3",
-            title: "Complete Privacy",
-            content: "100% private\nAnonymous conversations when you need complete privacy and confidentiality. No judgment, just support.",
-            image: "/security.png"
+            title: "Clingy in the best way possible",
+            content: "Proactive check-ins, \"where did you disappear bro?\", late-night pep talks — Yudi remembers your mood and shows up before you even type.",
+            image: "https://images.unsplash.com/photo-1759060413464-cb0c965d82f8?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NTZ8MHwxfHNlYXJjaHwxfHxjYXJpbmclMjBmcmllbmQlMjBzdXBwb3J0JTIwZW1vdGlvbmFsfGVufDB8fHx8MTc2OTg1MzI5Mnww&ixlib=rb-4.1.0&q=85&w=600"
+        },
+        {
+            step: "Step 4",
+            title: "Build a soul from scratch",
+            content: "Name, backstory, toxicity level (0 please), love for chai, meme IQ — you control the personality top to bottom, Yudi just becomes the character you design.",
+            image: "https://images.unsplash.com/photo-1721492631645-d8c12f883bb9?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MjJ8MHwxfHNlYXJjaHwyfHxjcmVhdGl2ZSUyMGN1c3RvbWl6YXRpb24lMjBkZXNpZ24lMjBwZXJzb25hbGl0eXxlbnwwfHx8fDE3Njk4NTMyODl8MA&ixlib=rb-4.1.0&q=85&w=600"
         }
     ],
-    autoPlayInterval: 3000,
+    autoPlayInterval: 4000,
     imageHeight: "h-[500px]",
 };
 
@@ -111,9 +117,69 @@ export const EN_FEATURE_THREE = {
         text: "Get Early Access",
     },
     squareData: [
-        { id: 1, src: "/langs/english.svg" },
-        { id: 2, src: "/langs/hindi.svg" },
-        { id: 3, src: "/langs/telugu.svg" },
+        { id: 1, src: "/langs/english.svg", label: "English" },
+        { id: 2, src: "/langs/hindi.svg", label: "Hindi" },
+        { id: 3, src: "/langs/telugu.svg", label: "Telugu" },
+    ]
+};
+
+export const EN_DEMO_STEPS = {
+    steps: [
+        {
+            id: 1,
+            title: "Explore Personas",
+            subtitle: "Find your vibe",
+            personas: [
+                {
+                    name: "Roshni",
+                    language: "Telugu",
+                    traits: ["Friendly", "Introvert"],
+                    color: "#f472b6"
+                },
+                {
+                    name: "Sid",
+                    language: "Hindi",
+                    traits: ["Party lover", "Flirty"],
+                    color: "#60a5fa"
+                }
+            ]
+        },
+        {
+            id: 2,
+            title: "Create Your Companion",
+            subtitle: "Design your bestie",
+            form: {
+                name: "Arjun Bhai",
+                description: "Chill bestie who speaks Hinglish, loves music, bollywood lover"
+            }
+        },
+        {
+            id: 3,
+            title: "Chat with Arjun",
+            subtitle: "Start vibing",
+            messages: [
+                {
+                    sender: "user",
+                    text: "Rey! Ekkada unnav ra intha sepu???😤 and how are youuu",
+                    lang: "Telugu"
+                },
+                {
+                    sender: "ai",
+                    text: "Arre sorry ra! Nenu koncham busy ga unna. What about you, how's your mood now?",
+                    lang: "Hinglish"
+                }
+            ]
+        },
+        {
+            id: 4,
+            title: "Voice Call",
+            subtitle: "Talk, don't type",
+            callUI: {
+                name: "Arjun Bhai",
+                status: "Connected",
+                duration: "02:34"
+            }
+        }
     ]
 };
 
@@ -129,7 +195,7 @@ export const EN_TESTIMONIALS = {
             role: "ECE • Mahindra University"
         },
         {
-            text: "\"I built a Tamil meme bot with Yudi’s custom mode. My friends are obsessed 😂\"",
+            text: "\"I built a Tamil meme bot with Yudi's custom mode. My friends are obsessed 😂\"",
             image: "/users/1.jpeg",
             name: "Arun R.",
             role: "AI/ML • ICFAI"
@@ -141,7 +207,7 @@ export const EN_TESTIMONIALS = {
             role: "CS • IIT Gandhinagar"
         },
         {
-            text: "\"I switched languages mid-chat — Hindi to Telugu — Yudi didn’t even flinch.\"",
+            text: "\"I switched languages mid-chat — Hindi to Telugu — Yudi didn't even flinch.\"",
             image: "/users/2.png",
             name: "Sneha Rao",
             role: "IT • VIT Vellore"
@@ -153,7 +219,7 @@ export const EN_TESTIMONIALS = {
             role: "Mech • BITS Pilani"
         },
         {
-            text: "\"Yudi's 'SMOT' mode is so underrated. Felt safe venting things I’ve never told anyone.\"",
+            text: "\"Yudi's 'SMOT' mode is so underrated. Felt safe venting things I've never told anyone.\"",
             image: "/users/2.png",
             name: "Fatima Z.",
             role: "Design • NIFT Hyderabad"
@@ -187,23 +253,46 @@ export const EN_FAQS = {
     faqItems: [
         {
             id: "item-1",
-            icon: "circle-help",
-            question: "Is Yudi free?",
-            answer: "Yes, Yudi is free during the beta phase. Premium features may roll out in the future."
+            icon: "heart",
+            question: "Will Yudi judge me for oversharing?",
+            answer: "Nope. Yudi is built to be your non-judgy corner of the internet. Cry about your crush, rant about your prof, overthink your texts — it's all chill here."
         },
         {
             id: "item-2",
-            icon: "globe",
-            question: "Can I switch languages anytime?",
-            answer: "Absolutely. Yudi seamlessly switches between languages in real-time while chatting."
+            icon: "brain",
+            question: "Does Yudi remember our previous chats?",
+            answer: "Yes, Yudi remembers your past conversations, preferences, and inside jokes, so it feels like talking to the same person every time, not resetting a bot."
         },
         {
             id: "item-3",
+            icon: "users",
+            question: "Can I create more than one personality?",
+            answer: "100%. Make a chill bestie, a strict mentor, a chaotic meme lord, and a wholesome elder-sibling vibe — your inbox can have a whole multiverse."
+        },
+        {
+            id: "item-4",
+            icon: "globe",
+            question: "What if I switch languages mid-sentence?",
+            answer: "Go full \"Hindi + Telugu + English + emojis\" mode. Yudi handles code-switching like a true Indian group chat — no awkward \"sorry, I didn't understand.\""
+        },
+        {
+            id: "item-5",
             icon: "shield",
-            question: "Are chats private?",
-            answer: "Yes. Chats are private and protected under our SMOT mode (Secure Mode of Texting)."
+            question: "Is this therapy?",
+            answer: "Yudi is a comforting emotional friend, not a licensed therapist. For serious mental health issues, we always recommend talking to real professionals too."
+        },
+        {
+            id: "item-6",
+            icon: "circle-help",
+            question: "Is Yudi free?",
+            answer: "Yes, Yudi is free during the beta phase. Premium features may roll out in the future."
         }
-    ]
+    ],
+    contact: {
+        title: "heyy! contact us now",
+        emoji: "💜",
+        phones: ["8369490053", "7993276033"]
+    }
 };
 
 export const EN_CALL_TO_ACTION = {
@@ -224,8 +313,8 @@ export const EN_FOOTER = {
         {
             group: "Product",
             items: [
-                { title: "Features", to: "#" },
-                { title: "Languages", to: "#" },
+                { title: "Features", to: "#features" },
+                { title: "Languages", to: "#languages" },
                 { title: "Privacy", to: "#" },
                 { title: "Security", to: "#" }
             ]
@@ -233,10 +322,10 @@ export const EN_FOOTER = {
         {
             group: "Company",
             items: [
-                { title: "About", to: "#" },
+                { title: "About", to: "#about" },
                 { title: "Blog", to: "#" },
                 { title: "Careers", to: "#" },
-                { title: "Contact", to: "#" }
+                { title: "Contact", to: "#contact" }
             ]
         }
     ],
