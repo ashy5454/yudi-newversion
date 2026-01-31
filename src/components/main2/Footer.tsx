@@ -1,62 +1,76 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
 import { Logo } from "./Logo";
 import { EN_FOOTER } from "@/content/en";
+import { motion } from "framer-motion";
 
 const Footer: React.FC = () => {
     return (
-        <footer className="relative w-full bg-muted/50 pt-20 pb-12">
-            <div className="mx-auto max-w-6xl pt-20 px-12 lg:px-0">
-                <div className="flex flex-col lg:flex-row justify-between gap-20 lg:gap-40">
-                    <div className="md:col-span-2">
+        <footer className="relative w-full bg-gradient-to-b from-[#0B0F19] to-black/95 pt-12 pb-6">
+            <div className="mx-auto max-w-7xl px-4 md:px-8">
+                {/* Main Footer Content */}
+                <div className="flex flex-col lg:flex-row justify-between gap-12 lg:gap-20">
+                    {/* Logo & Description */}
+                    <div className="lg:max-w-sm">
                         <Logo />
-                        <div className="mt-4">
-                            <p className="mt-4 text-sm text-white/70">
-                                {EN_FOOTER.description}
-                            </p>
-                        </div>
+                        <p className="mt-4 text-sm text-white/60 leading-relaxed">
+                            {EN_FOOTER.description}
+                        </p>
                     </div>
 
-                    <div className="flex flex-row justify-between gap-40">
+                    {/* Links */}
+                    <div className="flex flex-row gap-16 md:gap-24">
                         {EN_FOOTER.links.map((link, index) => (
-                            <div
-                                key={index}
-                                className="space-y-4 text-sm">
-                                <span className="block font-bold text-white">{link.group}</span>
-                                {link.items.map((item, index) => (
+                            <div key={index} className="space-y-3">
+                                <span className="block text-sm font-semibold text-white/90">
+                                    {link.group}
+                                </span>
+                                {link.items.map((item, idx) => (
                                     <Link
-                                        key={index}
+                                        key={idx}
                                         href={item.to}
-                                        className="text-white/70 hover:text-white block duration-150">
-                                        <span>{item.title}</span>
+                                        className="text-white/50 hover:text-white block text-sm transition-colors duration-200"
+                                    >
+                                        {item.title}
                                     </Link>
                                 ))}
                             </div>
                         ))}
                     </div>
                 </div>
-                <div className="mt-12 flex flex-wrap items-end justify-between gap-6 border-t py-6">
-                    <span className="text-white/70 order-last block text-center text-sm md:order-first">© {new Date().getFullYear()}{' '}{EN_FOOTER.footerText}</span>
-                    <div className="order-first flex flex-wrap justify-center gap-6 text-sm md:order-last">
+
+                {/* Divider */}
+                <div className="mt-10 border-t border-white/10" />
+
+                {/* Bottom Bar - Slimmer */}
+                <div className="mt-4 flex flex-col md:flex-row items-center justify-between gap-4">
+                    {/* Copyright */}
+                    <span className="text-white/50 text-xs order-last md:order-first">
+                        © {new Date().getFullYear()}{EN_FOOTER.footerText}
+                    </span>
+
+                    {/* Social Links */}
+                    <div className="flex items-center gap-4 order-first md:order-last">
                         {EN_FOOTER.socialLinks.map((icon, index) => (
-                            <Link
-                                key={index}
-                                href={icon.to}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                aria-label={icon.label}
-                                className="text-white/70 hover:text-white block">
-                                <svg
-                                    className="size-6"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="1em"
-                                    height="1em"
-                                    viewBox="0 0 24 24">
-                                    <path
-                                        fill="currentColor"
-                                        d={icon.svgPath}></path>
-                                </svg>
-                            </Link>
+                            <motion.div key={index} whileHover={{ scale: 1.1, y: -2 }}>
+                                <Link
+                                    href={icon.to}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    aria-label={icon.label}
+                                    className="text-white/40 hover:text-white transition-colors duration-200"
+                                >
+                                    <svg
+                                        className="w-5 h-5"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path fill="currentColor" d={icon.svgPath} />
+                                    </svg>
+                                </Link>
+                            </motion.div>
                         ))}
                     </div>
                 </div>
@@ -66,4 +80,3 @@ const Footer: React.FC = () => {
 };
 
 export default Footer;
-
