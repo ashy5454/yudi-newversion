@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 
 const Footer: React.FC = () => {
     return (
-        <footer className="relative w-full bg-gradient-to-b from-[#0B0F19] to-black/95 pt-12 pb-6">
+        <footer className="relative w-full bg-gradient-to-b from-[#0B0F19] to-black/95 pt-8 pb-4">
             <div className="mx-auto max-w-7xl px-4 md:px-8">
                 {/* Main Footer Content */}
                 <div className="flex flex-col lg:flex-row justify-between gap-12 lg:gap-20">
