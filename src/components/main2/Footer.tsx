@@ -45,7 +45,7 @@ const Footer: React.FC = () => {
                 <div className="mt-6 border-t border-white/10" />
 
                 {/* Bottom Bar - Slimmer */}
-                <div className="mt-4 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="mt-3 flex flex-col md:flex-row items-center justify-between gap-3">
                     {/* Copyright */}
                     <span className="text-white/50 text-xs order-last md:order-first">
                         © {new Date().getFullYear()}{EN_FOOTER.footerText}
