@@ -42,7 +42,7 @@ const Footer: React.FC = () => {
                 </div>
 
                 {/* Divider */}
-                <div className="mt-10 border-t border-white/10" />
+                <div className="mt-6 border-t border-white/10" />
 
                 {/* Bottom Bar - Slimmer */}
                 <div className="mt-4 flex flex-col md:flex-row items-center justify-between gap-4">
