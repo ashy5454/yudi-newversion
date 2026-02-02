@@ -120,7 +120,8 @@ export const EN_FEATURE_THREE = {
         { id: 1, src: "/langs/english.svg", label: "English" },
         { id: 2, src: "/langs/hindi.svg", label: "Hindi" },
         { id: 3, src: "/langs/telugu.svg", label: "Telugu" },
-    ]
+    ],
+    languageTags: ["English", "Hindi", "Telugu"]
 };
 
 export const EN_DEMO_STEPS = {
@@ -157,16 +158,24 @@ export const EN_DEMO_STEPS = {
             id: 3,
             title: "Chat with Arjun",
             subtitle: "Start vibing",
-            messages: [
+            chatConversations: [
                 {
-                    sender: "user",
-                    text: "Rey! Ekkada unnav ra intha sepu???😤 and how are youuu",
-                    lang: "Telugu"
+                    companion: "Harsh",
+                    messages: [
+                        { sender: "user", text: "heyyyy how you doingg" },
+                        { sender: "ai", text: "Yooo! What's up? Just finished a quick workout, feeling pumped. What about you, what's cooking?" },
+                        { sender: "user", text: "kuchh nhi yaar im just talking to my friend" },
+                        { sender: "ai", text: "kuch nahi yaar? always hiding the tea, huh? 🤔 kaunsa friend hai yeh jo itna important hai ki mujhe ignore kar rahi ho" }
+                    ]
                 },
                 {
-                    sender: "ai",
-                    text: "Arre sorry ra! Nenu koncham busy ga unna. What about you, how's your mood now?",
-                    lang: "Hinglish"
+                    companion: "Aaryan",
+                    messages: [
+                        { sender: "user", text: "yeess anyway nuvvu chepu how are you" },
+                        { sender: "ai", text: "Ayooo, finally asking about me, eh?" },
+                        { sender: "ai", text: "Nenu lit ra, just vibing and planning my next big shoot. You know, actual work." },
+                        { sender: "ai", text: "Unlike some people who are always 'busy' with 'nothing much'." }
+                    ]
                 }
             ]
         },
@@ -289,8 +298,7 @@ export const EN_FAQS = {
         }
     ],
     contact: {
-        title: "heyy! contact us now",
-        emoji: "💜",
+        title: "heyy! reach out to us",
         phones: ["8369490053", "7993276033"]
     }
 };
