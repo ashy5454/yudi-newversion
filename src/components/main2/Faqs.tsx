@@ -5,7 +5,7 @@ import { EN_FAQS } from '@/content/en'
 import { DynamicIcon, type IconName } from 'lucide-react/dynamic'
 import { motion } from 'framer-motion'
 import AnimatedBackground from './AnimatedBackground'
-import { Heart, Phone, Sparkles, MessageCircle } from 'lucide-react'
+import { Phone, MessageCircle, Mail } from 'lucide-react'
 
 export default function Faqs() {
     return (
@@ -30,7 +30,7 @@ export default function Faqs() {
                                 {EN_FAQS.title}
                             </h2>
                             
-                            {/* Creative Contact Card */}
+                            {/* Contact Card - Subtle Colors */}
                             <motion.div 
                                 className="relative mt-8 p-6 rounded-3xl overflow-hidden"
                                 initial={{ opacity: 0, y: 20 }}
@@ -38,59 +38,32 @@ export default function Faqs() {
                                 transition={{ delay: 0.3 }}
                                 viewport={{ once: true }}
                             >
-                                {/* Gradient Background */}
-                                <div className="absolute inset-0 bg-gradient-to-br from-purple-600/30 via-pink-600/20 to-purple-600/30 backdrop-blur-xl" />
-                                <div className="absolute inset-0 border border-white/20 rounded-3xl" />
+                                {/* Subtle Background */}
+                                <div className="absolute inset-0 bg-white/5 backdrop-blur-xl" />
+                                <div className="absolute inset-0 border border-white/10 rounded-3xl" />
                                 
-                                {/* Floating Hearts */}
+                                {/* Floating Icon - Subtle */}
                                 <motion.div
                                     className="absolute top-4 right-4"
                                     animate={{ 
-                                        y: [0, -10, 0],
-                                        rotate: [0, 10, 0, -10, 0],
-                                        scale: [1, 1.2, 1]
+                                        y: [0, -8, 0],
+                                        rotate: [0, 5, 0, -5, 0]
                                     }}
-                                    transition={{ duration: 3, repeat: Infinity }}
+                                    transition={{ duration: 4, repeat: Infinity }}
                                 >
-                                    <Heart className="w-8 h-8 text-pink-400 fill-pink-400" />
-                                </motion.div>
-                                
-                                <motion.div
-                                    className="absolute bottom-6 left-6"
-                                    animate={{ 
-                                        y: [0, 8, 0],
-                                        rotate: [0, -15, 0, 15, 0]
-                                    }}
-                                    transition={{ duration: 4, repeat: Infinity, delay: 0.5 }}
-                                >
-                                    <Sparkles className="w-6 h-6 text-purple-400" />
+                                    <Mail className="w-6 h-6 text-white/30" />
                                 </motion.div>
 
                                 {/* Content */}
                                 <div className="relative z-10">
-                                    <motion.p 
-                                        className="text-2xl md:text-3xl font-bold text-white mb-2"
+                                    <p 
+                                        className="text-xl md:text-2xl font-bold text-white/90 mb-2"
                                         style={{ fontFamily: "'Clash Display', 'Outfit', sans-serif" }}
-                                        animate={{ 
-                                            textShadow: [
-                                                "0 0 10px rgba(236, 72, 153, 0)",
-                                                "0 0 20px rgba(236, 72, 153, 0.5)",
-                                                "0 0 10px rgba(236, 72, 153, 0)",
-                                            ]
-                                        }}
-                                        transition={{ duration: 2, repeat: Infinity }}
                                     >
-                                        {EN_FAQS.contact.title} 
-                                        <motion.span 
-                                            className="inline-block ml-2"
-                                            animate={{ scale: [1, 1.3, 1] }}
-                                            transition={{ duration: 1.5, repeat: Infinity }}
-                                        >
-                                            {EN_FAQS.contact.emoji}
-                                        </motion.span>
-                                    </motion.p>
+                                        {EN_FAQS.contact.title} :)
+                                    </p>
                                     
-                                    {/* Phone Numbers with Animation */}
+                                    {/* Phone Numbers */}
                                     <div className="space-y-3 mt-6">
                                         {EN_FAQS.contact.phones.map((phone, idx) => (
                                             <motion.a
@@ -104,14 +77,14 @@ export default function Faqs() {
                                                 whileHover={{ x: 5 }}
                                             >
                                                 <motion.div
-                                                    className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-green-500/30 transition-colors"
+                                                    className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors"
                                                     whileHover={{ rotate: [0, -10, 10, 0] }}
                                                     transition={{ duration: 0.3 }}
                                                 >
-                                                    <Phone className="w-5 h-5 text-green-400" />
+                                                    <Phone className="w-5 h-5 text-white/70" />
                                                 </motion.div>
                                                 <span 
-                                                    className="text-xl md:text-2xl font-bold text-white/90 group-hover:text-white transition-colors"
+                                                    className="text-lg md:text-xl font-semibold text-white/80 group-hover:text-white transition-colors"
                                                     style={{ fontFamily: "'JetBrains Mono', monospace" }}
                                                 >
                                                     {phone}
@@ -128,9 +101,9 @@ export default function Faqs() {
                                         transition={{ delay: 0.6 }}
                                         viewport={{ once: true }}
                                     >
-                                        <p className="text-white/60 text-sm flex items-center gap-2">
+                                        <p className="text-white/50 text-sm flex items-center gap-2">
                                             <MessageCircle className="w-4 h-4" />
-                                            slide into our DMs anytime bestie ✨
+                                            reach out anytime, we're here for you
                                         </p>
                                     </motion.div>
                                 </div>
@@ -165,10 +138,10 @@ export default function Faqs() {
                                     >
                                         <AccordionTrigger className="cursor-pointer items-center py-5 hover:no-underline group">
                                             <div className="flex items-center gap-4">
-                                                <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-white/10 group-hover:from-purple-500/30 group-hover:to-pink-500/30 transition-all">
+                                                <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/10 border border-white/10 group-hover:bg-white/15 transition-all">
                                                     <DynamicIcon
                                                         name={item.icon as IconName}
-                                                        className="w-5 h-5 text-purple-400"
+                                                        className="w-5 h-5 text-white/70"
                                                     />
                                                 </div>
                                                 <span className="text-base md:text-lg text-white font-medium text-left">
