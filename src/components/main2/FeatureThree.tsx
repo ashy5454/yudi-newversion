@@ -175,7 +175,7 @@ const ShuffleHero = ({ handleEarlyAccess }: { handleEarlyAccess?: MouseEventHand
 
                 {/* Language Tags */}
                 <div className="flex flex-wrap gap-3 mt-8">
-                    {["English", "Hindi", "Telugu", "Tamil", "Bengali", "+ More"].map((lang, idx) => (
+                    {["English", "Hindi", "Telugu"].map((lang, idx) => (
                         <motion.span
                             key={lang}
                             initial={{ opacity: 0, scale: 0.8 }}
