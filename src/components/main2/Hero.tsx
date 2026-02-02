@@ -41,17 +41,6 @@ const Hero = ({ handleEarlyAccess }: { handleEarlyAccess?: MouseEventHandler<HTM
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.8 }}
                     >
-                        {/* Badge */}
-                        <motion.div
-                            initial={{ opacity: 0, y: -20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.2 }}
-                            className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-full px-4 py-2 mb-6"
-                        >
-                            <Sparkles className="w-4 h-4 text-purple-400" />
-                            <span className="text-sm font-medium text-purple-300">Your AI bestie awaits</span>
-                        </motion.div>
-
                         {/* Main Heading */}
                         <h1 
                             className="font-bold leading-tight mb-6" 
