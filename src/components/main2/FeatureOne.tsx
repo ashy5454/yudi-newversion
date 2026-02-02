@@ -63,9 +63,6 @@ export default function FeatureOne() {
                     >
                         {EN_FEATURE_ONE.title}
                     </h2>
-                    <p className="text-white/60 text-lg max-w-2xl mx-auto">
-                        no cap, Yudi hits different fr fr 💯
-                    </p>
                 </motion.div>
 
                 {/* Horizontal Carousel */}
