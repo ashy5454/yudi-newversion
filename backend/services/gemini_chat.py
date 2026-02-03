@@ -141,7 +141,7 @@ def generate_response_with_history(
     language: str,
     emotion: str,
     gemini_api_key: Optional[str] = None,
-    gemini_model: str = "gemini-2.0-flash-exp"
+    gemini_model: str = "gemini-2.5-flash"
 ) -> str:
     """
     Generate Gemini response with full conversation history

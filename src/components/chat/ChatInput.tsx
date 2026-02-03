@@ -7,6 +7,7 @@ import { MessageClientDb } from "@/lib/firebase/clientDb";
 import { toast } from "sonner";
 import { useAuth } from "@/components/AuthContext";
 import { useAccessControl } from "@/hooks/useAccessControl";
+import { auth } from "@/lib/firebase/firebase";
 
 export default function ChatInput({ roomId, personaId, onMessageSent, onSynthesizing, onMessageStream, lastMessageTime, onUserTyping }: { roomId: string; personaId: string; onMessageSent?: (message: any) => void; onSynthesizing?: (isSynthesizing: boolean) => void; onMessageStream?: (id: string, chunk: string) => void; lastMessageTime?: Date | number; onUserTyping?: () => void }) {
     const router = useRouter();
@@ -27,6 +28,34 @@ export default function ChatInput({ roomId, personaId, onMessageSent, onSynthesi
             return;
         }
 
+        // 🛑 CRITICAL: Check if user is signed in
+        if (!user) {
+            console.error("[ChatInput] User not signed in");
+            toast.error("Please sign in to send messages");
+            router.push('/');
+            return;
+        }
+
+        // 🛑 Get fresh auth token for this request
+        let authToken: string | null = null;
+        try {
+            const currentUser = auth.currentUser;
+            if (currentUser) {
+                authToken = await currentUser.getIdToken();
+            }
+        } catch (tokenError) {
+            console.error("[ChatInput] Failed to get auth token:", tokenError);
+            toast.error("Authentication error. Please sign in again.");
+            router.push('/');
+            return;
+        }
+
+        if (!authToken) {
+            console.error("[ChatInput] No auth token available");
+            toast.error("Please sign in to send messages");
+            router.push('/');
+            return;
+        }
 
         isSendingRef.current = true; // Mark as sending
 
@@ -133,8 +162,7 @@ export default function ChatInput({ roomId, personaId, onMessageSent, onSynthesi
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-
-
+                    "Authorization": `Bearer ${authToken}`, // 🛑 CRITICAL: Send token in Authorization header
                 },
                 body: JSON.stringify({
                     text: cleanUserText, // ✅ CLEAN text for database saving
@@ -165,29 +193,29 @@ export default function ChatInput({ roomId, personaId, onMessageSent, onSynthesi
                     const chunkValue = decoder.decode(value, { stream: !done });
                     fullBuffer += chunkValue;
                     lineBuffer += chunkValue;
-                    
+
                     // Process complete lines immediately for faster UI updates
                     const lines = lineBuffer.split('\n');
                     lineBuffer = lines.pop() || ''; // Keep incomplete line in buffer
-                    
+
                     // Process complete SSE lines as they arrive
                     for (const line of lines) {
                         const trimmedLine = line.trim();
                         if (!trimmedLine || trimmedLine === 'data: [DONE]' || trimmedLine === '[DONE]') continue;
-                        
+
                         if (trimmedLine.startsWith('data:')) {
                             const jsonStr = trimmedLine.replace(/^data:\s*/, '').trim();
                             if (jsonStr === '[DONE]' || jsonStr === '') continue;
-                            
+
                             try {
-                                    const data = JSON.parse(jsonStr);
-                                    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                                    if (text && typeof text === 'string' && onMessageStream) {
-                                        // Stream chunks to UI immediately for faster display
-                                        onMessageStream(aiMsgId, text);
-                                        // ⚡ Keep typing indicator ON during streaming (don't hide it yet)
-                                        // It will be hidden after the message is fully saved to DB
-                                    }
+                                const data = JSON.parse(jsonStr);
+                                const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                                if (text && typeof text === 'string' && onMessageStream) {
+                                    // Stream chunks to UI immediately for faster display
+                                    onMessageStream(aiMsgId, text);
+                                    // ⚡ Keep typing indicator ON during streaming (don't hide it yet)
+                                    // It will be hidden after the message is fully saved to DB
+                                }
                             } catch (e) {
                                 // Continue processing
                             }
@@ -379,12 +407,12 @@ export default function ChatInput({ roomId, personaId, onMessageSent, onSynthesi
             // EXCEPTION: If response is very short (<10 words) or contains exclamation, disable chopper
             const cleanLines: string[] = [];
             let questionCount = 0;
-            
+
             // Calculate total word count of all lines to check if response is very short
             const totalWords = rawLines.join(' ').split(/\s+/).filter(w => w.length > 0).length;
             const hasExclamation = rawLines.some(line => line.includes('!'));
             const isVeryShortResponse = totalWords < 10;
-            
+
             // DISABLE chopper for very short responses or responses with exclamations (punchy replies)
             const shouldDisableChopper = isVeryShortResponse || hasExclamation;
 
@@ -478,7 +506,7 @@ export default function ChatInput({ roomId, personaId, onMessageSent, onSynthesi
             // 3. THE DECISION (Roll the dice)
             // Spam if we have 2+ complete lines AND the dice roll hits
             const useSpamFormat = hasMultipleCompleteThoughts && Math.random() < spamChance;
-            
+
 
             // =========================================================
             // 🛑 OPTION A: SPAM MODE (Separate Bubbles)
@@ -513,7 +541,7 @@ export default function ChatInput({ roomId, personaId, onMessageSent, onSynthesi
                                 messageType: "text",
                                 isSent: true,
                             }, new Date(explicitTime));
-                            
+
                             // ⚡ Keep typing indicator ON for spam mode - it will be hidden when subscription receives the last message
                             // Don't hide it here - let the subscription handle it
                             if (i === lines.length - 1) {
@@ -525,7 +553,7 @@ export default function ChatInput({ roomId, personaId, onMessageSent, onSynthesi
                         }
                     }, i * 1200); // 1.2s delay between messages
                 }
-                
+
                 // ⚡ Keep typing indicator ON during spam mode - it will be hidden when subscription receives all messages
                 // Don't hide it here - let the subscription handle it
 
@@ -571,15 +599,30 @@ export default function ChatInput({ roomId, personaId, onMessageSent, onSynthesi
                     error instanceof Error ? error.message : "Failed to send message"
                 );
             }
-            // Remove the placeholder message if error? Or show error state?
-            // For now keep as is.
+            // 🛑 CRITICAL FIX: Reset typing state on error to re-enable send button
+            setIsTyping(false);
+            if (onSynthesizing) onSynthesizing(false);
+            isSendingRef.current = false;
         } finally {
-            // ⚡ Keep typing indicator ON until message is fully saved to DB
-            // The subscription will handle hiding it when the message appears from DB
-            // Only hide if there was an error or if message saving failed
-            // setIsTyping(false); // Don't hide here - let subscription handle it
-            // if (onSynthesizing) onSynthesizing(false); // Don't hide here - let subscription handle it
-            isSendingRef.current = false; // 🛑 Reset sending flag
+            // 🛑 CRITICAL FIX: Always reset sending flag
+            isSendingRef.current = false;
+
+            // 🛑 MOBILE FIX: Reset typing state after a delay to ensure button re-enables
+            // The subscription will handle hiding it earlier if it fires, but this ensures it always resets
+            // This prevents the button from staying disabled on mobile if subscription doesn't fire
+            setTimeout(() => {
+                // Only reset if still typing (to avoid race conditions with subscription)
+                setIsTyping(prev => {
+                    if (prev) {
+                        console.log("[ChatInput] Auto-resetting isTyping after timeout (subscription may not have fired)");
+                        return false;
+                    }
+                    return prev;
+                });
+                if (onSynthesizing) {
+                    onSynthesizing(false);
+                }
+            }, 2000); // 2 second delay - gives subscription time to fire, but ensures reset if it doesn't
         }
     };
 

@@ -15,7 +15,7 @@ export const EN_HEADER = {
         { name: 'Contact', to: '#contact' }
     ],
     cta: {
-        text: "Try Yudi",
+        text: "Join Yudi",
     },
 };
 
@@ -27,6 +27,9 @@ export const EN_HERO = {
     titleTwo: "",
     description: "Create someone who gets you",
     cta: {
+        text: "Join Yudi",
+    },
+    tryCta: {
         text: "Try Yudi",
     }
 };

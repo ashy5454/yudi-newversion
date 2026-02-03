@@ -48,7 +48,7 @@ Please provide a JSON response with these fields:
 Return ONLY valid JSON, no markdown or explanation.`;
 
     // ─── 3) Choose model ───────────────────────────────────────────────────────
-    // .env -> GEMINI_MODEL=gemini-2.5-flash (optional)
+    // .env -> GEMINI_MODEL=gemini-2.5-flash (optional, can also use gemini-1.5-flash for faster/cheaper)
     const rawModel = process.env.GEMINI_MODEL || "gemini-2.5-flash";
     const modelName = rawModel.trim();
 

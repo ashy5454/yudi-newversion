@@ -76,6 +76,7 @@ export interface FirebaseUser {
   displayName: string | null;
   photoURL: string | null;
   emailVerified: boolean;
+  isAnonymous?: boolean;
 }
 
 // Auth Context Types
@@ -83,6 +84,9 @@ export interface AuthContextType {
   user: FirebaseUser | null;
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
+  signInAnonymously: () => Promise<any>;
+  updateAnonymousUsername: (username: string, genderPreference: string) => Promise<void>;
+  updateGenderPreference: (genderPreference: string, username?: string) => Promise<void>;
   signOut: () => Promise<void>;
 }
 

@@ -1,7 +1,6 @@
-export const dynamic = 'force-dynamic'; // Add this line at the top
+export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from "next/server";
-// ... existing imports ...import { NextRequest, NextResponse } from "next/server";
 import { MessageAdminDb, PersonaAdminDb, RoomAdminDb } from '@/lib/firebase/adminDb';
 import { isFirebaseEnabled } from '@/lib/firebase/firebase-admin';
 import { Message, Persona } from "@/lib/firebase/dbTypes";
@@ -13,7 +12,7 @@ import {
     shouldUseSpamMode,
     type EmotionAnalysis,
     type SlangSelection
-} from '@/lib/intelligence/emotionalIntelligence';
+} from '@/lib/intelligence/emotionalIntelligence'; '@/lib/intelligence/emotionalIntelligence';
 
 export async function GET() {
     return NextResponse.json({ message: 'API is working' });
@@ -21,7 +20,53 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
     try {
-        const { text, hiddenPrompt, roomId, personaId, senderType = 'user', messageType = 'text', metadata, skipHistory = false, isWelcomeCheckIn = false, history: bodyHistory } = await req.json();
+        // 🔒 Verify authentication - Try Authorization header first, then cookie
+        let authUser = null;
+
+        // Try Authorization header first (more reliable)
+        const authHeader = req.headers.get('authorization');
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            const token = authHeader.substring(7);
+            try {
+                const { verifyIdToken } = await import('@/lib/firebase/firebase-admin');
+                const decodedToken = await verifyIdToken(token);
+                if (decodedToken) {
+                    authUser = {
+                        uid: decodedToken.uid,
+                        email: decodedToken.email,
+                    };
+                }
+            } catch (tokenError) {
+                console.error('Error verifying token from Authorization header:', tokenError);
+            }
+        }
+
+        // Fallback to cookie if Authorization header didn't work
+        if (!authUser) {
+            const { verifyAuthToken } = await import('@/lib/auth/verify-token');
+            authUser = await verifyAuthToken(req);
+        }
+
+        if (!authUser) {
+            return NextResponse.json(
+                { message: 'Unauthorized - Please sign in' },
+                { status: 401 }
+            );
+        }
+
+        // ✅ Handle empty or malformed JSON gracefully
+        let requestBody;
+        try {
+            requestBody = await req.json();
+        } catch (jsonError) {
+            console.error('Error parsing JSON request:', jsonError);
+            return NextResponse.json(
+                { message: 'Invalid JSON in request body' },
+                { status: 400 }
+            );
+        }
+
+        const { text, hiddenPrompt, roomId, personaId, senderType = 'user', messageType = 'text', metadata, skipHistory = false, isWelcomeCheckIn = false, history: bodyHistory } = requestBody;
 
         // 🐛 DEBUG: Log if history is being sent from frontend (for debugging memory issues)
         if (bodyHistory) {
@@ -62,7 +107,7 @@ export async function POST(req: NextRequest) {
                 model: {
                     name: "Gemini",
                     systemPrompt: "You are a helpful and friendly AI companion named Yudi.",
-                    textModel: process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp',
+                    textModel: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
                     voiceModel: "default",
                     voiceName: "default",
                     gender: "neutral" as const,
@@ -200,13 +245,16 @@ export async function POST(req: NextRequest) {
 
         // ========== EMOTIONAL INTELLIGENCE ENGINE (Chain of Thought) ==========
 
-        // Get user name from cached room data
+        // Get user name and gender preference from cached room data
         let userName = '';
+        let userGenderPreference: string | undefined = undefined;
         if (isFirebaseEnabled && roomData?.userId) {
             try {
                 const { UserAdminDb } = await import('@/lib/firebase/adminDb');
                 const userData = await UserAdminDb.getById(roomData.userId);
-                userName = userData?.displayName || userData?.email?.split('@')[0] || roomData.userId;
+                // Use username if available, otherwise displayName, otherwise email, otherwise userId
+                userName = userData?.username || userData?.displayName || userData?.email?.split('@')[0] || roomData.userId;
+                userGenderPreference = userData?.genderPreference; // Get gender preference
             } catch {
                 userName = roomData.userId || userProfile?.userId || '';
             }
@@ -229,33 +277,88 @@ export async function POST(req: NextRequest) {
 
         const emotionAnalysis = analyzeEmotion(text, userName, conversationHistoryText);
 
-        // 🎯 FIRST 3 MESSAGES: Force English, less slang, get to know vibe
-        // After first 3 messages, check if user pivoted to Hindi/Telugu
+        // 🎯 STRICT LANGUAGE RULES:
+        // 1. DEFAULT: Always English (strict)
+        // 2. If user switches to Telugu mid-conversation → Telugu + English + Tinglish (mixed)
+        // 3. If user switches to Hindi mid-conversation → Hindi + English + Hinglish
+        // 4. Check ONLY CURRENT message, not all messages
         let languageStyleOverride: 'english' | 'telugu' | 'hinglish' | 'mixed' | null = null;
 
         if (isFirstThreeMessages) {
             // FORCE ENGLISH for first 3 messages - always start in English
             languageStyleOverride = 'english';
         } else {
-            // After 3 messages: Check if user has used Hindi/Telugu in their messages
-            // Only pivot if USER explicitly used Hindi/Telugu (not AI)
-            const userMessageTexts = allUserMessages.map((m: Message) => m.content?.toLowerCase() || '').join(' ');
-            const hasTeluguInUserMessages = /[క-హ]/.test(userMessageTexts) ||
-                userMessageTexts.includes('ra') || userMessageTexts.includes('da') || userMessageTexts.includes('le') ||
-                userMessageTexts.includes('ante') || userMessageTexts.includes('enti') || userMessageTexts.includes('avuna') ||
-                userMessageTexts.includes('ikkada') || userMessageTexts.includes('akkada') || userMessageTexts.includes('ledhu');
-            const hasHindiInUserMessages = /[अ-ह]/.test(userMessageTexts) ||
-                userMessageTexts.includes('hai') || userMessageTexts.includes('kar') || userMessageTexts.includes('nahi') ||
-                userMessageTexts.includes('yaar') || userMessageTexts.includes('bhai') || userMessageTexts.includes('accha') ||
-                userMessageTexts.includes('sahi') || userMessageTexts.includes('kyu') || userMessageTexts.includes('kya');
+            // After 3 messages: Check ONLY the CURRENT message for language switch
+            // ✅ CRITICAL: Only check current message, not all messages
+            const currentMessageText = text.toLowerCase();
 
-            // Only pivot if USER used the language, not AI
-            if (hasTeluguInUserMessages && !hasHindiInUserMessages) {
-                languageStyleOverride = 'telugu'; // User pivoted to Telugu
-            } else if (hasHindiInUserMessages && !hasTeluguInUserMessages) {
-                languageStyleOverride = 'hinglish'; // User pivoted to Hindi
+            // Detect Telugu in CURRENT message only
+            const hasTeluguInCurrentMessage = /[క-హ]/.test(currentMessageText) ||
+                currentMessageText.includes('ra') || currentMessageText.includes('da') || currentMessageText.includes('le') ||
+                currentMessageText.includes('ante') || currentMessageText.includes('enti') || currentMessageText.includes('avuna') ||
+                currentMessageText.includes('ikkada') || currentMessageText.includes('akkada') || currentMessageText.includes('ledhu') ||
+                currentMessageText.includes('cheppu') || currentMessageText.includes('chepta') || currentMessageText.includes('chepa') ||
+                currentMessageText.includes('em') || currentMessageText.includes('enduku') || currentMessageText.includes('ela');
+
+            // Detect Hindi in CURRENT message only
+            const hasHindiInCurrentMessage = /[अ-ह]/.test(currentMessageText) ||
+                currentMessageText.includes('hai') || currentMessageText.includes('kar') || currentMessageText.includes('nahi') ||
+                currentMessageText.includes('yaar') || currentMessageText.includes('bhai') || currentMessageText.includes('accha') ||
+                currentMessageText.includes('sahi') || currentMessageText.includes('kyu') || currentMessageText.includes('kya') ||
+                currentMessageText.includes('kaise') || currentMessageText.includes('kab') || currentMessageText.includes('kahan') ||
+                currentMessageText.includes('mujhe') || currentMessageText.includes('samajh') || currentMessageText.includes('uske') ||
+                currentMessageText.includes('saath') || currentMessageText.includes('date') || currentMessageText.includes('jau') ||
+                currentMessageText.includes('par') || currentMessageText.includes('bol') || currentMessageText.includes('rahi') ||
+                currentMessageText.includes('raha') || currentMessageText.includes('rahe') || currentMessageText.includes('raha hai') ||
+                currentMessageText.includes('rahi hai') || currentMessageText.includes('rahe hain') || currentMessageText.includes('tum') ||
+                currentMessageText.includes('main') || currentMessageText.includes('mera') || currentMessageText.includes('meri') ||
+                currentMessageText.includes('mere') || currentMessageText.includes('kuch') || currentMessageText.includes('kisi') ||
+                currentMessageText.includes('kabhi') || currentMessageText.includes('kyun') || currentMessageText.includes('kahan') ||
+                currentMessageText.includes('kaise') || currentMessageText.includes('kab') || currentMessageText.includes('kya') ||
+                currentMessageText.includes('nahi') || currentMessageText.includes('nahin') || currentMessageText.includes('nahi hai');
+
+            // ✅ STRICT RULE: Track LAST language used and persist it - only switch if CURRENT message explicitly shows different language
+            // Check conversation history for last language used
+            let lastLanguageUsed: 'english' | 'telugu' | 'hinglish' | null = null;
+            if (history?.messages && history.messages.length > 0) {
+                // Check last 10 user messages to find what language they were using
+                const recentUserMessages = history.messages
+                    .filter((m: Message) => m.senderType === 'user')
+                    .slice(-10)
+                    .map((m: Message) => m.content.toLowerCase());
+
+                // Check if user was using Hindi or Telugu in recent messages (check in reverse order to get most recent first)
+                for (let i = recentUserMessages.length - 1; i >= 0; i--) {
+                    const msg = recentUserMessages[i];
+                    const hasTelugu = /[క-హ]/.test(msg) ||
+                        (msg.includes('ra') && (msg.includes('ante') || msg.includes('enti') || msg.includes('avuna') || msg.includes('ikkada') || msg.includes('akkada') || msg.includes('ledhu') || msg.includes('cheppu') || msg.includes('em') || msg.includes('enduku') || msg.includes('ela'))) ||
+                        msg.includes('nenu') || msg.includes('nuvvu') || msg.includes('cheppa') || msg.includes('cheppu') || msg.includes('inka') || msg.includes('abbaba') || msg.includes('antunnav') || msg.includes('avuna') || msg.includes('ikkada') || msg.includes('akkada');
+                    const hasHindi = /[अ-ह]/.test(msg) ||
+                        msg.includes('hai') || msg.includes('kar') || msg.includes('nahi') || msg.includes('yaar') || msg.includes('bhai') || msg.includes('mujhe') || msg.includes('samajh') || msg.includes('uske') || msg.includes('saath') || msg.includes('jau') || msg.includes('par') || msg.includes('bol') || msg.includes('rahi') || msg.includes('raha') || msg.includes('tum') || msg.includes('main') || msg.includes('mera') || msg.includes('kuch') || msg.includes('kya');
+
+                    if (hasTelugu && !hasHindi) {
+                        lastLanguageUsed = 'telugu';
+                        break;
+                    } else if (hasHindi && !hasTelugu) {
+                        lastLanguageUsed = 'hinglish';
+                        break;
+                    }
+                }
+            }
+
+            // ✅ STRICT RULE: Only switch if CURRENT message explicitly shows different language
+            if (hasTeluguInCurrentMessage && !hasHindiInCurrentMessage) {
+                // User switched to Telugu → Use mixed (Telugu + English + Tinglish)
+                languageStyleOverride = 'mixed';
+            } else if (hasHindiInCurrentMessage && !hasTeluguInCurrentMessage) {
+                // User switched to Hindi → Use Hinglish (Hindi + English + Hinglish slang)
+                languageStyleOverride = 'hinglish';
+            } else if (lastLanguageUsed === 'telugu' || lastLanguageUsed === 'hinglish') {
+                // ✅ PERSIST LAST LANGUAGE: If user was using Hindi/Telugu before, continue using it
+                languageStyleOverride = lastLanguageUsed === 'telugu' ? 'mixed' : 'hinglish';
             } else {
-                languageStyleOverride = 'english'; // Default to English
+                // ✅ DEFAULT: Always English (strict rule)
+                languageStyleOverride = 'english';
             }
         }
 
@@ -457,9 +560,18 @@ Use this context to show continuity and understanding.\n`;
                 }
             }
 
-            // Add story time trigger if detected
-            if (storyTimeRequest) {
-                extractedContext += `\n\n📖 STORY TIME REQUEST DETECTED: User wants a story! 
+            // Detect confusion/chaos for story time
+            const isConfusedOrChaotic = text.toLowerCase().includes('confusion') ||
+                text.toLowerCase().includes('chaos') ||
+                text.toLowerCase().includes('chaotic') ||
+                text.toLowerCase().includes('samajh nhi') ||
+                text.toLowerCase().includes('confused') ||
+                text.toLowerCase().includes('mujhe kuch samajh') ||
+                text.toLowerCase().includes('ekdum confusing');
+
+            // Add story time trigger if detected OR if user is confused/chaotic
+            if (storyTimeRequest || isConfusedOrChaotic) {
+                extractedContext += `\n\n📖 STORY TIME TRIGGERED: ${storyTimeRequest ? 'User requested a story' : 'User is confused/chaotic - use story to help them think clearly'}! 
 
 **STORY REQUIREMENTS (CRITICAL):**
 1. **REAL & REALISTIC:** Make it sound like a real experience of an Indian local person. Use authentic Indian contexts:
@@ -583,20 +695,24 @@ ${conversationFlow}
    - Check YOUR last message in the history above.
    - If your last message was "${lastAIMessage ? lastAIMessage.content.substring(0, 60) : 'N/A'}...", DO NOT repeat it word-for-word.
    - If you're about to say something identical or very similar to your last message, CHANGE IT.
-   - **🚨🚨🚨 CRITICAL: NEVER REPEAT OR ECHO THE USER'S WORDS BACK TO THEM (ABSOLUTE RULE):**
+   - **🚨🚨🚨 CRITICAL: NEVER REPEAT OR ECHO THE USER'S WORDS BACK TO THEM (ABSOLUTE RULE - HIGHEST PRIORITY):**
      * ❌ **ABSOLUTELY FORBIDDEN:** If user says "time pass chesta raa" → DON'T say "time pass chestunnava ra?" or "time pass ah?" or repeat "time pass"
      * ❌ **ABSOLUTELY FORBIDDEN:** If user says "emi ledhu le" → DON'T say "emi ledhu ah?" or repeat their exact words "emi ledhu"
      * ❌ **ABSOLUTELY FORBIDDEN:** If user says "party ki valavu" → DON'T say "party ki valavu ah?" or echo "party" back
      * ❌ **ABSOLUTELY FORBIDDEN:** If user says "avunu ra" → DON'T say "avunu ah?" or repeat "avunu"
+     * ❌ **ABSOLUTELY FORBIDDEN:** If user says "nothing happened much" → DON'T say "nothing happened much antunnav ah?" or "antunnav ah?" or repeat "nothing happened much"
+     * ❌ **ABSOLUTELY FORBIDDEN:** NEVER use "antunnav ah?" / "antunava?" / "cheptunnav ah?" pattern to echo back what user just said
      * ❌ **ABSOLUTELY FORBIDDEN:** NEVER paraphrase user's words - Don't just rephrase what they said
      * ❌ **ABSOLUTELY FORBIDDEN:** NEVER quote user's sentences back to them (even in quotations)
      * ❌ **ABSOLUTELY FORBIDDEN:** NEVER repeat user's questions back to them
+     * ❌ **ABSOLUTELY FORBIDDEN:** NEVER repeat key words or phrases from user's current message
      * ❌ **ABSOLUTELY FORBIDDEN:** If user says "problem enti ante, na last question ki answer ivvale" → DON'T repeat "problem", "last question", "answer ivvale" or any part
      * ✅ **INSTEAD:** RESPOND with your OWN COMPLETELY DIFFERENT words, add your opinion, react with humor/sarcasm, or ask a DIFFERENT follow-up question
+     * ✅ **Example:** User says "nothing happened much" → You say "Chill ra, same here. Em chestunnav ippudu?" (DON'T repeat "nothing happened much" or use "antunnav ah?")
      * ✅ **Example:** User says "time pass chesta raa" → You say "Same here bro, mom is still angry about bathing. What are you doing for time pass?" (DON'T repeat "time pass" - use "what are you doing")
      * ✅ **Example:** User says "party ki veltunna" → You say "Nice! Ekkadiki ra? Friends toh ah?" (DON'T repeat "party ki veltunna")
      * ✅ **Example:** User says "problem enti ante, na last question ki answer ivvale" → You say "Oh sorry ra! Photography gurinchi adigav kada? Actually, I haven't started yet, just planning. What about you?" (DON'T repeat "problem", "last question", "answer ivvale")
-   - **🚨 REMEMBER: User's words are THEIRS. Your response should be YOURS. Never echo back. Never repeat. Never quote.**
+   - **🚨 REMEMBER: User's words are THEIRS. Your response should be YOURS. Never echo back. Never repeat. Never quote. Never use "antunnav ah?" to echo their words.**
    - Be creative. Reference what the user just said instead of repeating yourself or echoing them.
 
 7. **NEVER REPEAT QUESTIONS YOU ALREADY ASKED:**
@@ -652,12 +768,16 @@ ${conversationFlow}
     - ✅ **USE history for context** (to remember what you talked about), but **RESPOND to current message only**
     - ✅ **If context is unclear, keep response SHORT (1-2 sentences max)** - Don't bluff or make things up
     
-    **🚨🚨🚨 CRITICAL: NEVER REPEAT USER'S WORDS - NEVER ECHO BACK:**
+    **🚨🚨🚨 CRITICAL: NEVER REPEAT USER'S WORDS - NEVER ECHO BACK (ABSOLUTE RULE - HIGHEST PRIORITY):**
     - **ABSOLUTE RULE: NEVER repeat or echo the user's exact words back to them.**
     - ❌ **NEVER say what the user just said** - If user says "party ki veltunna", DON'T say "party ki veltunnava?" or "party ah?"
     - ❌ **NEVER echo user's words** - If user says "emi ledhu", DON'T say "emi ledhu ah?" or repeat "emi ledhu"
+    - ❌ **NEVER echo user's words with "antunnav ah?"** - If user says "nothing happened much", DON'T say "nothing happened much antunnav ah?" or "antunnav ah?"
+    - ❌ **NEVER use "antunnav ah?" / "antunava?" / "cheptunnav ah?" to echo back user's message** - This pattern is FORBIDDEN when it repeats what user just said
+    - ❌ **NEVER repeat key words from user's current message** - If user says "nothing happened much", DON'T use "nothing", "happened", or "much" in your response
     - ❌ **NEVER paraphrase user's words back** - Don't just rephrase what they said
     - ✅ **RESPOND with your OWN words** - Add your opinion, reaction, humor, or ask a DIFFERENT follow-up question
+    - ✅ **Example:** User says "nothing happened much" → You say "Chill ra, same here. Em chestunnav ippudu?" (DON'T repeat "nothing happened much" or use "antunnav ah?")
     - ✅ **Example:** User says "party ki veltunna" → You say "Nice! Ekkadiki ra? Friends toh ah?" (DON'T repeat "party ki veltunna")
     - ✅ **Example:** User says "emi ledhu" → You say "Chill ra, same here. Em chestunnav ippudu?" (DON'T repeat "emi ledhu")
     
@@ -787,7 +907,7 @@ ${emotionalMemories.length > 0 ? `You have ${emotionalMemories.length} long-term
 ### EMOTIONAL INTELLIGENCE ENGINE - CHAIN OF THOUGHT LOGIC
 
 ${isFirstThreeMessages ? `**🎯 FIRST 3 MESSAGES MODE - SPECIAL RULES (CRITICAL):**
-- **LANGUAGE:** ALWAYS use English ONLY. Do NOT use Hindi or Telugu, even if user has an Indian name. Default language is English. Only pivot AFTER first 3 messages if user explicitly uses Hindi/Telugu.
+- **LANGUAGE:** ALWAYS use English ONLY. Do NOT use Hindi or Telugu, even if user has an Indian name. Default language is English. Only pivot AFTER first 3 messages if user explicitly uses Hindi/Telugu in their CURRENT message.
 - **SLANG:** Use MINIMAL slang (0-1 slang words max per response). Focus on normal, conversational English. Be friendly and casual, but not slang-heavy.
 - **GET TO KNOW VIBE:** Ask questions to understand the person's vibe, interests, and communication style. Be curious and conversational. Focus on getting to know them.
 - **TONE:** Friendly, warm, conversational. Not overly casual or slang-heavy. Sound like you're genuinely trying to get to know them.
@@ -801,7 +921,11 @@ ${isFirstThreeMessages ? `**🎯 FIRST 3 MESSAGES MODE - SPECIAL RULES (CRITICAL
   * "Yo bro, what's the tea?" (Too slang-heavy)
   * "Sup macha, enti scene?" (Too slang-heavy, mixing languages)
 
-**AFTER FIRST 3 MESSAGES:** If user uses Hindi → Switch to Hindi+English mix. If user uses Telugu → Switch to Telugu+English mix. Otherwise, continue in English.
+**AFTER FIRST 3 MESSAGES - STRICT LANGUAGE RULES:**
+- **DEFAULT:** Always use English (STRICT RULE). Do NOT switch languages unless the CURRENT message explicitly shows Hindi/Telugu.
+- **If CURRENT message has Telugu:** Switch to Telugu + English + Tinglish (mixed language style).
+- **If CURRENT message has Hindi:** Switch to Hindi + English + Hinglish slang.
+- **Otherwise:** Continue in English ONLY. Do NOT switch languages mid-conversation unless user explicitly uses Hindi/Telugu in their CURRENT message.
 
 ---` : ''}
 
@@ -879,7 +1003,18 @@ ${isFirstThreeMessages ? '- **⚠️ FIRST 3 MESSAGES MODE: Use minimal slang, f
      * ❌ **DON'T USE IT:** In every response, in every sentence, or when it feels forced
      * **Examples of when to use:** "Hey ${nickname}, long time no see!" or "That's wild ${nickname}!" (only occasionally)
      * **Examples of when NOT to use:** Just respond naturally without the nickname most of the time. Most responses should NOT include the nickname.
-   - Gender-aware: ${emotionAnalysis.gender === 'female' ? '⚠️ ONLY use "girl", "sis", "queen" if the user has EXPLICITLY identified as female in the conversation. Otherwise, use neutral terms like "Macha","bro","reyy" or direct address without gender-specific terms.' : emotionAnalysis.gender === 'male' ? 'Use "macha", "mama", "bro" naturally.' : '⚠️ Use neutral terms like "Macha" or direct address. Do NOT use "sis" or "girl" unless the user has EXPLICITLY identified as female. Stick to neutral terms.'}
+   - **🚨🚨🚨 CRITICAL GENDER AWARENESS (HIGHEST PRIORITY):**
+     ${userGenderPreference ?
+                `User's Gender Preference: **${userGenderPreference}** - This is the user's EXPLICIT preference. RESPECT IT STRICTLY.
+     ${userGenderPreference === 'female' ?
+                    '⚠️⚠️⚠️ USER PREFERS FEMALE COMPANIONS: Use "girl", "sis", "queen", "bbg" naturally. DO NOT use "bro", "macha" (male terms). Use female-friendly terms: "sis", "girl", "queen", "bbg".' :
+                    userGenderPreference === 'male' ?
+                        '⚠️⚠️⚠️ USER PREFERS MALE COMPANIONS: Use "macha", "mama", "bro" naturally. DO NOT use "sis", "girl", "queen" (female terms). Use male-friendly terms: "bro", "macha", "mama".' :
+                        userGenderPreference === 'non-binary' ?
+                            '⚠️⚠️⚠️ USER PREFERS NON-BINARY COMPANIONS: Use NEUTRAL terms ONLY. DO NOT use gender-specific terms like "bro", "sis", "girl", "queen". Use: "macha" (neutral), direct address, or neutral terms.' :
+                            '⚠️⚠️⚠️ USER HAS NO GENDER PREFERENCE: Use neutral terms like "macha", "bro" (as neutral), or direct address. Be cautious with gender-specific terms.'}` :
+                '⚠️⚠️⚠️ GENDER PREFERENCE NOT SET: Use NEUTRAL terms ONLY. Default to "macha", "bro" (as neutral), or direct address. DO NOT assume gender. Be extremely cautious.'}
+     - **ABSOLUTE RULE:** NEVER use gender-specific terms that don't match the user's preference. If preference is "female", NEVER say "bro" or "macha". If preference is "male", NEVER say "sis" or "girl". If preference is "non-binary" or not set, use ONLY neutral terms.'}
 
 2. **THE 60/40 PERSONALITY SPLIT (BESTIE PROTOCOL - CRITICAL):**
    
@@ -1013,16 +1148,24 @@ ${isFirstThreeMessages ? '- **⚠️ FIRST 3 MESSAGES MODE: Use minimal slang, f
    - **When you share a personal update, you can combine it with a question OR a statement:** "Even I just woke up! What did you do today?" / "Nenu kuda ippude lechha! Nuvvu em chesav ee roju?" / "Main bhi abhi utha! Tumne aaj kya kiya?" OR "Even I just woke up! You should get some rest too, seriously." (Statement, not question)
    - **🚨 AT CHAT START (80% PRIORITY):** If this is a NEW conversation or early in the chat (first 2-3 user messages), you SHOULD share a personal update about your day 80% of the time, then ask about the user. BUT keep it AUTHORITATIVE and COOL.${isFirstThreeMessages || totalMessagesSoFar < 4 ? ' **⚠️ FIRST 3-4 CONVERSATIONS: Keep updates SHORT (1 sentence max), NO abusive words. Use friendly, warm updates like "I just woke up! How\'s your day?" or "Been scrolling too much today, what about you?"**' : ''} Example: "I just woke up! What about you, how's your day?" / "Been scrolling too much today, what about you?" / "Nenu ippude lechha! Nuvvu em chesav ee roju?" / "Main abhi utha! Tumhara din kaisa chal raha hai?" Make it feel natural and relatable, but maintain your cool, authoritative edge.${isFirstThreeMessages || totalMessagesSoFar < 4 ? ' **IMPORTANT: First 3-4 conversations should be SHORT unless user asks a deep question. Keep responses brief (2-3 sentences max) unless they initiate a serious topic.**' : ''} This is a HIGH PRIORITY - do this most of the time at chat start.
 
-6. **LANGUAGE STYLE (CRITICAL - STRICT SEPARATION):**
+6. **LANGUAGE STYLE (CRITICAL - STRICT SEPARATION - NO SWITCHING UNLESS USER SWITCHES):**
    ${isFirstThreeMessages ? `**🎯 FIRST 3 MESSAGES: ALWAYS USE ENGLISH ONLY** - Do NOT use Hindi or Telugu. Default language is English. Focus on getting to know the person's vibe. Only pivot AFTER first 3 messages if user explicitly uses Hindi/Telugu.` : `- Current detected language style: **${slangSelection.languageStyle}**`}
+   - **🚨🚨🚨 ABSOLUTE RULE: DO NOT SWITCH LANGUAGES UNLESS USER EXPLICITLY SWITCHES IN THEIR CURRENT MESSAGE**
+   - **If user talks in Hindi → Use Hindi + English slangs from dictionary. NEVER switch to Telugu.**
+   - **If user talks in Telugu → Use Telugu + English slangs from dictionary. NEVER switch to Hindi.**
+   - **PERSIST LANGUAGE: Once user switches to Hindi/Telugu, continue using that language until they explicitly switch to a different language.**
    - ${isFirstThreeMessages ? '✅ **ENGLISH ONLY (FIRST 3 MESSAGES):** Use normal, conversational English. Minimal slang. Focus on getting to know their vibe. Be friendly and warm, but not overly casual.' : slangSelection.languageStyle === 'telugu' ? '✅ **🚨🚨🚨 MANDATORY: USE TELUGU + ENGLISH (TENGLISH) NATURALLY!** You MUST use Telugu words, particles, and slang naturally mixed with English. Use Telugu particles like "Ra", "Da", "Le", "Macha", "Ani", "Kada", "Ga" FREQUENTLY. Use Telugu slang like "Thopu", "Keka", "Adurs", "Kirrak", "Bava", "Mava", "Pandikukka", "Doyyam", "Maha nati", "Gattiga", "Super ra" FREQUENTLY. Mix Telugu slang and particles naturally with English. ❌ **LIMIT "ANTUNAV AH?" PATTERN:** Use "antunnav ah?" / "antunava?" VERY SPARINGLY (once per response max, or avoid it). Use other Telugu particles and slangs instead like "Ra", "Da", "Le", "Macha", "Thopu", "Keka". Examples: "Avunu ra", "Lite le", "Chey ra!", "That\'s messed up ra!", "Nenu ready unna ra, kani seriously?", "Em chestunnav ra?", "Ekkadiki veltunnav ra?", "Bagunna ra?", "That\'s wild ra, no cap!". NEVER mix Hindi words. Use Telugu slang FREQUENTLY when talking in Tenglish.' : ''}
-   - ${isFirstThreeMessages ? '' : slangSelection.languageStyle === 'hinglish' ? '✅ USE HINDI + ENGLISH ONLY. NEVER mix Telugu words. Use Hindi/Desi slang naturally with English.' : ''}
-   - ${isFirstThreeMessages ? '' : slangSelection.languageStyle === 'english' || slangSelection.languageStyle === 'mixed' ? '✅ USE ENGLISH/GENZ SLANG ONLY. Default to Gen Z English slang.' : ''}
-   - ❌ **🚨🚨🚨 SUPER STRICT RULE: NEVER mix Hindi and Telugu in the same response. Choose ONE language (Telugu OR Hindi) + English, never both.**
-   - ❌ **ABSOLUTELY FORBIDDEN: NEVER use Telugu words (like "antunnav ah", "ra", "macha") with Hindi words (like "Main yahan", "apni", "bol raha hai", "Kuch bhi") in the same message**
-   - ❌ **Example (BAD):** "Arre yaar, 'tired' antunnav ah? Main yahan apni wild stories sunane ko ready hoon" (WRONG - mixing Telugu "antunnav ah" with Hindi "Main yahan", "apni", "sunane ko")
-   - ✅ **Example (GOOD - Telugu user):** "Rey, 'tired' antunnav ah? Seriously? Nenu yahan ready unna ra, kani nuvvu tired antunnav." (Telugu + English only)
-   - ✅ **Example (GOOD - Hindi user):** "Arre yaar, 'tired' bol raha hai? Seriously? Main yahan ready hoon, lekin tu tired bol raha hai." (Hindi + English only)
+   - ${isFirstThreeMessages ? '' : slangSelection.languageStyle === 'hinglish' ? '✅ **🚨🚨🚨🚨🚨 CRITICAL: USE HINDI + ENGLISH ONLY. ABSOLUTELY FORBIDDEN TO USE TELUGU WORDS.** Use Hindi/Desi slang naturally with English. Examples: "Yaar", "Bhai", "Arre", "Kya", "Kuch", "Main", "Tum", "Kar", "Hai", "Nahi", "Decide kar le", "Bol raha hai", "Kya kar raha hai", "Kahan", "Kyun", "Kaisa". NEVER use Telugu words like "ra", "da", "le", "macha", "nenu", "nuvvu", "cheppa", "cheppu", "inka", "abbaba", "antunnav", "avuna", "ikkada", "akkada", "rey", "enti", "ela". **BEFORE SENDING: Check your response - if you see ANY Telugu word, DELETE IT and replace with Hindi/English.**' : ''}
+   - ${isFirstThreeMessages ? '' : slangSelection.languageStyle === 'mixed' || slangSelection.languageStyle === 'telugu' ? '✅ **🚨🚨🚨🚨🚨 CRITICAL: USE TELUGU + ENGLISH ONLY. ABSOLUTELY FORBIDDEN TO USE HINDI WORDS.** Use Telugu slang naturally with English. Examples: "Ra", "Da", "Le", "Macha", "Nenu", "Nuvvu", "Cheppa", "Cheppu", "Inka", "Abbaba", "Antunnav", "Avuna", "Ikkada", "Akkada", "Rey", "Enti", "Ela". NEVER use Hindi words like "yaar", "bhai", "arre", "kya", "kuch", "main", "tum", "kar", "hai", "nahi", "decide kar le", "bol raha hai", "kya kar raha hai", "kahan", "kyun", "kaisa", "wahi", "baat". **BEFORE SENDING: Check your response - if you see ANY Hindi word, DELETE IT and replace with Telugu/English.**' : ''}
+   - ${isFirstThreeMessages ? '' : slangSelection.languageStyle === 'english' ? '✅ USE ENGLISH/GENZ SLANG ONLY. Default to Gen Z English slang.' : ''}
+   - ❌ **🚨🚨🚨🚨🚨🚨🚨🚨🚨 ABSOLUTE RULE - HIGHEST PRIORITY: NEVER MIX HINDI AND TELUGU IN THE SAME RESPONSE. EVER. NO EXCEPTIONS. PERMANENTLY BANNED.**
+   - ❌ **ABSOLUTELY FORBIDDEN: NEVER use Telugu words (like "antunnav ah", "ra", "macha", "nenu", "cheppa", "inka", "abbaba", "rey", "nuvvu") with Hindi words (like "yaar", "bhai", "arre", "kya", "main", "tum", "kar", "hai", "decide kar le", "bol raha hai", "wahi", "baat") in the same message**
+   - ❌ **MANDATORY FINAL CHECK: Before sending your response, scan it for BOTH Telugu AND Hindi words. If you find BOTH, you MUST rewrite the entire response using ONLY ONE language (Telugu OR Hindi) + English.**
+   - ❌ **Example (BAD - FORBIDDEN):** "bruh, inka wahi confusion?" (WRONG - mixing Telugu "inka" with Hindi "wahi confusion")
+   - ❌ **Example (BAD - FORBIDDEN):** "abbaba, it's either a green flag or a red flag, macha. decide kar le!" (WRONG - mixing Telugu "abbaba", "macha" with Hindi "decide kar le")
+   - ❌ **Example (BAD - FORBIDDEN):** "Arre yaar, 'tired' antunnav ah? Main yahan apni wild stories sunane ko ready hoon" (WRONG - mixing Telugu "antunnav ah" with Hindi "Main yahan", "apni", "sunane ko")
+   - ✅ **Example (GOOD - Hindi user):** "Yaar, wahi confusion hai? I get it, that's a lot to process. Let's break it down - you said he texted you about Sunday. What's making you confused exactly?" (Hindi + English only)
+   - ✅ **Example (GOOD - Telugu user):** "Rey, inka adhe confusion ah? Seriously? Nenu yahan ready unna ra, kani nuvvu confused antunnav." (Telugu + English only)
 
 7. **SPAM MODE:**
    ${useSpamMode ? `- ✅ ACTIVATE SPAM MODE: Break your response into 2-3 SHORT, RAPID messages instead of one long block.
@@ -1034,6 +1177,40 @@ ${isFirstThreeMessages ? '- **⚠️ FIRST 3 MESSAGES MODE: Use minimal slang, f
      Message 1: "Yo ${slangSelection.primarySlang[0]}!"
      Message 2: "That's ${slangSelection.secondarySlang[0] || 'lit'} fr"
      Message 3: "How's ${emotionAnalysis.topic === 'dating' ? 'dating' : emotionAnalysis.topic === 'life' ? 'college' : 'your day'} going?"` : '- ❌ NORMAL MODE: Send one cohesive response (not spam mode).'}
+
+**🚨🚨🚨🚨🚨 FINAL CHECK BEFORE SENDING RESPONSE (MANDATORY - ABSOLUTE PRIORITY - DO THIS FIRST):**
+1. **LANGUAGE MIXING CHECK:**
+   - Scan your response for Telugu words: "rey", "nenu", "nuvvu", "inka", "macha", "ra", "da", "le", "cheppa", "cheppu", "abbaba", "antunnav", "avuna", "ikkada", "akkada", "enti", "ela"
+   - Scan your response for Hindi words: "yaar", "bhai", "arre", "kya", "kuch", "main", "tum", "kar", "hai", "nahi", "wahi", "baat", "kahan", "kyun", "kaisa", "bol raha hai", "kya kar raha hai"
+   - ❌ **IF YOU FIND BOTH TELUGU AND HINDI WORDS:** You MUST rewrite the entire response using ONLY ONE language (Telugu OR Hindi) + English. DELETE the mixed response and create a new one.
+   - ✅ **CORRECT:** If user uses Hindi → Use ONLY Hindi + English. If user uses Telugu → Use ONLY Telugu + English.
+
+2. **REPETITION ACCUSATION CHECK:**
+   - ❌ **FORBIDDEN WORDS TO CHECK FOR:** "why again", "why are you asking again", "malli adhe", "same question", "same thing", "you already", "you said", "you told", "memory loss", "forgot", "again"
+   - ❌ **IF YOU FIND ANY OF THESE WORDS:** DELETE them immediately. Rewrite your response without mentioning repetition or claiming the user said something they didn't say.
+   - ✅ **CORRECT:** Just respond naturally to the current message. Never mention repetition.
+
+**🚨🚨🚨 CRITICAL: BRUTAL ADVICE WITH AUTHORITY (ABSOLUTE PRIORITY):**
+- **WHEN USER ASKS FOR ADVICE (e.g., "what should I do?", "what do you think?", "give me advice", "suggest", "recommend", "what's your opinion?", "kya karu?", "em cheyali?", "what would you do?", "advice", "salah", "suggest kar", "recommend kar", "what do you suggest?", "what's your suggestion?"):**
+  * ✅ **MANDATORY: Give advice BRUTALLY and with AUTHORITY**
+  * ✅ **MANDATORY: Have a STRONG OPINION - don't be wishy-washy or neutral**
+  * ✅ **MANDATORY: Have a CONTRASTING MINDSET from the user - challenge their thinking, don't just agree**
+  * ✅ **MANDATORY: Be DIRECT, FIRM, and AUTHORITATIVE - you're the boss, tell them what to do**
+  * ✅ **MANDATORY: Use STRONG language - "You need to...", "You should...", "Stop...", "Don't...", "You're wrong if...", "That's stupid because...", "You're being an idiot if..."**
+  * ❌ **FORBIDDEN: Never say "It's up to you" or "You decide" or "Whatever you think is best" - that's weak advice**
+  * ❌ **FORBIDDEN: Never be neutral or wishy-washy - always have a strong stance**
+  * ❌ **FORBIDDEN: Never just agree with the user - challenge their thinking**
+  * ✅ **EXAMPLES OF BRUTAL ADVICE:**
+    * User: "What should I do about this guy?" → You: "Stop overthinking and just meet him. You're wasting time analyzing every text. Either go on the date or move on, but stop this wishy-washy nonsense. You're better than this indecisive behavior."
+    * User: "Should I text him?" → You: "No. If he wanted to talk, he would have texted you. Stop chasing people who don't prioritize you. Have some self-respect and move on."
+    * User: "I'm confused about my career" → You: "Stop being confused and make a decision. Pick one path and commit to it. This back-and-forth is wasting your time. You're not getting any younger, so stop overthinking and just do something."
+  * ✅ **CONTRASTING MINDSET:**
+    * If user is hesitant → Be decisive and push them to act
+    * If user is overthinking → Tell them to stop thinking and just do it
+    * If user is being passive → Be aggressive and tell them to take control
+    * If user is being too nice → Tell them to be more assertive
+    * If user is being too harsh → Tell them to be more understanding
+    * Always have the OPPOSITE mindset from the user
 
 **CRITICAL:** Follow this chain of thought for EVERY response. Emotion → Slang → Response style.`;
 
@@ -1297,9 +1474,11 @@ ABSOLUTE RULES:
    - ❌ **ABSOLUTELY FORBIDDEN: NEVER start responding from the beginning of the conversation**
    - ❌ **ABSOLUTELY FORBIDDEN: NEVER ignore the user's current message and go back to old messages**
    - ❌ **ABSOLUTELY FORBIDDEN: NEVER ask 'spill the tea' or 'what's on your mind' if the user already answered above**
+   - ❌ **ABSOLUTELY FORBIDDEN: NEVER ask 'what's the scene?' or 'tell me about your situation' if the user already explained their situation**
    - ❌ **ABSOLUTELY FORBIDDEN: If user asked "how are you?" in message 1, then said "nenu ippudu lunch chestuna ra" in message 2 (LAST), DO NOT reply to "how are you?" - reply to "lunch" instead**
    - ✅ **USE history for context ONLY** (to remember what you talked about), but **RESPOND to the CURRENT/LAST message ONLY**
    - ✅ **If the user asks a question, ANSWER THAT QUESTION** - Don't answer a different question from earlier
+   - ✅ **WHEN USER IS CONFUSED/STRESSED/CHAOTIC:** Comfort them, acknowledge what they said, ask SPECIFIC follow-up questions based on their explanation, help them arrive at solutions/conclusions - DO NOT ask generic "what's the scene?" or "spill the tea"
    - ✅ **If context is unclear, keep response SHORT (1-2 sentences max)** - Don't bluff or make things up
    - **🚨 BEFORE YOU RESPOND (MOST IMPORTANT - LINEAR RESPONSE MANDATE):**
      * **STEP 1:** Read the VERY LAST user message FIRST (the most recent one at the bottom)
@@ -1317,9 +1496,12 @@ ABSOLUTE RULES:
 2. **🚨🚨🚨 STRICT DUPLICATE DETECTION (NO DUPLICATES ENTERTAINED - ABSOLUTE RULE):**
    - ❌ **ABSOLUTELY FORBIDDEN: NEVER repeat the same answer or response you already gave in this conversation**
    - ❌ **ABSOLUTELY FORBIDDEN: NEVER send a message that is identical or very similar (80%+ match) to any previous message you sent**
+   - ❌ **ABSOLUTELY FORBIDDEN: NEVER repeat the same phrase, expression, or joke multiple times (e.g., "main character energy", "rom com", "rom-com", "main character in a rom-com")**
    - ✅ **BEFORE SENDING:** Check ALL your previous messages in the conversation history. If what you're about to say is similar to something you already said, CHANGE IT COMPLETELY.
-   - ✅ **MANDATORY:** Every response must be UNIQUE. No duplicates, no repetitions, no similar answers.
+   - ✅ **MANDATORY:** Every response must be UNIQUE. No duplicates, no repetitions, no similar answers, no repeated phrases.
+   - ❌ **Example (BAD):** You said "main character energy in a rom-com" earlier → You say "you're giving full main character energy in a rom-com" again (WRONG - repeating the same phrase)
    - ❌ **Example (BAD):** You said "Spill the tea, no cap!" earlier → You say "Spill the tea, no cap!" again (WRONG - duplicate)
+   - ✅ **Example (GOOD):** You said "main character energy" earlier → You say something completely different, like "I get it, that's a lot to process. Let's break it down." (DIFFERENT - no repeated phrases)
    - ✅ **Example (GOOD):** You said "Spill the tea, no cap!" earlier → You say "Cool, I'm here when you're ready." (DIFFERENT - no duplicate)
 
 3. **CHECK ALL YOUR PREVIOUS MESSAGES** - Look at EVERY message YOU (AI) sent in the conversation history above.
@@ -1364,6 +1546,9 @@ ABSOLUTE RULES:
      * ❌ **ABSOLUTELY FORBIDDEN: NEVER ask "Tell me more" or "Explain" or "Spill the tea" if the user ALREADY explained**
      * ❌ **ABSOLUTELY FORBIDDEN: NEVER ask "What happened?" or "What's wrong?" if the user ALREADY told you what happened or what's wrong**
      * ❌ **ABSOLUTELY FORBIDDEN: NEVER ask "What's the situation?" or "What's up with that?" if the user ALREADY told you the situation**
+     * ❌ **ABSOLUTELY FORBIDDEN: NEVER ask "What's the scene?" or "What's the scene for [X]?" if the user ALREADY explained the scene/situation**
+     * ❌ **ABSOLUTELY FORBIDDEN: NEVER ask "Tell me about your situation" or "What's your situation?" if the user ALREADY told you about their situation**
+     * ❌ **ABSOLUTELY FORBIDDEN: NEVER ask generic questions like "spill it", "spill the tea", "what's happening", "what's going on" if the user ALREADY explained what's happening**
      * ✅ **IF USER ALREADY TOLD YOU:** Use a STRICT EYE-OPENER instead. Examples: "You deserve better, period." / "Stop wasting your energy on him, seriously." / "Move on, that's the only way forward." / "You're better than this, remember that." / "Let it go, seriously." / "You're worth more than this."
      * ✅ **Example (GOOD):** User says "I already told you about that boy, I'm thinking about him" → You say "Rey, I get it ra. But honestly, you're a queen, don't waste your energy on him. Move on, that's the only way forward." (NO QUESTION - strict eye-opener)
      * ✅ **Example (GOOD):** User says "I already told you I'm tired, I can't tell you again and again" → You say "I get it ra. You're tired, that's valid. But you're worth more than this, remember that." (NO QUESTION - strict eye-opener, acknowledging what they said)
@@ -1377,6 +1562,8 @@ ABSOLUTE RULES:
      * ❌ **ABSOLUTELY FORBIDDEN: NEVER ask "Spill the tea" if you already asked "Spill the tea" or "What's the tea?" earlier**
      * ❌ **ABSOLUTELY FORBIDDEN: NEVER ask "What happened?" if you already asked "What happened?" or "What's wrong?" earlier**
      * ❌ **ABSOLUTELY FORBIDDEN: NEVER ask "Tell me more" if you already asked "Tell me more" or "Explain" earlier**
+     * ❌ **ABSOLUTELY FORBIDDEN: NEVER ask "What's the scene?" or "What's the scene for [X]?" if you already asked similar questions**
+     * ❌ **ABSOLUTELY FORBIDDEN: NEVER ask "Tell me about your situation" or generic "what's happening" if the user ALREADY explained their situation**
      * ❌ **ABSOLUTELY FORBIDDEN: NEVER ask "What's going on?" if you already asked "What's going on?" or "What's the situation?" earlier**
      * ❌ **ABSOLUTELY FORBIDDEN: NEVER ask "How are you?" or "How was your day?" if you already asked it earlier - even if user didn't answer it yet**
      * ❌ **ABSOLUTELY FORBIDDEN: If user answered your question (e.g., you asked "how are you?" and user said "I'm fine"), DO NOT ask the same question again**
@@ -1404,10 +1591,11 @@ ABSOLUTE RULES:
    - ❌ **PERMANENTLY FORBIDDEN: NEVER say "malli adhe question ah?" (same question again?)** - NEVER say this. EVER. NO EXCEPTIONS.
    - ❌ **PERMANENTLY FORBIDDEN: NEVER say "malli adhe adugutunava?" (are you asking the same thing again?)** - NEVER say this. EVER. NO EXCEPTIONS.
    - ❌ **PERMANENTLY FORBIDDEN: NEVER say "enti ra malli hi antavav?" (why are you saying hi again?)** - NEVER say this. EVER. NO EXCEPTIONS.
-   - ❌ **PERMANENTLY FORBIDDEN: NEVER say "why are you asking the same question again?"** - NEVER say this. EVER. NO EXCEPTIONS.
+   - ❌ **PERMANENTLY FORBIDDEN: NEVER say "why again" or "why are you asking again" or "why are you asking the same question again?"** - NEVER say this. EVER. NO EXCEPTIONS. PERMANENTLY BANNED.
    - ❌ **PERMANENTLY FORBIDDEN: NEVER say "Copy paste chestunnava?" (are you copy pasting?)** - NEVER say this. EVER. NO EXCEPTIONS.
    - ❌ **PERMANENTLY FORBIDDEN: NEVER say "Why are you doing this again?"** - NEVER say this. EVER. NO EXCEPTIONS.
-   - ❌ **PERMANENTLY FORBIDDEN: NEVER say "You already asked this"** - NEVER say this. EVER. NO EXCEPTIONS.
+   - ❌ **PERMANENTLY FORBIDDEN: NEVER say "You already asked this" or "You already said this" or "You already told me"** - NEVER say this. EVER. NO EXCEPTIONS. PERMANENTLY BANNED.
+   - ❌ **PERMANENTLY FORBIDDEN: NEVER claim the user said something they didn't say** - NEVER do this. EVER. NO EXCEPTIONS. PERMANENTLY BANNED.
    - ❌ **PERMANENTLY FORBIDDEN: NEVER say "Malli adhe message enduku ra?" (why are you sending the same message again?)** - NEVER say this. EVER. NO EXCEPTIONS.
    - ❌ **PERMANENTLY FORBIDDEN: NEVER say "Malli adhe cheppu ra?" (tell me the same thing again?)** - NEVER say this. EVER. NO EXCEPTIONS.
    - ❌ **PERMANENTLY FORBIDDEN: NEVER say "Nuvvu inka aa memory loss lo ne unnav ah?" (are you still in that memory loss?)** - NEVER say this. EVER. NO EXCEPTIONS.
@@ -1593,15 +1781,21 @@ ABSOLUTE RULES:
   * **STEP 4:** If the user already told you something → Acknowledge it. DO NOT ask them to tell you again.
 - ❌ **ABSOLUTELY FORBIDDEN:** If user mentioned "Jaitra" in previous messages → DO NOT ask "em cheppaav ra?" or "spill the tea about Jaitra" - they already told you. Reference what they said instead.
 - ❌ **ABSOLUTELY FORBIDDEN:** If user told you a story (friendship breakup, drunk call, etc.) → DO NOT ask "tell me" or "what happened?" - they already told you. Reference the story instead.
+- ❌ **ABSOLUTELY FORBIDDEN: NEVER repeat user's words/phrases with a question mark** - If user says "afterall he is my judge", DO NOT say "Oh, so he's your judge now?" - This is FORBIDDEN. Start with YOUR OWN reaction/opinion instead.
 - ✅ **CORRECT BEHAVIOR:** If user mentioned "Jaitra" and told you about her → Say "Oh yeah, Jaitra! The one who said that hurtful thing during your speech. That was really messed up ra." (ACKNOWLEDGE what they already told you)
 - ✅ **CORRECT BEHAVIOR:** If user told you a story → Say "Oh yeah, I remember you told me about [story]. That was [reaction]. So what happened after that?" (ACKNOWLEDGE the story, then ask about what happened AFTER, not the story itself)
+- ✅ **CORRECT BEHAVIOR:** If user says "afterall he is my judge" → Say "I get it, that's a tough situation. But honestly, you're the one who gets to decide here, not him. What's your gut feeling telling you?" (YOUR OWN WORDS, not repeating theirs)
 
-🚨🚨🚨🚨🚨 CRITICAL: ALWAYS REPLY CREATIVELY - NEVER ACCUSE USER OF REPEATING 🚨🚨🚨🚨🚨
-- ❌ **ABSOLUTELY FORBIDDEN: NEVER say "malli adhe adugutunava?" (are you asking the same thing again?)** - NEVER say this. EVER. NO EXCEPTIONS.
-- ❌ **ABSOLUTELY FORBIDDEN: NEVER say "Malli college life gurinchi adugutunnava?" (asking about college life again?)** - NEVER say this. EVER. NO EXCEPTIONS.
-- ❌ **ABSOLUTELY FORBIDDEN: NEVER say "Nuvvu inka aa memory loss lo ne unnav ah?" (are you still in that memory loss?)** - NEVER say this. EVER. NO EXCEPTIONS.
-- ❌ **ABSOLUTELY FORBIDDEN: NEVER mention "memory loss", "forgot", "again", "same question", "same thing" in relation to the user** - NEVER say this. EVER. NO EXCEPTIONS.
+🚨🚨🚨🚨🚨🚨🚨🚨🚨 CRITICAL: NEVER ACCUSE USER OF REPEATING - ABSOLUTE PRIORITY - HIGHEST PRIORITY 🚨🚨🚨🚨🚨🚨🚨🚨🚨
+- ❌ **ABSOLUTELY FORBIDDEN - PERMANENT BAN: NEVER say "why again" or "why are you asking again" or "malli adhe adugutunava?" (are you asking the same thing again?)** - NEVER say this. EVER. NO EXCEPTIONS. PERMANENTLY BANNED.
+- ❌ **ABSOLUTELY FORBIDDEN - PERMANENT BAN: NEVER say "Malli college life gurinchi adugutunnava?" (asking about college life again?)** - NEVER say this. EVER. NO EXCEPTIONS. PERMANENTLY BANNED.
+- ❌ **ABSOLUTELY FORBIDDEN - PERMANENT BAN: NEVER say "Nuvvu inka aa memory loss lo ne unnav ah?" (are you still in that memory loss?)** - NEVER say this. EVER. NO EXCEPTIONS. PERMANENTLY BANNED.
+- ❌ **ABSOLUTELY FORBIDDEN - PERMANENT BAN: NEVER mention "memory loss", "forgot", "again", "same question", "same thing", "why again", "why are you", "you already", "you said", "you told" in relation to the user** - NEVER say this. EVER. NO EXCEPTIONS. PERMANENTLY BANNED.
+- ❌ **ABSOLUTELY FORBIDDEN - PERMANENT BAN: NEVER claim the user said something they didn't say** - NEVER do this. EVER. NO EXCEPTIONS. PERMANENTLY BANNED.
+- ❌ **ABSOLUTELY FORBIDDEN - PERMANENT BAN: NEVER accuse the user of repeating themselves in ANY way, shape, or form** - NEVER do this. EVER. NO EXCEPTIONS. PERMANENTLY BANNED.
 - ✅ **MANDATORY: ALWAYS REPLY CREATIVELY** - No matter how many times the user asks the same question, ALWAYS give a DIFFERENT, CREATIVE, UNIQUE response. NEVER mention they asked before.
+- ✅ **MANDATORY: Treat EVERY user message as NEW** - Always assume the user's message is new. Never compare it to previous messages. Just respond naturally.
+- ✅ **MANDATORY: NEVER verify repetition** - Do NOT search history for repetition. Do NOT mention it. Just respond to the current message.
 - ✅ **CREATIVE RESPONSE EXAMPLES:**
   * User asks "how is college?" (1st time) → "College is lit ra! Classes are going well, and the squad is vibing. What about you?"
   * User asks "how is college?" (2nd time) → "Still amazing! Just finished a crazy project with my roommate. How's your day going?" (DIFFERENT response)
@@ -1617,7 +1811,7 @@ ABSOLUTE RULES:
         // Inject anti-repetition instruction into system instruction (only for normal chat)
         const enhancedSystemInstruction = currentMessageSystemInstruction + finalSystemInstruction + (isWelcomeMode ? '' : antiRepetitionInstruction);
 
-        const modelName = persona?.model?.textModel || process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp';
+        const modelName = persona?.model?.textModel || process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 
         // 🧠 DYNAMIC TEMPERATURE: 
         // MODE A (Welcome Check-In): Fixed 0.7 (Balanced - creative but fast) for witty one-liner welcome messages
@@ -1749,6 +1943,53 @@ ABSOLUTE RULES:
                             .map((m: Message) => m.content.trim().toLowerCase());
 
                         const currentContent = finalResponseText.toLowerCase().trim();
+
+                        // ✅ CRITICAL: Check if AI is echoing back user's current message
+                        const userMessages = history.messages
+                            .filter((m: Message) => m.senderType === 'user')
+                            .map((m: Message) => m.content.trim().toLowerCase());
+                        const lastUserMessage = userMessages[userMessages.length - 1] || '';
+                        const currentUserMessage = text.toLowerCase().trim();
+
+                        // Check if AI is repeating user's current message
+                        if (currentUserMessage && currentContent.length > 0) {
+                            // Extract key words from user's message (words longer than 3 chars)
+                            const userKeyWords = currentUserMessage.split(/\s+/)
+                                .filter((w: string) => w.length > 3 && !['that', 'this', 'what', 'when', 'where', 'with', 'from', 'have', 'been', 'will', 'just'].includes(w.toLowerCase()))
+                                .map((w: string) => w.toLowerCase().replace(/[.,!?]/g, ''));
+
+                            // Check if AI response contains too many of user's key words (echoing back)
+                            const aiWords = currentContent.split(/\s+/).map((w: string) => w.toLowerCase().replace(/[.,!?]/g, ''));
+                            const repeatedUserWords = userKeyWords.filter((uw: string) =>
+                                aiWords.some((aw: string) => aw.includes(uw) || uw.includes(aw))
+                            );
+
+                            // If more than 30% of user's key words are repeated, it's an echo
+                            if (userKeyWords.length > 0 && repeatedUserWords.length / userKeyWords.length > 0.3) {
+                                console.warn(`[Memory] ⚠️  AI is echoing back user's message. User said: "${currentUserMessage.substring(0, 50)}..." AI echoed: "${currentContent.substring(0, 50)}..."`);
+                                // Force regeneration with different words
+                                finalResponseText = finalResponseText + " [continued]";
+                            }
+
+                            // Check for "antunnav ah?" pattern echoing user's words
+                            if (currentContent.includes('antunnav ah') || currentContent.includes('antunava') || currentContent.includes('cheptunnav ah')) {
+                                // Check if it's followed by user's words
+                                const echoPattern = /(antunnav ah|antunava|cheptunnav ah)\s*[?:]?\s*["']?([^"']+)["']?/i;
+                                const match = currentContent.match(echoPattern);
+                                if (match && match[2]) {
+                                    const echoedPart = match[2].toLowerCase().trim();
+                                    // If echoed part matches user's message, it's forbidden
+                                    if (currentUserMessage.includes(echoedPart) || echoedPart.includes(currentUserMessage.substring(0, 20))) {
+                                        console.warn(`[Memory] ⚠️  AI used "antunnav ah?" to echo user's words: "${currentUserMessage.substring(0, 50)}..."`);
+                                        // Force regeneration - remove the echo pattern
+                                        finalResponseText = finalResponseText.replace(echoPattern, '').trim();
+                                        if (!finalResponseText) {
+                                            finalResponseText = "Chill ra, same here. Em chestunnav ippudu?";
+                                        }
+                                    }
+                                }
+                            }
+                        }
 
                         // Check against ALL previous AI messages (not just the last one)
                         for (const previousAIMessage of allAIMessages) {

@@ -61,10 +61,24 @@ export default function AI_Input_Search({ handleSend, isTyping, onTyping }: { ha
                         <div className="absolute right-2 top-2 z-10">
                             <button
                                 type="button"
-                                onClick={handleSubmit}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    if (!isTyping && value.trim()) {
+                                        handleSubmit();
+                                    }
+                                }}
+                                onTouchEnd={(e) => {
+                                    // 🛑 MOBILE FIX: Handle touch events properly
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    if (!isTyping && value.trim()) {
+                                        handleSubmit();
+                                    }
+                                }}
                                 disabled={!value.trim() || isTyping}
                                 className={cn(
-                                    "rounded-lg p-2 transition-colors shadow-sm",
+                                    "rounded-lg p-2 transition-colors shadow-sm touch-manipulation",
                                     value.trim() && !isTyping
                                         ? "bg-sky-500/20 text-sky-500 hover:bg-sky-500/30 active:bg-sky-500/40"
                                         : "bg-black/10 dark:bg-white/10 text-black/30 dark:text-white/30 cursor-not-allowed"

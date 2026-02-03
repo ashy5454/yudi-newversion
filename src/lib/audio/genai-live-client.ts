@@ -111,6 +111,7 @@ export class GenAILiveClient extends EventEmitter<LiveClientEventTypes> {
 
     try {
       console.log('Attempting to connect to GenAI Live with model:', this.model);
+      console.log('Connecting to Live API with model: gemini-2.5-flash-native-audio-preview-12-2025 (v1beta)');
 
       // 🧼 CRITICAL: Log config to verify it's clean (helps debug 1007 errors)
       console.log('📤 Connecting to Gemini Live API');
@@ -135,48 +136,13 @@ export class GenAILiveClient extends EventEmitter<LiveClientEventTypes> {
         throw new Error('Invalid config: responseModalities array cannot be empty');
       }
 
-      // CRITICAL: Validate languageCode format (must be ISO 639-1 code, not full name)
+      // CRITICAL: For gemini-2.5-flash-native-audio-preview-12-2025, languageCode may not be supported
+      // Remove languageCode if present to avoid "Unsupported language code" errors
       if (config.speechConfig?.languageCode) {
-        const langCode = config.speechConfig.languageCode;
-        // Check if it's a full name instead of ISO code (common mistake)
-        const fullNames = ['Hindi', 'Telugu', 'Tamil', 'English'];
-        if (fullNames.includes(langCode)) {
-          console.error(`❌ ERROR: languageCode is a full name "${langCode}" instead of ISO code!`);
-          console.error('   Gemini Live API requires ISO 639-1 codes like "hi-IN", "te-IN", "en-IN"');
-          console.error('   Converting automatically...');
-
-          // Auto-convert to ISO codes
-          const langMap: Record<string, string> = {
-            'Hindi': 'hi-IN',
-            'Telugu': 'te-IN',
-            'Tamil': 'ta-IN',
-            'English': 'en-IN'
-          };
-          config.speechConfig.languageCode = langMap[langCode] || 'hi-IN';
-          console.log(`   ✅ Converted "${langCode}" to "${config.speechConfig.languageCode}"`);
-        }
-      }
-
-      // CRITICAL: Validate languageCode format (must be ISO 639-1 code, not full name)
-      if (config.speechConfig?.languageCode) {
-        const langCode = config.speechConfig.languageCode;
-        // Check if it's a full name instead of ISO code (common mistake)
-        const fullNames = ['Hindi', 'Telugu', 'Tamil', 'English'];
-        if (fullNames.includes(langCode)) {
-          console.error(`❌ ERROR: languageCode is a full name "${langCode}" instead of ISO code!`);
-          console.error('   Gemini Live API requires ISO 639-1 codes like "hi-IN", "te-IN", "en-IN"');
-          console.error('   Converting automatically...');
-
-          // Auto-convert to ISO codes
-          const langMap: Record<string, string> = {
-            'Hindi': 'hi-IN',
-            'Telugu': 'te-IN',
-            'Tamil': 'ta-IN',
-            'English': 'en-IN'
-          };
-          config.speechConfig.languageCode = langMap[langCode] || 'hi-IN';
-          console.log(`   ✅ Converted "${langCode}" to "${config.speechConfig.languageCode}"`);
-        }
+        console.warn(`⚠️ WARNING: languageCode "${config.speechConfig.languageCode}" may not be supported by this model`);
+        console.warn('   Removing languageCode - model will auto-detect language or use default');
+        // Remove languageCode to avoid errors
+        delete config.speechConfig.languageCode;
       }
 
       // Validate system instruction length (very long instructions might cause issues)
@@ -190,6 +156,18 @@ export class GenAILiveClient extends EventEmitter<LiveClientEventTypes> {
           console.warn(`⚠️ WARNING: System instruction is very long (${totalLength} chars). This might cause 1007 errors.`);
           console.warn('   Consider truncating or simplifying the system instruction.');
         }
+      }
+
+      // Create a working copy of config to avoid mutating the original
+      let workingConfig: LiveConnectConfig = {
+        ...config,
+        speechConfig: config.speechConfig ? { ...config.speechConfig } : undefined,
+      };
+
+      // Remove languageCode from working copy if present
+      if (workingConfig.speechConfig && 'languageCode' in workingConfig.speechConfig) {
+        const { languageCode, ...speechConfigWithoutLang } = workingConfig.speechConfig;
+        workingConfig.speechConfig = speechConfigWithoutLang;
       }
 
       // 🧼 CRITICAL: Sanitize config for UTF-8 encoding before sending
@@ -222,8 +200,8 @@ export class GenAILiveClient extends EventEmitter<LiveClientEventTypes> {
         return obj;
       };
 
-      // Sanitize the entire config
-      const sanitizedConfig = sanitizeConfigForUTF8(config);
+      // Sanitize the entire config (use workingConfig)
+      const sanitizedConfig = sanitizeConfigForUTF8(workingConfig);
 
       // Try to stringify to check for circular references or invalid values
       try {
@@ -284,8 +262,15 @@ export class GenAILiveClient extends EventEmitter<LiveClientEventTypes> {
       this.session = undefined;
       this.setupCompleteEmitted = false;
 
-      // Emit a more specific error
+      // Enhanced error message for model not found errors
       const errorMessage = e instanceof Error ? e.message : 'Unknown connection error';
+      if (errorMessage.includes('not found') || errorMessage.includes('not supported')) {
+        console.error('🚨 MODEL ERROR: The model', this.model, 'is not available for Live API');
+        console.error('💡 TIP: Try using a model that supports bidiGenerateContent endpoint');
+        console.error('💡 TIP: Check Google AI Studio or Vertex AI documentation for supported Live API models');
+        console.error('💡 TIP: You may need to use a different model name or check your API key permissions');
+      }
+      
       this.emit('error', new ErrorEvent('error', { message: `Connection failed: ${errorMessage}` }));
       return false;
     }
@@ -655,7 +640,7 @@ export class GenAILiveClient extends EventEmitter<LiveClientEventTypes> {
       // Check if it's a voice-related error
       if (reason.toLowerCase().includes('voice') || reason.toLowerCase().includes('not available')) {
         reason = `Invalid voice name: ${reason}`;
-        console.error(`🚨 VOICE ERROR: The selected voice is not available for gemini-2.0-flash-exp. Error: ${reason}`);
+        console.error(`🚨 VOICE ERROR: The selected voice is not available for gemini-2.5-flash-native-audio-preview-12-2025. Error: ${reason}`);
       } else {
         reason = 'Invalid frame payload data';
       }

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Modality } from '@google/genai';
+import { Modality, LiveConnectConfig } from '@google/genai';
 
 import BasicFace from '@/components/audio/actor/basic-face/BasicFace';
 import { useLiveAPIContext } from '@/components/audio/LiveAPIContext';
@@ -14,18 +14,28 @@ export default function KeynoteCompanion({ persona }: { persona: Persona }) {
 
   // Set the configuration for the Live API
   useEffect(() => {
-    const config = {
+    // Validate required fields
+    if (!persona.model?.voiceName) {
+      console.warn('⚠️ KeynoteCompanion: persona.model.voiceName is missing, using default voice');
+    }
+    if (!persona.userPrompt) {
+      console.warn('⚠️ KeynoteCompanion: persona.userPrompt is missing');
+    }
+
+    const config: LiveConnectConfig = {
       responseModalities: [Modality.AUDIO],
       speechConfig: {
-        languageCode: persona.model.languageCode,
+        // languageCode removed - gemini-2.5-flash-native-audio-preview-12-2025 doesn't support it
         voiceConfig: {
-          prebuiltVoiceConfig: { voiceName: persona.model.voiceName },
+          prebuiltVoiceConfig: { 
+            voiceName: persona.model?.voiceName || 'Puck' // Fallback to default voice
+          },
         },
       },
       systemInstruction: {
         parts: [
           {
-            text: persona.userPrompt,
+            text: persona.userPrompt || '',
           },
         ],
       },
@@ -33,7 +43,7 @@ export default function KeynoteCompanion({ persona }: { persona: Persona }) {
 
     console.log('Setting Live API config in KeynoteCompanion:', config);
     setConfig(config);
-  }, [setConfig, persona.model.languageCode, persona.model.voiceName, persona.userPrompt]);
+  }, [setConfig, persona.model?.voiceName, persona.userPrompt]);
 
   // Listen for setup completion
   useEffect(() => {

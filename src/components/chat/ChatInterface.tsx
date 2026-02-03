@@ -5,6 +5,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useRoom } from "@/hooks/useRoom";
 import { usePersona } from "@/hooks/usePersona";
 import { useAuth } from "@/components/AuthContext";
+import { auth } from "@/lib/firebase/firebase";
 import { useTyping } from "@/contexts/TypingContext";
 import { Room, Persona, Message } from "@/lib/firebase/dbTypes";
 import ChatHeader from "./ChatHeader";
@@ -213,33 +214,33 @@ export default function ChatInterface() {
                     const checkInContent = getRandomWelcomeGreeting();
                     console.log(`🎲 [Preset] Selected random welcome greeting: "${checkInContent}"`);
 
-                            // Use Date.now() to ensure we get a proper timestamp (milliseconds)
-                            const checkInTimestamp = Date.now();
-                    
+                    // Use Date.now() to ensure we get a proper timestamp (milliseconds)
+                    const checkInTimestamp = Date.now();
+
                     // Save to database immediately
                     const checkInMessageData = {
-                                    roomId,
-                                    personaId: personaIdForCheckIn,
+                        roomId,
+                        personaId: personaIdForCheckIn,
                         senderType: "persona" as const,
-                                    content: checkInContent,
+                        content: checkInContent,
                         messageType: "text" as const,
-                                    isSent: true,
+                        isSent: true,
                     };
-                    
+
                     console.log(`💾 [Preset] Saving preset check-in message to DB:`, {
                         ...checkInMessageData,
                         contentPreview: checkInContent.substring(0, 50),
                         timestamp: checkInTimestamp
                     });
-                    
+
                     MessageClientDb.create(checkInMessageData, new Date(checkInTimestamp))
                         .then(async (messageId) => {
                             console.log(`✅ [Preset] Check-in message saved with ID: ${messageId}`);
-                            
+
                             // Update room's last message to move chat to top
                             await RoomClientDb.updateLastMessage(roomId, checkInContent);
                             console.log(`✅ [Preset] Room last message updated for check-in`);
-                            
+
                             // IMMEDIATE REFRESH: Force re-fetch to ensure message appears (optimized for speed)
                             try {
                                 const immediateResult = await MessageClientDb.getByRoomId(roomId, 50);
@@ -247,13 +248,13 @@ export default function ChatInterface() {
                                 if (immediateResult.messages) {
                                     const sorted = sortMessagesByTime(immediateResult.messages);
                                     setMessages(sorted);
-                                    
+
                                     // Check if our message is in the list
-                                    const hasOurMessage = sorted.some(m => 
-                                        m.id === messageId || 
+                                    const hasOurMessage = sorted.some(m =>
+                                        m.id === messageId ||
                                         (m.senderType === 'persona' && m.content === checkInContent)
                                     );
-                                    
+
                                     if (hasOurMessage) {
                                         console.log(`✅ [Preset] Message confirmed in immediate refresh - hiding typing indicator`);
                                         updateGeneratingState(false);
@@ -265,7 +266,7 @@ export default function ChatInterface() {
                                 console.error("❌ [Preset] Error in immediate refresh:", immediateError);
                                 updateGeneratingState(false);
                             }
-                            
+
                             // Second refresh: After 150ms (for DB propagation - optimized for speed)
                             setTimeout(async () => {
                                 try {
@@ -273,12 +274,12 @@ export default function ChatInterface() {
                                     if (result.messages) {
                                         const sorted = sortMessagesByTime(result.messages);
                                         setMessages(sorted);
-                                        
-                                        const hasOurMessage = sorted.some(m => 
-                                            m.id === messageId || 
+
+                                        const hasOurMessage = sorted.some(m =>
+                                            m.id === messageId ||
                                             (m.senderType === 'persona' && m.content === checkInContent)
                                         );
-                                        
+
                                         if (hasOurMessage) {
                                             console.log(`✅ [Preset] Message confirmed in delayed refresh - hiding typing indicator`);
                                             updateGeneratingState(false);
@@ -317,7 +318,7 @@ export default function ChatInterface() {
             abortCheckInRef.current.delete(roomId); // Clear kill switch for new room
             updateGeneratingState(false); // Clear typing state when switching rooms
         }
-        
+
         // Cleanup: Clear typing state when component unmounts or room changes
         return () => {
             if (roomId) {
@@ -345,7 +346,7 @@ export default function ChatInterface() {
                     }
                 }
             };
-            
+
             loadInitialMessages();
 
             // Subscribe to real-time updates - this fires immediately with existing messages
@@ -364,7 +365,7 @@ export default function ChatInterface() {
                     // After initial load, only add NEW messages (deduplicate)
                     // 🛑 HARD FIX #2: Track processed message IDs to prevent duplicate processing
                     const processedIds = new Set<string>();
-                    
+
                     const filteredBackendMessages = updatedMessages.filter(newMessage => {
                         // A. BLOCK ID DUPLICATES (Standard) - Check both prev messages and processed set
                         // If we already have a message with this ID locally, skip it
@@ -373,10 +374,10 @@ export default function ChatInterface() {
                             // Silently block duplicates - no logging needed
                             return false;
                         }
-                        
+
                         // Mark as processed to prevent duplicate processing in same filter run
                         processedIds.add(newMessage.id);
-                        
+
                         // Note: We'll hide typing indicator in useEffect when messages change
 
                         // B. BLOCK "USER" ECHO (Aggressive) - Only user messages have local copies for instant feedback
@@ -401,7 +402,7 @@ export default function ChatInterface() {
                             if (isUserDuplicate) {
                                 // Only log once per unique message to prevent spam
                                 if (!processedIds.has(`duplicate_${newMessage.id}`)) {
-                                console.log("🛡️ Blocked duplicate user message from DB");
+                                    console.log("🛡️ Blocked duplicate user message from DB");
                                     processedIds.add(`duplicate_${newMessage.id}`);
                                 }
                                 return false; // Block the DB echo of user message
@@ -433,7 +434,7 @@ export default function ChatInterface() {
     // DELAY: Wait a bit to ensure message is fully rendered before hiding typing indicator
     useEffect(() => {
         if (!roomId || messages.length === 0 || !isGenerating) return;
-        
+
         // Check if the last message is from the persona (AI) and has substantial content
         const lastMessage = messages[messages.length - 1];
         if (lastMessage && lastMessage.senderType === 'persona' && lastMessage.content && lastMessage.content.trim().length > 10) {
@@ -442,7 +443,7 @@ export default function ChatInterface() {
                 console.log(`✅ [useEffect] New AI message detected - hiding typing indicator after delay`);
                 updateGeneratingState(false);
             }, 150); // Optimized: Reduced from 300ms to 150ms for faster response
-            
+
             return () => clearTimeout(hideTimer);
         }
     }, [messages, roomId, isGenerating, updateGeneratingState]);
@@ -535,7 +536,7 @@ export default function ChatInterface() {
                         model: {
                             name: "Gemini",
                             systemPrompt: "You are a helpful assistant.",
-                            textModel: "gemini-2.0-flash-exp",
+                            textModel: "gemini-2.5-flash",
                             voiceModel: "default",
                             voiceName: "default",
                             gender: "neutral",
@@ -582,9 +583,23 @@ export default function ChatInterface() {
 
                         setTimeout(async () => {
                             try {
+                                // 🛑 Get fresh auth token for this request
+                                let authToken: string | null = null;
+                                try {
+                                    const currentUser = auth.currentUser;
+                                    if (currentUser) {
+                                        authToken = await currentUser.getIdToken();
+                                    }
+                                } catch (tokenError) {
+                                    console.error("[ChatInterface] Failed to get auth token:", tokenError);
+                                }
+
                                 const initResponse = await fetch('/api/chat/init', {
                                     method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        ...(authToken && { 'Authorization': `Bearer ${authToken}` }), // 🛑 Send token in Authorization header
+                                    },
                                     body: JSON.stringify({ roomId, personaId: roomData.personaId })
                                 });
                                 const initData = await initResponse.json();
@@ -638,7 +653,7 @@ export default function ChatInterface() {
                     model: {
                         name: "Gemini",
                         systemPrompt: "You are a helpful assistant.",
-                        textModel: "gemini-2.0-flash-exp",
+                        textModel: "gemini-2.5-flash",
                         voiceModel: "default",
                         voiceName: "default",
                         gender: "neutral",

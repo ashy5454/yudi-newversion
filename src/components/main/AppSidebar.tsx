@@ -3,10 +3,11 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { ThemeToggle } from "../ThemeToggle";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
-import { Globe2Icon, HomeIcon } from "lucide-react";
+import { Globe2Icon, HomeIcon, UserCircle } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "../AuthContext";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuDescription } from "../ui/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 
 export default function AppSidebar() {
     const isMobile = useIsMobile();
@@ -76,8 +77,44 @@ export default function AppSidebar() {
                 {/* Bottom */}
                 {!isMobile && (
                     <div className="flex flex-row md:flex-col items-center gap-2 mr-2 md:mr-0 md:mb-2">
+                        {user?.isAnonymous && (
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <div className="flex items-center justify-center w-10 h-10 rounded-full bg-yellow-500/20 border border-yellow-500/50 cursor-help">
+                                            <UserCircle className="w-5 h-5 text-yellow-500" />
+                                        </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="right" className="max-w-xs">
+                                        <p className="text-sm">
+                                            You are in Guest Mode. Your personas and chats are saved locally.{" "}
+                                            <span className="underline font-semibold">Sign Up</span>{" "}
+                                            to sync them across devices.
+                                        </p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        )}
                         {avatar}
                     </div>
+                )}
+                {isMobile && user?.isAnonymous && (
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-yellow-500/20 border border-yellow-500/50 cursor-help">
+                                    <UserCircle className="w-5 h-5 text-yellow-500" />
+                                </div>
+                            </TooltipTrigger>
+                            <TooltipContent side="top" className="max-w-xs">
+                                <p className="text-sm">
+                                    You are in Guest Mode. Your personas and chats are saved locally.{" "}
+                                    <span className="underline font-semibold">Sign Up</span>{" "}
+                                    to sync them across devices.
+                                </p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
                 )}
             </div>
         </div>);

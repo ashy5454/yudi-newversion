@@ -1,10 +1,10 @@
 import { EN_LOGO } from "@/content/en"
-import { Link } from "react-router-dom"
+import Link from "next/link"
 
 export const Logo = () => {
     return (
         <Link
-            to="/"
+            href="/"
             aria-label="home"
             className="flex items-center space-x-2">
             <LogoIcon />

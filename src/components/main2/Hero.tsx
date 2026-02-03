@@ -13,7 +13,12 @@ import { FlipWords } from "@/magicui/flip-words";
 import AnimatedBackground from "./AnimatedBackground";
 import DemoGraphic from "./DemoGraphic";
 
-const Hero = ({ handleEarlyAccess }: { handleEarlyAccess?: MouseEventHandler<HTMLButtonElement> }) => {
+interface HeroProps {
+    handleJoinYudi?: MouseEventHandler<HTMLButtonElement>;
+    handleTryYudi?: MouseEventHandler<HTMLButtonElement>;
+}
+
+const Hero = ({ handleJoinYudi, handleTryYudi }: HeroProps) => {
     const color = useMotionValue(EN_HERO.colors[0]);
 
     useEffect(() => {
@@ -31,30 +36,30 @@ const Hero = ({ handleEarlyAccess }: { handleEarlyAccess?: MouseEventHandler<HTM
     return (
         <motion.section className="relative min-h-screen overflow-hidden w-full pt-20">
             <AnimatedBackground showGradient={true} />
-            
+
             <div className="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-8 py-12 md:py-16">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center min-h-[80vh]">
                     {/* Left Side - Text Content */}
-                    <motion.div 
+                    <motion.div
                         className="flex flex-col items-center lg:items-start text-center lg:text-left"
                         initial={{ opacity: 0, x: -50 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.8 }}
                     >
                         {/* Main Heading */}
-                        <h1 
-                            className="font-bold leading-tight mb-6" 
-                            style={{ 
-                                fontFamily: "'Clash Display', 'Outfit', sans-serif", 
+                        <h1
+                            className="font-bold leading-tight mb-6"
+                            style={{
+                                fontFamily: "'Clash Display', 'Outfit', sans-serif",
                                 fontSize: "clamp(2.5rem, 5vw, 4rem)",
                                 lineHeight: 1.1
                             }}
                         >
                             <span className="text-white">{EN_HERO.titleOne}</span>
                             <span className="inline-block">
-                                <FlipWords 
-                                    className="px-2 inline relative bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent" 
-                                    words={EN_HERO.animationTexts} 
+                                <FlipWords
+                                    className="px-2 inline relative bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent"
+                                    words={EN_HERO.animationTexts}
                                     duration={2000}
                                 />
                             </span>
@@ -63,7 +68,7 @@ const Hero = ({ handleEarlyAccess }: { handleEarlyAccess?: MouseEventHandler<HTM
                         </h1>
 
                         {/* Description */}
-                        <motion.p 
+                        <motion.p
                             className="text-white/70 text-lg md:text-xl mb-8 max-w-lg"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -73,24 +78,48 @@ const Hero = ({ handleEarlyAccess }: { handleEarlyAccess?: MouseEventHandler<HTM
                             {EN_HERO.description}
                         </motion.p>
 
-                        {/* CTA Button */}
-                        <motion.button
-                            style={{
-                                border,
-                                boxShadow,
-                            }}
-                            whileHover={{
-                                scale: 1.05,
-                            }}
-                            whileTap={{
-                                scale: 0.95,
-                            }}
-                            onClick={handleEarlyAccess}
-                            className="group relative flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-600/20 to-pink-600/20 px-8 py-4 text-lg font-semibold text-white transition-all hover:from-purple-600/30 hover:to-pink-600/30"
+                        {/* CTA Buttons - Side by Side */}
+                        <motion.div
+                            className="flex flex-row gap-4 items-center"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.5 }}
                         >
-                            <span>{EN_HERO.cta.text}</span>
-                            <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1 group-hover:-rotate-45" />
-                        </motion.button>
+                            <motion.button
+                                style={{
+                                    border,
+                                    boxShadow,
+                                }}
+                                whileHover={{
+                                    scale: 1.05,
+                                }}
+                                whileTap={{
+                                    scale: 0.95,
+                                }}
+                                onClick={handleJoinYudi}
+                                className="group relative flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-600/20 to-pink-600/20 px-8 py-4 text-lg font-semibold text-white transition-all hover:from-purple-600/30 hover:to-pink-600/30"
+                            >
+                                <span>{EN_HERO.cta.text}</span>
+                                <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1 group-hover:-rotate-45" />
+                            </motion.button>
+                            <motion.button
+                                style={{
+                                    border,
+                                    boxShadow,
+                                }}
+                                whileHover={{
+                                    scale: 1.05,
+                                }}
+                                whileTap={{
+                                    scale: 0.95,
+                                }}
+                                onClick={handleTryYudi}
+                                className="group relative flex items-center gap-2 rounded-full bg-gray-800/10 px-8 py-4 text-lg font-semibold text-gray-50 transition-colors hover:bg-gray-950/50 border-gray-600/50"
+                            >
+                                <span>{EN_HERO.tryCta?.text || "Try Yudi"}</span>
+                                <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1 group-hover:-rotate-45" />
+                            </motion.button>
+                        </motion.div>
 
                         {/* Trust Badges */}
                         <motion.div
@@ -116,7 +145,7 @@ const Hero = ({ handleEarlyAccess }: { handleEarlyAccess?: MouseEventHandler<HTM
                     </motion.div>
 
                     {/* Right Side - Demo Graphic */}
-                    <motion.div 
+                    <motion.div
                         className="hidden md:flex items-center justify-center"
                         initial={{ opacity: 0, x: 50 }}
                         animate={{ opacity: 1, x: 0 }}

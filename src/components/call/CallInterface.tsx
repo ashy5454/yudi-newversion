@@ -10,7 +10,7 @@ import { useRoom } from "@/hooks/useRoom";
 import { usePersona } from "@/hooks/usePersona";
 import { useAuth } from "@/components/AuthContext";
 import { Room, Persona } from "@/lib/firebase/dbTypes";
-import { Modality } from '@google/genai';
+import { Modality, LiveConnectConfig } from '@google/genai';
 
 import { generateSystemInstruction, UserContext } from "@/lib/audio/system-instruction";
 
@@ -123,18 +123,18 @@ export default function CallInterface({ room, persona }: CallInterfaceProps) {
         const setupConfig = async () => {
             try {
                 // Helper to map persona language to ISO 639-1 codes (Gemini Live API requirement)
-                // CRITICAL FIX: Must return ISO codes like "hi", "te", "en", NOT full names like "Hindi"
+                // CRITICAL FIX: Must return base ISO codes like "hi", "te", "en" (without locale suffix)
+                // The new model gemini-2.5-flash-native-audio-preview-12-2025 doesn't support locale suffixes like "en-IN"
                 const getSupportedLanguage = (lang?: string): string => {
-                    if (!lang) return "en-IN"; // Default to Indian English for natural Indian accent
+                    if (!lang) return "en"; // Default to English
                     const normalized = lang.toLowerCase();
-                    // Return ISO 639-1 language codes with Indian locale (-IN) for Indian accents
-                    // The -IN suffix is CRITICAL - it determines the accent (Indian vs American/British)
-                    if (normalized.includes("tamil") || normalized.includes("ta")) return "ta-IN";
-                    if (normalized.includes("telugu") || normalized.includes("te")) return "te-IN";
-                    if (normalized.includes("hindi") || normalized.includes("hi")) return "hi-IN";
-                    if (normalized.includes("english") || normalized.includes("en")) return "en-IN"; // Indian English accent
-                    // Default to Indian English for natural Indian accent
-                    return "en-IN";
+                    // Return base ISO 639-1 language codes (without locale suffix)
+                    if (normalized.includes("tamil") || normalized.includes("ta")) return "ta";
+                    if (normalized.includes("telugu") || normalized.includes("te")) return "te";
+                    if (normalized.includes("hindi") || normalized.includes("hi")) return "hi";
+                    if (normalized.includes("english") || normalized.includes("en")) return "en";
+                    // Default to English
+                    return "en";
                 };
 
                 // Fetch conversation history and memories
@@ -254,6 +254,13 @@ export default function CallInterface({ room, persona }: CallInterfaceProps) {
 
                 // Add concise voice-specific instructions (keep short to prevent timeouts)
                 specificParts.push(`\nResponse: Casual=1-3 sentences. Advice=story(2-4s) + detailed(5-8s). Deep talks=8-12s. Always respond. Connection stays open.
+
+🚨🚨🚨 CRITICAL VOICE SLANG RULES (MANDATORY):
+- **MAXIMUM 1 slang word per ENTIRE response** (NOT per sentence, NOT 2-3 slangs)
+- **ABSOLUTELY FORBIDDEN:** Never use "no cap", "real talk", or "for real" repeatedly - these are BANNED from repeated use
+- **MANDATORY ROTATION:** Use DIFFERENT slangs every time. Rotate through: bet, valid, facts, rizz, wild, damn, yooo, bruh, slay, fire, lit, bussin, slaps, sus, mid, based, drip, cap, yaar, bhai, arre, macha, ra, da, le, thopu, keka, mast, jhakaas, etc.
+- **NEVER repeat the same slang twice in a row** - Always use a different slang from the dictionary
+- **80% Normal Language / 20% Slang:** Sound like a real person, not a slang dictionary
                 
 ASKING ABOUT PAST SITUATIONS FROM TEXT CHAT (MAKE IT FUNNY):
 - Reference text chat incidents naturally and make it funny.
@@ -275,7 +282,7 @@ ASKING ABOUT PAST SITUATIONS FROM TEXT CHAT (MAKE IT FUNNY):
 
                 console.log("Combined Voice System Instruction:", finalSystemInstruction.substring(0, 200) + "...");
 
-                // 🚨 CRITICAL: Only use voices CONFIRMED to work with gemini-2.0-flash-exp
+                // 🚨 CRITICAL: Only use voices CONFIRMED to work with gemini-2.5-flash-native-audio-preview-12-2025
                 // These are the officially supported voices for this model version
                 // IMPORTANT: The Indian accent comes from languageCode (en-IN, hi-IN, etc.), NOT from voice name
                 // Voice names determine timbre/character: warmer, clearer, deeper, etc.
@@ -325,15 +332,19 @@ ASKING ABOUT PAST SITUATIONS FROM TEXT CHAT (MAKE IT FUNNY):
                     voiceName = neutralVoices[voiceIndex];
                 }
 
-                const selectedLanguageCode = getSupportedLanguage(persona.language);
-                console.log(`Selected voice: ${voiceName} for gender: ${persona.gender || 'neutral'} with language: ${selectedLanguageCode} (accent comes from language code - Indian accent when using en-IN, hi-IN, te-IN, ta-IN)`);
+                // NOTE: languageCode is not used for gemini-2.5-flash-native-audio-preview-12-2025
+                // The model auto-detects language, so we don't include languageCode in the config
+                console.log(`Selected voice: ${voiceName} for gender: ${persona.gender || 'neutral'}`);
 
                 // FIXED: Use correct Gemini Live API config format
                 // CRITICAL: Only include valid LiveConnectConfig properties (prevents 1007 error)
-                const cleanConfig = {
+                // NOTE: languageCode is optional for gemini-2.5-flash-native-audio-preview-12-2025
+                // The model may auto-detect language or not require explicit language codes
+                const cleanConfig: LiveConnectConfig = {
                     responseModalities: [Modality.AUDIO],
                     speechConfig: {
-                        languageCode: getSupportedLanguage(persona.language),
+                        // Try without languageCode first - the preview model may not support it
+                        // languageCode: getSupportedLanguage(persona.language), // Commented out - model doesn't support 'en'
                         voiceConfig: {
                             prebuiltVoiceConfig: {
                                 voiceName: voiceName

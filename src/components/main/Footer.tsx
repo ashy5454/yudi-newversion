@@ -1,5 +1,5 @@
 import React from "react"
-import { Link } from "react-router-dom"
+import Link from "next/link"
 import { Logo } from "./Logo"
 import { EN_FOOTER } from "@/content/en"
 
@@ -26,7 +26,7 @@ const Footer: React.FC = () => {
                                 {link.items.map((item, index) => (
                                     <Link
                                         key={index}
-                                        to={item.to}
+                                        href={item.to}
                                         className="text-muted-foreground hover:text-primary block duration-150">
                                         <span>{item.title}</span>
                                     </Link>
@@ -41,7 +41,7 @@ const Footer: React.FC = () => {
                         {EN_FOOTER.socialLinks.map((icon, index) => (
                             <Link
                                 key={index}
-                                to={icon.to}
+                                href={icon.to}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 aria-label={icon.label}

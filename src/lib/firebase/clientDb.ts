@@ -90,16 +90,19 @@ const getDocWithSource = async <T>(docRef: any): Promise<{ data: T | null; fromC
       fromCache: docSnap.metadata.fromCache
     };
   } catch (error) {
-    // Handle permission errors and not-found errors gracefully
+    // Handle permission errors and not-found errors gracefully (don't log as errors)
     if (error instanceof FirestoreError &&
       (error.code === 'permission-denied' || error.code === 'not-found')) {
       return { data: null, fromCache: false };
     }
 
-    logFirestoreError(error, 'getDocWithSource', {
-      collection: docRef.parent.id,
-      documentId: docRef.id
-    });
+    // Only log unexpected errors
+    if (error instanceof FirestoreError && error.code !== 'unavailable') {
+      logFirestoreError(error, 'getDocWithSource', {
+        collection: docRef.parent.id,
+        documentId: docRef.id
+      });
+    }
     return { data: null, fromCache: false };
   }
 };

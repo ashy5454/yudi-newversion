@@ -19,6 +19,8 @@ export interface User {
     accessLevel?: 'trial' | 'approved'; // Waitlist system: trial or approved access
     trialStartedAt?: Date; // When text chat trial started
     voiceTrialStartedAt?: Date; // When voice call trial started
+    isAnonymous?: boolean; // True for anonymous/guest users
+    username?: string; // Username for anonymous users
 }
 
 export interface Credit {
