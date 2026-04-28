@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research — YUDI AI Research Lab</title>
+    <meta name="description" content="Research paper from YUDI AI Research Lab.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* ══════════════════════════════════════════
+           DESIGN TOKENS
+           ══════════════════════════════════════════ */
+        :root {
+            --bg:             #030303;
+            --surface:        rgba(255,255,255,0.03);
+            --surface-hover:  rgba(255,255,255,0.07);
+            --border:         rgba(255,255,255,0.08);
+            --border-hover:   rgba(255,255,255,0.22);
+            --text-primary:   rgba(255,255,255,0.95);
+            --text-secondary: rgba(255,255,255,0.5);
+            --text-dim:       rgba(255,255,255,0.2);
+            --font:           'Outfit', system-ui, sans-serif;
+            --ease-spring:    cubic-bezier(0.16,1,0.3,1);
+            --max-prose:      720px;
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg);
+            color: var(--text-primary);
+            font-family: var(--font);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* ══════════════════════════════════════════
+           BACKGROUND CANVAS
+           ══════════════════════════════════════════ */
+        #neural-canvas {
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 0; opacity: 0.18; pointer-events: none;
+        }
+
+        /* ══════════════════════════════════════════
+           NAVBAR
+           ══════════════════════════════════════════ */
+        nav {
+            position: fixed; top: 0; width: 100%; z-index: 100;
+            padding: 1.5rem 5%;
+            display: flex; justify-content: space-between; align-items: center;
+            transition: all 0.4s ease;
+        }
+        nav.scrolled {
+            background: rgba(0,0,0,0.65);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 5%;
+        }
+        .logo img { height: 48px; width: auto; object-fit: contain; }
+        .nav-links { display: flex; gap: 2.5rem; align-items: center; }
+        .nav-links a {
+            color: var(--text-secondary); text-decoration: none;
+            font-size: 0.85rem; font-weight: 500;
+            letter-spacing: 0.1em; text-transform: uppercase;
+            transition: color 0.3s;
+        }
+        .nav-links a:hover { color: #fff; }
+        .nav-highlight { border: 1px solid var(--border); padding: 0.5rem 1rem; border-radius: 6px; }
+
+        /* ══════════════════════════════════════════
+           ARTICLE LAYOUT
+           ══════════════════════════════════════════ */
+        .article-wrapper {
+            position: relative; z-index: 1;
+            padding-top: 8rem;
+        }
+
+        /* ── Back link ── */
+        .back-link {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            margin: 0 5% 3rem;
+            font-size: 0.8rem; font-weight: 500;
+            letter-spacing: 0.1em; text-transform: uppercase;
+            color: var(--text-dim); text-decoration: none;
+            transition: color 0.3s, gap 0.3s;
+        }
+        .back-link:hover { color: var(--text-secondary); gap: 0.8rem; }
+        .back-link svg { transition: transform 0.3s; flex-shrink: 0; }
+        .back-link:hover svg { transform: translateX(-3px); }
+
+        /* ── Hero image ── */
+        .hero-img-wrap {
+            width: 100%; max-height: 520px; overflow: hidden;
+            margin-bottom: 0;
+            position: relative;
+        }
+        .hero-img-wrap img {
+            width: 100%; height: 100%; object-fit: cover; display: block;
+            filter: brightness(0.7);
+        }
+        .hero-img-wrap::after {
+            content: '';
+            position: absolute; bottom: 0; left: 0; right: 0;
+            height: 60%;
+            background: linear-gradient(to bottom, transparent, var(--bg));
+        }
+
+        /* ── Article header ── */
+        .article-header {
+            max-width: var(--max-prose); margin: 4rem auto 3rem;
+            padding: 0 5%;
+            opacity: 0; transform: translateY(20px);
+            animation: fadeUp 0.7s var(--ease-spring) 0.1s forwards;
+        }
+        @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+        .article-label {
+            font-size: 0.72rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.2em;
+            color: var(--text-dim); margin-bottom: 1rem;
+        }
+        .article-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800; letter-spacing: -0.03em; line-height: 1.15;
+            background: linear-gradient(180deg, #ffffff 0%, #777 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+        }
+        .article-byline {
+            display: flex; align-items: center; gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+        .byline-author {
+            font-size: 0.85rem; font-weight: 500;
+            color: var(--text-secondary);
+        }
+        .byline-dot {
+            width: 3px; height: 3px; border-radius: 50%;
+            background: var(--text-dim);
+        }
+        .byline-date {
+            font-size: 0.8rem; color: var(--text-dim);
+            letter-spacing: 0.05em;
+        }
+
+        /* ── Divider ── */
+        .article-divider {
+            max-width: var(--max-prose); margin: 2.5rem auto;
+            padding: 0 5%;
+        }
+        .article-divider hr {
+            border: none; border-top: 1px solid var(--border);
+        }
+
+        /* ── Prose body ── */
+        .article-body {
+            max-width: var(--max-prose); margin: 0 auto;
+            padding: 0 5% 8rem;
+            opacity: 0; transform: translateY(20px);
+            animation: fadeUp 0.7s var(--ease-spring) 0.25s forwards;
+        }
+
+        /* Rich text styles */
+        .prose p {
+            font-size: 1.05rem; font-weight: 300;
+            color: var(--text-secondary); line-height: 1.85;
+            margin-bottom: 1.5rem;
+        }
+        .prose h2 {
+            font-size: 1.6rem; font-weight: 700; letter-spacing: -0.02em;
+            color: var(--text-primary); margin: 3rem 0 1rem;
+            line-height: 1.25;
+        }
+        .prose h3 {
+            font-size: 1.2rem; font-weight: 600;
+            color: rgba(255,255,255,0.8); margin: 2.5rem 0 0.75rem;
+        }
+        .prose h4 {
+            font-size: 1rem; font-weight: 600;
+            color: rgba(255,255,255,0.7); margin: 2rem 0 0.5rem;
+            text-transform: uppercase; letter-spacing: 0.08em;
+        }
+        .prose strong { color: var(--text-primary); font-weight: 600; }
+        .prose em { font-style: italic; color: rgba(255,255,255,0.65); }
+        .prose code {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 0.85em;
+            background: rgba(255,255,255,0.07);
+            padding: 0.15em 0.45em; border-radius: 4px;
+            color: rgba(255,255,255,0.8);
+        }
+        .prose pre {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            border-radius: 10px; padding: 1.5rem;
+            overflow-x: auto; margin: 2rem 0;
+        }
+        .prose pre code { background: none; padding: 0; }
+        .prose blockquote {
+            border-left: 2px solid rgba(255,255,255,0.2);
+            padding: 0.5rem 0 0.5rem 1.5rem;
+            margin: 2rem 0; font-style: italic;
+            color: var(--text-dim);
+        }
+        .prose ul, .prose ol {
+            padding-left: 1.5rem; margin-bottom: 1.5rem;
+        }
+        .prose li {
+            font-size: 1.05rem; font-weight: 300;
+            color: var(--text-secondary); line-height: 1.8;
+            margin-bottom: 0.4rem;
+        }
+        .prose a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            transition: color 0.2s;
+        }
+        .prose a:hover { color: #fff; }
+        .prose img {
+            width: 100%; border-radius: 10px;
+            margin: 2rem 0; border: 1px solid var(--border);
+        }
+        .prose hr {
+            border: none; border-top: 1px solid var(--border);
+            margin: 3rem 0;
+        }
+
+        /* ── Skeleton ── */
+        .skeleton-header { max-width: var(--max-prose); margin: 4rem auto 3rem; padding: 0 5%; }
+        .skeleton-body   { max-width: var(--max-prose); margin: 0 auto; padding: 0 5% 8rem; }
+        .sk { height: 12px; border-radius: 4px; margin-bottom: 1rem;
+              background: linear-gradient(90deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.09) 50%, rgba(255,255,255,0.04) 100%);
+              background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+
+        /* ── Not Found ── */
+        .not-found {
+            max-width: var(--max-prose); margin: 8rem auto;
+            padding: 0 5%; text-align: center;
+        }
+        .not-found h2 { font-size: 1.5rem; color: var(--text-secondary); margin-bottom: 0.5rem; }
+        .not-found p { color: var(--text-dim); margin-bottom: 2rem; }
+        .btn-back {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            padding: 0.8rem 1.8rem; border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--surface); color: #fff;
+            font-family: var(--font); font-size: 0.85rem;
+            font-weight: 500; text-decoration: none;
+            transition: all 0.3s;
+        }
+        .btn-back:hover { background: var(--surface-hover); transform: translateY(-2px); }
+
+        /* FOOTER */
+        footer {
+            text-align: center; padding: 3rem 5%;
+            border-top: 1px solid var(--border);
+            position: relative; z-index: 1;
+        }
+        footer p { color: var(--text-dim); font-size: 0.8rem; }
+        .footer-logo { font-weight: 800; letter-spacing: 0.2em; color: var(--text-dim); margin-bottom: 0.4rem; }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .article-title { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="neural-canvas"></canvas>
+
+<!-- ═══════ NAVBAR ═══════ -->
+<nav id="navbar">
+    <a href="index.html" class="logo">
+        <img src="logo.png" alt="YUDI Logo"
+             onerror="this.outerHTML='<span style=\'font-weight:800;font-size:1.5rem;letter-spacing:0.1em;text-transform:uppercase;color:#fff;\'>YUDI.</span>'">
+    </a>
+    <div class="nav-links">
+        <a href="index.html#research">Research</a>
+        <a href="blogs.html">Papers</a>
+        <a href="index.html#architecture">Architecture</a>
+        <a href="index.html#recruit" class="nav-highlight">Join the Lab</a>
+    </div>
+</nav>
+
+<!-- ═══════ ARTICLE AREA ═══════ -->
+<div class="article-wrapper" id="article-wrapper">
+
+    <!-- Loading skeleton (shown while fetching) -->
+    <div id="skeleton">
+        <a href="blogs.html" class="back-link">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="19" y1="12" x2="5" y2="12"/>
+                <polyline points="12 19 5 12 12 5"/>
+            </svg>
+            All Research
+        </a>
+        <div class="skeleton-header">
+            <div class="sk" style="width:30%; height:8px;"></div>
+            <div class="sk" style="width:85%; height:28px; margin-top:1rem;"></div>
+            <div class="sk" style="width:60%; height:28px;"></div>
+            <div class="sk" style="width:40%; height:10px; margin-top:1.5rem;"></div>
+        </div>
+        <div class="skeleton-body">
+            <div class="sk" style="width:100%;"></div>
+            <div class="sk" style="width:95%;"></div>
+            <div class="sk" style="width:80%;"></div>
+            <div class="sk" style="width:100%; margin-top:1.5rem;"></div>
+            <div class="sk" style="width:90%;"></div>
+            <div class="sk" style="width:70%;"></div>
+            <div class="sk" style="width:100%; margin-top:1.5rem;"></div>
+            <div class="sk" style="width:85%;"></div>
+        </div>
+    </div>
+
+    <!-- Actual article content injected here -->
+    <div id="article" style="display:none;"></div>
+</div>
+
+<!-- ═══════ FOOTER ═══════ -->
+<footer>
+    <div class="footer-logo">YUDI.</div>
+    <p>&copy; 2026 YUDI AI Research Lab. All rights reserved.</p>
+</footer>
+
+<script>
+    /* ─────────────────────────────────────────────────────
+       CONFIG — replace YOUR_PROJECT_ID with your Sanity
+       Project ID after running: npm create sanity@latest
+    ───────────────────────────────────────────────────── */
+    const PROJECT_ID = "7xfeub9j";
+    const DATASET    = "production";
+    const API_VER    = "2023-01-01";
+    const ENDPOINT   = `https://${PROJECT_ID}.api.sanity.io/v${API_VER}/data/query/${DATASET}`;
+
+    /* ─────────────── Background Neural Canvas ─────────── */
+    (function () {
+        const canvas = document.getElementById('neural-canvas');
+        const ctx = canvas.getContext('2d');
+        let nodes = [];
+
+        function init() {
+            canvas.width  = window.innerWidth;
+            canvas.height = window.innerHeight;
+            nodes = Array.from({ length: 50 }, () => ({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                vx: (Math.random() - 0.5) * 0.35,
+                vy: (Math.random() - 0.5) * 0.35,
+                r: Math.random() * 1.2 + 0.4,
+            }));
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            nodes.forEach((n, i) => {
+                n.x += n.vx; n.y += n.vy;
+                if (n.x < 0 || n.x > canvas.width)  n.vx *= -1;
+                if (n.y < 0 || n.y > canvas.height) n.vy *= -1;
+                ctx.beginPath();
+                ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                ctx.fill();
+                nodes.slice(i + 1).forEach(m => {
+                    const d = Math.hypot(n.x - m.x, n.y - m.y);
+                    if (d < 130) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(255,255,255,${0.1 * (1 - d / 130)})`;
+                        ctx.lineWidth = 0.4;
+                        ctx.moveTo(n.x, n.y); ctx.lineTo(m.x, m.y); ctx.stroke();
+                    }
+                });
+            });
+            requestAnimationFrame(draw);
+        }
+
+        init(); draw();
+        window.addEventListener('resize', init);
+    })();
+
+    /* ─────────────── Navbar scroll ─────────────────── */
+    window.addEventListener('scroll', () => {
+        document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60);
+    });
+
+    /* ─────────────── Portable Text → HTML renderer ─── */
+    function renderBlocks(blocks) {
+        if (!blocks || !Array.isArray(blocks)) return '';
+
+        return blocks.map(block => {
+            if (block._type !== 'block') return '';
+
+            // Inline span renderer
+            const inlineText = (block.children || []).map(span => {
+                let text = escHtml(span.text || '');
+
+                // Apply marks
+                (span.marks || []).forEach(mark => {
+                    // Check mark definitions first
+                    const def = (block.markDefs || []).find(d => d._key === mark);
+                    if (def && def._type === 'link') {
+                        text = `<a href="${escHtml(def.href)}" target="_blank" rel="noopener">${text}</a>`;
+                    } else {
+                        switch (mark) {
+                            case 'strong': text = `<strong>${text}</strong>`; break;
+                            case 'em':     text = `<em>${text}</em>`;         break;
+                            case 'code':   text = `<code>${text}</code>`;     break;
+                            case 'underline': text = `<u>${text}</u>`;        break;
+                            case 'strike-through': text = `<s>${text}</s>`;  break;
+                        }
+                    }
+                });
+                return text;
+            }).join('');
+
+            // Block style
+            switch (block.style) {
+                case 'h2':     return `<h2>${inlineText}</h2>`;
+                case 'h3':     return `<h3>${inlineText}</h3>`;
+                case 'h4':     return `<h4>${inlineText}</h4>`;
+                case 'blockquote': return `<blockquote>${inlineText}</blockquote>`;
+                default:       return inlineText.trim() ? `<p>${inlineText}</p>` : '';
+            }
+        }).join('\n');
+    }
+
+    function escHtml(str) {
+        return String(str)
+            .replace(/&/g,'&amp;')
+            .replace(/</g,'&lt;')
+            .replace(/>/g,'&gt;')
+            .replace(/"/g,'&quot;');
+    }
+
+    /* ─────────────── Fetch post ─────────────────────── */
+    const slug = new URLSearchParams(window.location.search).get('slug');
+
+    if (!slug) {
+        showNotFound('No post specified.');
+    } else {
+        // GROQ: fetch single post by slug
+        const QUERY = `*[_type == "post" && slug.current == $slug][0]{
+            title,
+            author,
+            publishedAt,
+            summary,
+            "imageUrl": mainImage.asset->url,
+            body
+        }`;
+
+        const params = `&$slug="${encodeURIComponent(slug)}"`;
+
+        fetch(`${ENDPOINT}?query=${encodeURIComponent(QUERY)}${params}`)
+            .then(r => {
+                if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                return r.json();
+            })
+            .then(data => {
+                if (!data.result) { showNotFound('Post not found.'); return; }
+                renderArticle(data.result);
+            })
+            .catch(err => showError(err));
+    }
+
+    /* ─────────────── Render article ─────────────────── */
+    function renderArticle(post) {
+        document.title = `${post.title} — YUDI AI Research Lab`;
+
+        // Update meta description
+        const metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc && post.summary) metaDesc.setAttribute('content', post.summary);
+
+        const date = post.publishedAt
+            ? new Date(post.publishedAt).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' })
+            : '';
+
+        const heroHtml = post.imageUrl
+            ? `<div class="hero-img-wrap"><img src="${post.imageUrl}?w=1400&auto=format" alt="${escHtml(post.title)}"></div>`
+            : '';
+
+        const bodyHtml = renderBlocks(post.body);
+
+        document.getElementById('article').innerHTML = `
+            <a href="blogs.html" class="back-link">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"/>
+                    <polyline points="12 19 5 12 12 5"/>
+                </svg>
+                All Research
+            </a>
+
+            ${heroHtml}
+
+            <header class="article-header">
+                <div class="article-label">YUDI Research</div>
+                <h1 class="article-title">${escHtml(post.title || 'Untitled')}</h1>
+                <div class="article-byline">
+                    ${post.author ? `<span class="byline-author">${escHtml(post.author)}</span>` : ''}
+                    ${post.author && date ? '<span class="byline-dot"></span>' : ''}
+                    ${date ? `<span class="byline-date">${date}</span>` : ''}
+                </div>
+            </header>
+
+            <div class="article-divider"><hr></div>
+
+            <div class="article-body">
+                ${post.summary
+                    ? `<p style="font-size:1.15rem;font-weight:400;color:rgba(255,255,255,0.65);margin-bottom:2.5rem;font-style:italic;">${escHtml(post.summary)}</p><hr style="border:none;border-top:1px solid var(--border);margin-bottom:2.5rem;">`
+                    : ''}
+                <div class="prose">${bodyHtml || '<p style="color:var(--text-dim);">No content yet.</p>'}</div>
+            </div>
+        `;
+
+        document.getElementById('skeleton').style.display = 'none';
+        document.getElementById('article').style.display  = 'block';
+    }
+
+    function showNotFound(msg) {
+        document.getElementById('skeleton').style.display = 'none';
+        document.getElementById('article').style.display  = 'block';
+        document.getElementById('article').innerHTML = `
+            <div class="not-found">
+                <h2>Paper Not Found</h2>
+                <p>${msg}</p>
+                <a href="blogs.html" class="btn-back">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="19" y1="12" x2="5" y2="12"/>
+                        <polyline points="12 19 5 12 12 5"/>
+                    </svg>
+                    Back to Research
+                </a>
+            </div>`;
+    }
+
+    function showError(err) {
+        showNotFound(`Could not load this paper. Error: ${err.message}`);
+    }
+</script>
+</body>
+</html>

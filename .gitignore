@@ -1,0 +1,22 @@
+# Node / Sanity Studio dependencies
+node_modules/
+yudi-blog/node_modules/
+
+# Sanity build output
+yudi-blog/dist/
+yudi-blog/.sanity/
+
+# Environment / secrets
+.env
+.env.local
+*.env
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Editor dirs
+.vscode/
+.idea/
+
+yudi-blog/.git/
