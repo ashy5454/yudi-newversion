@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sam — YUDI Lab</title>
+    <title>Lab Updates & Blog — YUDI Lab</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,6 +18,7 @@
             --color-border: rgba(255, 255, 255, 0.08);
             --color-text-primary: rgba(255, 255, 255, 0.95);
             --color-text-secondary: rgba(255, 255, 255, 0.5);
+            --color-text-dim: rgba(255, 255, 255, 0.2);
             --font-stack: 'Outfit', system-ui, -apple-system, sans-serif;
             --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
         }
@@ -80,36 +81,58 @@
         }
 
         .content-section { padding: 4rem 0; }
-        .content-section h2 { font-size: 2.5rem; margin-bottom: 2rem; letter-spacing: -0.02em; color: #fff; }
-        .content-section p { font-size: 1.15rem; color: rgba(255,255,255,0.8); margin-bottom: 1.5rem; font-weight: 300; }
-
-        .glass-box {
+        
+        .blog-post {
             background: var(--color-surface);
             border: 1px solid var(--color-border);
             border-radius: 1.2rem;
             padding: 3rem;
             margin-bottom: 2rem;
+            transition: all 0.3s var(--ease-spring);
+            display: block;
+            text-decoration: none;
+            color: inherit;
         }
 
-        .feature-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
+        .blog-post:hover {
+            background: var(--color-surface-hover);
+            transform: translateY(-4px);
+            border-color: rgba(255,255,255,0.2);
         }
 
-        .feature-card {
-            padding: 2rem;
-            border: 1px solid var(--color-border);
-            border-radius: 12px;
-            background: rgba(255,255,255,0.02);
+        .post-meta {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--color-text-secondary);
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
         }
 
-        .feature-card h3 { font-size: 1.2rem; margin-bottom: 1rem; }
-        .feature-card p { font-size: 0.95rem; color: var(--color-text-secondary); margin-bottom: 0; }
+        .post-tag {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+        }
+
+        .blog-post h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #fff;
+            line-height: 1.3;
+        }
+
+        .blog-post p {
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.7);
+            font-weight: 300;
+        }
 
         @media (max-width: 768px) {
             .nav-links { display: none; }
-            .feature-grid { grid-template-columns: 1fr; }
         }
 
         footer { text-align: center; padding: 4rem 5%; border-top: 1px solid var(--color-border); margin-top: 5rem;}
@@ -125,58 +148,51 @@
             <a href="index.html">Home</a>
             <a href="about.html">About</a>
             <a href="cmp.html">Research</a>
-            <a href="products.html" style="color: #fff;">Ecosystem</a>
+            <a href="products.html">Ecosystem</a>
             <a href="team.html">The Lab</a>
         </div>
     </nav>
 
     <header class="page-header">
         <div class="container">
-            <div style="font-size:0.85rem; font-weight:600; text-transform:uppercase; letter-spacing:0.2em; color:var(--color-text-secondary); margin-bottom:1rem;">Content Generation Agent</div>
-            <h1 class="title">Sam</h1>
-            <p class="subtitle">An advanced creative agent bridging persistent state-tracking with fluent, emotionally-aware generative synthesis.</p>
+            <div style="font-size:0.85rem; font-weight:600; text-transform:uppercase; letter-spacing:0.2em; color:var(--color-text-secondary); margin-bottom:1rem;">Lab Updates</div>
+            <h1 class="title">Transmission Log</h1>
+            <p class="subtitle">Research notes, product updates, and technical deep-dives from the YUDI lab.</p>
         </div>
     </header>
 
     <main class="container">
         
-        <section class="content-section">
-            <h2>The Emotion-Aware Stack</h2>
-            <p>Most language models generate text that feels undeniably "AI". It is overly formal, mathematically average, and entirely devoid of emotional resonance. This occurs because Transformers have no native understanding of sentiment; they only predict the most statistically probable string of words.</p>
-            <p>Sam sits on top of our native LCoM infrastructure, meaning it inherently maps structural nodes to emotional weights. When Sam generates a long-form creative piece, it isn't just generating text; it is modulating its output based on a persistent internal emotional state that reacts to your prompts.</p>
-        </section>
+        <div class="content-section">
+            
+            <a href="#" class="blog-post">
+                <div class="post-meta">
+                    <span class="post-tag">Product</span>
+                    <span>May 18, 2026</span>
+                </div>
+                <h2>Why we built CTS: Solving the Quadratic Cost of Context</h2>
+                <p>Enterprise AI is bottlenecked by the API bills generated by infinite context windows. We built the Conversational Token System to compress state and flatten the scaling curve, saving up to 80% on compute costs.</p>
+            </a>
 
-        <section class="content-section">
-            <h2>Core Capabilities</h2>
-            <div class="feature-grid">
-                <div class="feature-card">
-                    <h3>Hyper-Personalized Tone</h3>
-                    <p>Sam learns the exact cadence, formatting, and emotional flavor of your brand voice, applying it consistently across thousands of generations without context-drift.</p>
+            <a href="#" class="blog-post">
+                <div class="post-meta">
+                    <span class="post-tag">Research</span>
+                    <span>May 12, 2026</span>
                 </div>
-                <div class="feature-card">
-                    <h3>Long-Horizon Continuity</h3>
-                    <p>Because Sam utilizes our CTS (Conversational Token System) internally, it can maintain the plot, character arcs, or thematic consistency of a 100-page document perfectly.</p>
-                </div>
-                <div class="feature-card">
-                    <h3>Dynamic Empathy</h3>
-                    <p>Ideal for customer-facing applications, Sam detects user frustration, joy, or urgency and dynamically adjusts its conversational output to match the situation.</p>
-                </div>
-                <div class="feature-card">
-                    <h3>Multi-Modal Synthesis</h3>
-                    <p>Sam is currently being tested with visual-structural data to generate contextually aware layout and design suggestions alongside text.</p>
-                </div>
-            </div>
-        </section>
+                <h2>Architecture Deep Dive: Mapping Emotional Weights to Concept Nodes</h2>
+                <p>A technical look at how we implemented Hebbian learning mechanics to ensure our LCoM agents don't just predict text, but dynamically react to the persistent emotional state of long-horizon conversations.</p>
+            </a>
 
-        <section class="content-section">
-            <div class="glass-box" style="text-align: center;">
-                <h2>Early Access</h2>
-                <p>Sam is currently in closed alpha testing for enterprise content teams and creative agencies.</p>
-                <div style="margin-top: 2rem;">
-                    <a href="pricing.html" style="display: inline-block; padding: 0.8rem 2rem; border-radius: 6px; background: #fff; color: #000; text-decoration: none; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em;">Request Alpha Access</a>
+            <a href="#" class="blog-post">
+                <div class="post-meta">
+                    <span class="post-tag">Vision</span>
+                    <span>May 04, 2026</span>
                 </div>
-            </div>
-        </section>
+                <h2>The Transformer Era is Over: Enter Brain-Native AI</h2>
+                <p>Why scaling up dense matrix multiplications will inevitably hit a wall, and why the next trillion-dollar market shift will require a biologically plausible, tokenless representation primitive.</p>
+            </a>
+
+        </div>
 
     </main>
 
