@@ -132,8 +132,11 @@
 
         footer { text-align: center; padding: 4rem 5%; border-top: 1px solid var(--color-border); margin-top: 5rem;}
     </style>
+    <link rel="stylesheet" href="assets/animations.css">
 </head>
 <body>
+    <canvas id="bg-canvas"></canvas>
+
 
     <nav id="navbar">
         <a href="index.html" class="logo">
@@ -222,6 +225,7 @@ const response = await client.chat.completions.create({
 
     <footer><div class="container" style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:2rem;"><div style="text-align:left;"><p style="font-weight: 800; letter-spacing: 0.2em; color: var(--color-text-dim); margin-bottom: 0.5rem;">YUDI.</p><p style="color: var(--color-text-dim); font-size: 0.8rem;">&copy; 2026 YUDI AI Research Lab. All rights reserved.</p></div><div style="display:flex; gap:2rem; font-size:0.85rem; text-transform:uppercase; letter-spacing:0.1em;"><a href="investors.html" style="color:var(--color-text-secondary); text-decoration:none;">Investors</a><a href="solutions.html" style="color:var(--color-text-secondary); text-decoration:none;">Use Cases</a><a href="faq.html" style="color:var(--color-text-secondary); text-decoration:none;">FAQ</a><a href="blog.html" style="color:var(--color-text-secondary); text-decoration:none;">Blog</a></div></div></footer>
 
+    <script src="assets/animations.js"></script>
 </body>
 </html>
 
