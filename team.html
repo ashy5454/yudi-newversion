@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Team & Contact — YUDI Lab</title>
+    <title>The Lab — YUDI</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,7 +16,6 @@
             --color-surface: rgba(255, 255, 255, 0.03);
             --color-surface-hover: rgba(255, 255, 255, 0.06);
             --color-border: rgba(255, 255, 255, 0.08);
-            --color-border-hover: rgba(255, 255, 255, 0.2);
             --color-text-primary: rgba(255, 255, 255, 0.95);
             --color-text-secondary: rgba(255, 255, 255, 0.5);
             --color-text-dim: rgba(255, 255, 255, 0.2);
@@ -47,7 +46,6 @@
         }
         .btn-primary { background: #ffffff; color: #000000; }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(255,255,255,0.15); }
-        .btn-secondary { border: 1px solid var(--color-border); background: var(--color-surface); color: #ffffff; }
 
         .glass {
             background: var(--color-surface);
@@ -88,7 +86,7 @@
         /* Team Grid */
         .team-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 2rem;
             margin: 4rem 0 8rem 0;
         }
@@ -96,28 +94,39 @@
         .team-member {
             padding: 3rem 2rem;
             text-align: center;
-            border-top: 1px solid var(--color-border);
-            background: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, transparent 100%);
+            border: 1px solid var(--color-border);
+            background: var(--color-surface);
+            border-radius: 1.2rem;
         }
         
         .team-avatar {
             width: 100px; height: 100px;
             border-radius: 50%;
-            background: var(--color-border);
+            background: rgba(255,255,255,0.05);
             margin: 0 auto 1.5rem auto;
             display: flex; justify-content: center; align-items: center;
+            border: 1px solid var(--color-border);
+        }
+
+        .affiliation {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: #888;
+            margin-bottom: 1rem;
+            display: block;
         }
 
         /* Forms */
         .contact-form { max-width: 600px; margin: 0 auto; padding: 3.5rem; }
         .form-group { margin-bottom: 1.5rem; }
         .form-group label { display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-text-secondary); margin-bottom: 0.5rem; }
-        input, textarea {
+        input, textarea, select {
             width: 100%; padding: 1rem 1.2rem; background: rgba(0,0,0,0.4);
             border: 1px solid var(--color-border); color: #fff; border-radius: 8px;
             font-family: inherit; font-size: 1rem; transition: border-color 0.3s;
         }
-        input:focus, textarea:focus { outline: none; border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.02); }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.02); }
         textarea { resize: vertical; min-height: 120px; }
 
         @media (max-width: 768px) {
@@ -135,40 +144,47 @@
         </a>
         <div class="nav-links">
             <a href="index.html">Home</a>
-            <a href="cmp.html">Our Research</a>
-            <a href="products.html">Products</a>
-            <a href="team.html" style="color: #fff;">Team & Contact</a>
+            <a href="about.html">About</a>
+            <a href="cmp.html">Research</a>
+            <a href="products.html">Ecosystem</a>
+            <a href="team.html" style="color: #fff;">The Lab</a>
         </div>
     </nav>
 
     <header class="page-header container">
         <h1 class="title">The Lab</h1>
-        <p class="text-muted" style="font-size: 1.2rem; max-width: 600px; margin: 0 auto;">We are a collective of computational neuroscientists, ML architects, and engineers pushing the boundaries of AI.</p>
+        <p class="text-muted" style="font-size: 1.2rem; max-width: 600px; margin: 0 auto;">A collective of computational neuroscientists, ML architects, and engineers pushing the boundaries of AI.</p>
     </header>
 
     <main class="container">
-        <!-- Placeholder for Team - Easily updatable later -->
-        <h2 style="text-align: center; margin-bottom: 1rem; font-size: 2.5rem;">Leadership</h2>
+        <h2 style="text-align: center; margin-bottom: 1rem; font-size: 2.5rem;">Leadership & Advisors</h2>
         <div class="team-grid">
             <div class="team-member">
                 <div class="team-avatar">
                     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                 </div>
                 <h3 style="margin-bottom: 0.2rem;">Ashmith Atmuri</h3>
-                <p class="text-muted" style="font-size: 0.9rem; margin-bottom: 1rem;">Lead Architect</p>
-                <a href="#" style="color: #fff; text-decoration: none; font-size: 0.8rem;">LinkedIn &rarr;</a>
+                <p class="text-muted" style="font-size: 0.95rem; margin-bottom: 0.5rem;">Founder & Lead Architect</p>
+                <span class="affiliation">Computational Neuroscience</span>
+                <p style="font-size: 0.85rem; color: #aaa; margin-bottom: 1rem;">Spearheading the tokenless CMP architecture and LCoMs paradigm.</p>
+                <a href="#" style="color: #fff; text-decoration: none; font-size: 0.8rem; font-weight: 600;">LinkedIn &rarr;</a>
             </div>
             <div class="team-member">
                 <div class="team-avatar">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 22l6-6-6-6 6-6"></path><path d="M22 2l-6 6 6 6-6 6"></path></svg>
                 </div>
-                <h3 style="margin-bottom: 0.2rem;">Founding Team</h3>
-                <p class="text-muted" style="font-size: 0.9rem; margin-bottom: 1rem;">Computational Neuroscience</p>
-                <a href="#" style="color: #fff; text-decoration: none; font-size: 0.8rem;">Open Roles &rarr;</a>
+                <h3 style="margin-bottom: 0.2rem;">Scientific Advisory</h3>
+                <p class="text-muted" style="font-size: 0.95rem; margin-bottom: 0.5rem;">Academic Partners</p>
+                <span class="affiliation">ERATO Dynamic Brain Project</span>
+                <p style="font-size: 0.85rem; color: #aaa; margin-bottom: 1rem;">Advising on biologically plausible learning and hippocampal episodic mechanics.</p>
             </div>
         </div>
 
         <div style="text-align: center; margin-bottom: 3rem;">
+            <a href="careers.html" class="btn" style="background: rgba(255,255,255,0.05); border: 1px solid var(--color-border); color: #fff;">View Open Lab Roles &rarr;</a>
+        </div>
+
+        <div style="text-align: center; margin-top: 8rem; margin-bottom: 3rem;">
             <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">Initiate Contact</h2>
             <p class="text-muted">For seed investor inquiries, academic collaboration, and lab recruitment.</p>
         </div>
@@ -183,8 +199,14 @@
                 <input type="email" name="email" required>
             </div>
             <div class="form-group">
-                <label>Inquiry Type</label>
-                <input type="text" name="subject" placeholder="Investment / Research / Careers">
+                <label>Inquiry Route</label>
+                <select name="subject" required>
+                    <option value="" disabled selected>Select an option...</option>
+                    <option value="investor">Investor / Capital</option>
+                    <option value="academic">Academic Partnership</option>
+                    <option value="careers">Careers / Lab Join</option>
+                    <option value="press">Press & Media</option>
+                </select>
             </div>
             <div class="form-group">
                 <label>Message</label>

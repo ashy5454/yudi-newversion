@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About — YUDI Lab</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Shared Styles */
+        :root {
+            --color-bg: #030303;
+            --color-surface: rgba(255, 255, 255, 0.03);
+            --color-surface-hover: rgba(255, 255, 255, 0.06);
+            --color-border: rgba(255, 255, 255, 0.08);
+            --color-text-primary: rgba(255, 255, 255, 0.95);
+            --color-text-secondary: rgba(255, 255, 255, 0.5);
+            --font-stack: 'Outfit', system-ui, -apple-system, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--color-bg);
+            color: var(--color-text-primary);
+            font-family: var(--font-stack);
+            line-height: 1.8;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4 { line-height: 1.2; font-weight: 600; }
+        .container { max-width: 900px; margin: 0 auto; padding: 0 5%; }
+        .text-muted { color: var(--color-text-secondary); }
+
+        /* Navigation */
+        nav {
+            position: fixed; top: 0; width: 100%; z-index: 100;
+            padding: 1.5rem 5%; transition: all 0.4s ease;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px); border-bottom: 1px solid var(--color-border);
+        }
+        .logo img { height: 48px; width: auto; object-fit: contain; }
+        .nav-links { display: flex; gap: 2.5rem; align-items: center; }
+        .nav-links a {
+            color: var(--color-text-secondary); text-decoration: none;
+            font-size: 0.85rem; font-weight: 500; letter-spacing: 0.1em;
+            text-transform: uppercase; transition: color 0.3s;
+        }
+        .nav-links a:hover { color: #fff; }
+
+        /* Page Layout */
+        .page-header {
+            padding: 12rem 0 6rem 0;
+            text-align: center;
+            border-bottom: 1px solid var(--color-border);
+            position: relative;
+        }
+
+        .title {
+            font-size: clamp(3rem, 6vw, 5rem);
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            background: linear-gradient(180deg, #FFFFFF 0%, #777777 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: var(--color-text-secondary);
+            font-weight: 300;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .content-section { padding: 5rem 0; }
+        .content-section h2 { font-size: 2.5rem; margin-bottom: 2rem; letter-spacing: -0.02em; color: #fff; }
+        .content-section p { font-size: 1.15rem; color: rgba(255,255,255,0.8); margin-bottom: 1.5rem; font-weight: 300; }
+        .content-section strong { color: #fff; font-weight: 600; }
+
+        .glass-box {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            backdrop-filter: blur(24px);
+            border-radius: 1.2rem;
+            padding: 3rem;
+            margin: 3rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+        }
+
+        footer { text-align: center; padding: 4rem 5%; border-top: 1px solid var(--color-border); margin-top: 5rem;}
+    </style>
+</head>
+<body>
+
+    <nav id="navbar">
+        <a href="index.html" class="logo">
+            <img src="logo.png" alt="YUDI Logo" onerror="this.outerHTML='<span style=\'font-weight:800; font-size:1.5rem; letter-spacing:0.1em; text-transform:uppercase; color:#fff;\'>YUDI.</span>'">
+        </a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="about.html" style="color: #fff;">About</a>
+            <a href="cmp.html">Research</a>
+            <a href="products.html">Ecosystem</a>
+            <a href="team.html">The Lab</a>
+        </div>
+    </nav>
+
+    <header class="page-header">
+        <div class="container">
+            <div style="font-size:0.85rem; font-weight:600; text-transform:uppercase; letter-spacing:0.2em; color:var(--color-text-secondary); margin-bottom:1rem;">Lab Overview</div>
+            <h1 class="title">The Mission</h1>
+            <p class="subtitle">Moving Artificial Intelligence out of the statistical dark ages and into an era of genuine, brain-native reasoning.</p>
+        </div>
+    </header>
+
+    <main class="container">
+        
+        <section class="content-section">
+            <h2>Why "Brain-Native" and Why Now?</h2>
+            <p>For the past decade, AI development has been trapped in a paradigm of brute force. The industry consensus—scaling up massive Transformer models to predict the next token—has yielded impressive parlor tricks but is fundamentally hitting a wall. Quadratic compute costs, catastrophic forgetting, and the inability to maintain persistent emotional state over long horizons are not bugs in modern LLMs; they are inherent architectural flaws.</p>
+            <p>At YUDI, we realized that to achieve true generalized intelligence, we had to stop fighting biology and start learning from it. A "brain-native" approach means we do not rely on dense matrices predicting static tokens. Instead, we use sparse, neuromorphic activations that learn continuously via prediction error, much like human cortical networks.</p>
+        </section>
+
+        <section class="content-section">
+            <h2>The Thesis: LCoMs vs. Transformers</h2>
+            <div class="glass-box">
+                <p><strong>Transformers</strong> are fundamentally static encyclopedias. They break text into arbitrary chunks, require massive context windows that scale quadratically in memory, and reset their understanding with every new prompt.</p>
+                <br>
+                <p style="margin-bottom: 0;"><strong>Large Conversational Models (LCoMs)</strong> represent our architectural thesis. Built entirely on top of our Conversational Meaning Patterns (CMP) infrastructure, LCoMs process information experientially. They do not predict the next word; they map conceptual nodes to relational edges and emotional weights. This allows an LCoM to maintain a persistent, unbounded conversational state over years, reacting with genuine empathy rather than statistical approximation.</p>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <h2>The Origin</h2>
+            <p>YUDI was founded by a collective of computational neuroscientists and machine learning architects who recognized the limits of backpropagation and tokenization. Originating from advanced academic cohorts, including influences from the ERATO Dynamic Brain Project, the founding team set out to build an architecture that could operate dynamically and efficiently.</p>
+            <p>We are not building another chatbot. We are laying the groundwork for a new industry standard in Machine Learning representation.</p>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p style="font-weight: 800; letter-spacing: 0.2em; color: var(--color-text-dim); margin-bottom: 0.5rem;">YUDI.</p>
+            <p style="color: var(--color-text-dim); font-size: 0.8rem;">&copy; 2026 YUDI AI Research Lab. All rights reserved.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
