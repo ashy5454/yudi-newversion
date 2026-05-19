@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NARA — YUDI Lab</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Shared Styles */
+        :root {
+            --color-bg: #030303;
+            --color-surface: rgba(255, 255, 255, 0.03);
+            --color-surface-hover: rgba(255, 255, 255, 0.06);
+            --color-border: rgba(255, 255, 255, 0.08);
+            --color-text-primary: rgba(255, 255, 255, 0.95);
+            --color-text-secondary: rgba(255, 255, 255, 0.5);
+            --font-stack: 'Outfit', system-ui, -apple-system, sans-serif;
+            --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--color-bg);
+            color: var(--color-text-primary);
+            font-family: var(--font-stack);
+            line-height: 1.8;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4 { line-height: 1.2; font-weight: 600; }
+        .container { max-width: 900px; margin: 0 auto; padding: 0 5%; }
+        .text-muted { color: var(--color-text-secondary); }
+
+        /* Navigation */
+        nav {
+            position: fixed; top: 0; width: 100%; z-index: 100;
+            padding: 1.5rem 5%; transition: all 0.4s ease;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px); border-bottom: 1px solid var(--color-border);
+        }
+        .logo img { height: 48px; width: auto; object-fit: contain; }
+        .nav-links { display: flex; gap: 2.5rem; align-items: center; }
+        .nav-links a {
+            color: var(--color-text-secondary); text-decoration: none;
+            font-size: 0.85rem; font-weight: 500; letter-spacing: 0.1em;
+            text-transform: uppercase; transition: color 0.3s;
+        }
+        .nav-links a:hover { color: #fff; }
+
+        /* Page Layout */
+        .page-header {
+            padding: 12rem 0 6rem 0;
+            text-align: center;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .title {
+            font-size: clamp(3rem, 6vw, 5rem);
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            background: linear-gradient(180deg, #FFFFFF 0%, #777777 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: var(--color-text-secondary);
+            font-weight: 300;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .content-section { padding: 4rem 0; }
+        .content-section h2 { font-size: 2.5rem; margin-bottom: 2rem; letter-spacing: -0.02em; color: #fff; }
+        .content-section p { font-size: 1.15rem; color: rgba(255,255,255,0.8); margin-bottom: 1.5rem; font-weight: 300; }
+
+        .glass-box {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 1.2rem;
+            padding: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .feature-card {
+            padding: 2rem;
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.02);
+        }
+
+        .feature-card h3 { font-size: 1.2rem; margin-bottom: 1rem; }
+        .feature-card p { font-size: 0.95rem; color: var(--color-text-secondary); margin-bottom: 0; }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .feature-grid { grid-template-columns: 1fr; }
+        }
+
+        footer { text-align: center; padding: 4rem 5%; border-top: 1px solid var(--color-border); margin-top: 5rem;}
+    </style>
+</head>
+<body>
+
+    <nav id="navbar">
+        <a href="index.html" class="logo">
+            <img src="logo.png" alt="YUDI Logo" onerror="this.outerHTML='<span style=\'font-weight:800; font-size:1.5rem; letter-spacing:0.1em; text-transform:uppercase; color:#fff;\'>YUDI.</span>'">
+        </a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="cmp.html">Research</a>
+            <a href="products.html" style="color: #fff;">Ecosystem</a>
+            <a href="team.html">The Lab</a>
+        </div>
+    </nav>
+
+    <header class="page-header">
+        <div class="container">
+            <div style="font-size:0.85rem; font-weight:600; text-transform:uppercase; letter-spacing:0.2em; color:var(--color-text-secondary); margin-bottom:1rem;">Research AI Agent</div>
+            <h1 class="title">NARA</h1>
+            <p class="subtitle">An autonomous agent designed for academics, scientific researchers, and founders to parse incredibly dense data using optimized retrieval structures.</p>
+        </div>
+    </header>
+
+    <main class="container">
+        
+        <section class="content-section">
+            <h2>Beyond Simple Retrieval</h2>
+            <p>Standard RAG (Retrieval-Augmented Generation) pipelines are fundamentally limited. They slice documents into arbitrary chunks and rely on simple cosine similarity to find "relevant" text. For complex scientific literature or highly technical market research, this semantic flattening destroys critical nuance.</p>
+            <p>NARA leverages the YUDI LCoM infrastructure to process dense documents experientially. It doesn't just retrieve chunks; it builds a relational map of the concepts within the text, allowing it to synthesize multi-document hypotheses with a level of rigor that standard LLMs cannot achieve.</p>
+        </section>
+
+        <section class="content-section">
+            <h2>Core Workflows</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>Literature Synthesis</h3>
+                    <p>Upload dozens of PDFs. NARA maps the conceptual overlap, identifies conflicting data points across papers, and generates a unified structural review.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Hypothesis Generation</h3>
+                    <p>By relying on sparse relational binding, NARA can identify non-obvious connections between disparate fields of research that traditional vector search misses.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Persistent Project Memory</h3>
+                    <p>Unlike chat windows that forget context, NARA maintains a persistent state for your specific research project, continuously learning as you feed it new data over months.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Citation Grounding</h3>
+                    <p>Every claim NARA makes is bi-directionally linked to the exact structural node in the source document, eliminating hallucination in critical research workflows.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <div class="glass-box" style="text-align: center;">
+                <h2>Roadmap & Access</h2>
+                <p>NARA is currently in private beta with select academic partners and enterprise research teams. We are gradually expanding access to ensure the architecture scales efficiently with our infrastructure.</p>
+                <div style="margin-top: 2rem;">
+                    <a href="pricing.html" style="display: inline-block; padding: 0.8rem 2rem; border-radius: 6px; background: #fff; color: #000; text-decoration: none; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em;">Join the NARA Waitlist</a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p style="font-weight: 800; letter-spacing: 0.2em; color: var(--color-text-dim); margin-bottom: 0.5rem;">YUDI.</p>
+            <p style="color: var(--color-text-dim); font-size: 0.8rem;">&copy; 2026 YUDI AI Research Lab. All rights reserved.</p>
+        </div>
+    </footer>
+
+</body>
+</html>

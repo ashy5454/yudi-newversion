@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Access & Pricing — YUDI Lab</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Shared Styles */
+        :root {
+            --color-bg: #030303;
+            --color-surface: rgba(255, 255, 255, 0.03);
+            --color-surface-hover: rgba(255, 255, 255, 0.06);
+            --color-border: rgba(255, 255, 255, 0.08);
+            --color-border-hover: rgba(255, 255, 255, 0.2);
+            --color-text-primary: rgba(255, 255, 255, 0.95);
+            --color-text-secondary: rgba(255, 255, 255, 0.5);
+            --color-text-dim: rgba(255, 255, 255, 0.2);
+            --font-stack: 'Outfit', system-ui, -apple-system, sans-serif;
+            --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--color-bg);
+            color: var(--color-text-primary);
+            font-family: var(--font-stack);
+            line-height: 1.8;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4 { line-height: 1.2; font-weight: 600; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 5%; }
+        .text-muted { color: var(--color-text-secondary); }
+
+        /* Navigation */
+        nav {
+            position: fixed; top: 0; width: 100%; z-index: 100;
+            padding: 1.5rem 5%; transition: all 0.4s ease;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px); border-bottom: 1px solid var(--color-border);
+        }
+        .logo img { height: 48px; width: auto; object-fit: contain; }
+        .nav-links { display: flex; gap: 2.5rem; align-items: center; }
+        .nav-links a {
+            color: var(--color-text-secondary); text-decoration: none;
+            font-size: 0.85rem; font-weight: 500; letter-spacing: 0.1em;
+            text-transform: uppercase; transition: color 0.3s;
+        }
+        .nav-links a:hover { color: #fff; }
+
+        /* Page Layout */
+        .page-header {
+            padding: 12rem 0 6rem 0;
+            text-align: center;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .title {
+            font-size: clamp(3rem, 6vw, 5rem);
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            background: linear-gradient(180deg, #FFFFFF 0%, #777777 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: var(--color-text-secondary);
+            font-weight: 300;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Pricing Grid */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 4rem 0;
+        }
+
+        .pricing-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 1.2rem;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s var(--ease-spring);
+        }
+
+        .pricing-card:hover { transform: translateY(-4px); border-color: rgba(255,255,255,0.2); }
+
+        .tier-name { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .tier-price { font-size: 3rem; font-weight: 800; margin-bottom: 1rem; }
+        .tier-price span { font-size: 1rem; font-weight: 400; color: var(--color-text-secondary); }
+        .tier-desc { color: var(--color-text-secondary); margin-bottom: 2rem; font-size: 0.95rem; }
+
+        .feature-list { margin-bottom: 2.5rem; flex-grow: 1; }
+        .feature-list li {
+            list-style: none;
+            margin-bottom: 0.8rem;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .feature-list li::before {
+            content: '✓';
+            color: #55ff55;
+        }
+
+        .btn {
+            padding: 1rem 2rem; border-radius: 8px; text-decoration: none; text-align: center;
+            font-size: 0.85rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.1em; transition: all 0.3s var(--ease-spring); border: none; cursor: pointer;
+        }
+        .btn-primary { background: #ffffff; color: #000000; }
+        .btn-secondary { border: 1px solid var(--color-border); background: transparent; color: #ffffff; }
+        .btn-secondary:hover { background: rgba(255,255,255,0.05); }
+
+        /* Forms */
+        .contact-form { max-width: 600px; margin: 0 auto; padding: 3.5rem; border: 1px solid var(--color-border); background: var(--color-surface); border-radius: 1.2rem;}
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-text-secondary); margin-bottom: 0.5rem; }
+        input, select {
+            width: 100%; padding: 1rem 1.2rem; background: rgba(0,0,0,0.4);
+            border: 1px solid var(--color-border); color: #fff; border-radius: 8px;
+            font-family: inherit; font-size: 1rem; transition: border-color 0.3s;
+        }
+        input:focus, select:focus { outline: none; border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.02); }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .pricing-grid { grid-template-columns: 1fr; }
+        }
+
+        footer { text-align: center; padding: 4rem 5%; border-top: 1px solid var(--color-border); margin-top: 5rem;}
+    </style>
+</head>
+<body>
+
+    <nav id="navbar">
+        <a href="index.html" class="logo">
+            <img src="logo.png" alt="YUDI Logo" onerror="this.outerHTML='<span style=\'font-weight:800; font-size:1.5rem; letter-spacing:0.1em; text-transform:uppercase; color:#fff;\'>YUDI.</span>'">
+        </a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="cmp.html">Research</a>
+            <a href="products.html">Ecosystem</a>
+            <a href="team.html">The Lab</a>
+        </div>
+    </nav>
+
+    <header class="page-header">
+        <div class="container">
+            <div style="font-size:0.85rem; font-weight:600; text-transform:uppercase; letter-spacing:0.2em; color:var(--color-text-secondary); margin-bottom:1rem;">Access</div>
+            <h1 class="title">Deploy YUDI</h1>
+            <p class="subtitle">Access our infrastructural layers and research agents. Currently serving closed beta and enterprise pilots.</p>
+        </div>
+    </header>
+
+    <main class="container">
+        
+        <div class="pricing-grid">
+            <!-- CTS Tier -->
+            <div class="pricing-card">
+                <div class="tier-name">CTS API (Beta)</div>
+                <div class="tier-price">$0.20 <span>/ 1M Tokens Processed</span></div>
+                <p class="tier-desc">Seamlessly compress conversational state before hitting commercial LLM APIs. Save up to 80% on total token bills.</p>
+                <ul class="feature-list">
+                    <li>Drop-in SDK for OpenAI/Anthropic</li>
+                    <li>Automatic persistent state tracking</li>
+                    <li>Up to 10k requests/minute</li>
+                    <li>Community Discord support</li>
+                </ul>
+                <a href="#waitlist-form" class="btn btn-secondary">Join API Waitlist</a>
+            </div>
+
+            <!-- Enterprise Tier -->
+            <div class="pricing-card" style="border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.02);">
+                <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.15em; color: #fff; background: rgba(255,255,255,0.1); padding: 0.3rem 0.8rem; border-radius: 4px; display: inline-block; margin-bottom: 1rem; width: fit-content;">For Partners</div>
+                <div class="tier-name">Enterprise Pilot</div>
+                <div class="tier-price">Custom</div>
+                <p class="tier-desc">Full access to the core CMP architecture, NARA research agent, and Sam generative instances for your proprietary data.</p>
+                <ul class="feature-list">
+                    <li>On-premise or VPC deployment</li>
+                    <li>Unbounded contextual streams</li>
+                    <li>Fine-tuned structural patterns</li>
+                    <li>Direct line to YUDI engineers</li>
+                </ul>
+                <a href="#waitlist-form" class="btn btn-primary">Request Pilot</a>
+            </div>
+        </div>
+
+        <div id="waitlist-form" style="margin-top: 8rem; text-align: center; margin-bottom: 3rem;">
+            <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">Apply for Access</h2>
+            <p class="text-muted">Tell us about your use case to expedite onboarding.</p>
+        </div>
+        
+        <form class="contact-form" action="https://formspree.io/f/mqewlawk" method="POST">
+            <div class="form-group">
+                <label>Work Email</label>
+                <input type="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label>Product Interest</label>
+                <select name="product" required>
+                    <option value="" disabled selected>Select an option...</option>
+                    <option value="cts">CTS API Access</option>
+                    <option value="nara">NARA Agent</option>
+                    <option value="sam">Sam Agent</option>
+                    <option value="enterprise">Enterprise CMP Pilot</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Estimated Volume / Use Case</label>
+                <input type="text" name="usecase" placeholder="e.g., 50M tokens/month, academic literature review..." required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Application</button>
+        </form>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p style="font-weight: 800; letter-spacing: 0.2em; color: var(--color-text-dim); margin-bottom: 0.5rem;">YUDI.</p>
+            <p style="color: var(--color-text-dim); font-size: 0.8rem;">&copy; 2026 YUDI AI Research Lab. All rights reserved.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
