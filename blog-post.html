@@ -101,6 +101,15 @@
             font-weight: 600;
         }
 
+        .author-label {
+            color: var(--color-text-secondary);
+        }
+
+        .author-label strong {
+            color: #fff;
+            font-weight: 500;
+        }
+
         /* Post Body */
         .post-body {
             padding: 4rem 0;
@@ -199,6 +208,7 @@
                 <div class="meta-info">
                     <span class="badge" id="post-badge">Lab Update</span>
                     <span id="post-date">May 19, 2026</span>
+                    <span class="author-label">By <strong id="post-author">Ashmith Atmuri</strong></span>
                 </div>
                 <h1 class="title" id="post-title">Loading Article...</h1>
             </div>
@@ -277,72 +287,152 @@
         const ENDPOINT   = `https://${PROJECT_ID}.api.sanity.io/v${API_VER}/data/query/${DATASET}`;
 
         const fallbackPostsDetail = {
-            "case-for-brain-native-architectures": {
-                label: "Technical Essay",
-                date: "May 19, 2026",
-                title: "The Case for Brain-Native Architectures Over Token-First Scaling",
-                content: `
-                    <p>Modern artificial intelligence has achieved remarkable milestones by training massive transformers with dense parameter matrices on astronomical volumes of data. However, as compute limits loom and inference energy demands skyrocket, a fundamental question emerges: Is token-first scaling the correct architectural trajectory for relational reasoning and continuous state adaptation?</p>
-                    <h2>The Bottleneck of Dense Tokens</h2>
-                    <p>Under the standard transformer paradigm, every input token must pay attention to every other input token within the context window. This quadratic attention constraint requires massive computing resources and limits long-horizon memory retrieval. Furthermore, the system remains static post-training; new information can only be incorporated via gradient updates or context window bloat.</p>
-                    <blockquote>"True brain-native intelligence depends on sparse, continuous representation states that update dynamically without global backpropagation."</blockquote>
-                    <h2>Continuous State Adaptation</h2>
-                    <p>In biological systems, the brain represents information as sparse populations of active neurons. Rather than processing dense token strings sequentially, it operates via a continuous relational state. At Yudi Labs, we believe that future architectures must transition from token-first attention toward sparse, recurrent activations with local prediction-error learning.</p>
-                `
-            },
-            "mapping-emotional-weights": {
+            "road-ahead-long-context": {
                 label: "Research Note",
-                date: "May 12, 2026",
-                title: "Mapping Emotional Weights to Concept Nodes",
+                date: "May 18, 2026",
+                title: "The Road Ahead: Long-Context Proofs and What Comes Next for CMP",
                 content: `
-                    <p>As conversational interfaces scale, capturing the nuanced emotional drift of long-horizon interactions remains a major challenge. Standard systems treat every turn independently or lose context in massive context windows. Our latest research explores the integration of emotional vectors directly into recurrent relational nodes.</p>
-                    <h2>Hebbian Synaptic Scaling</h2>
-                    <p>We leverage classic Hebbian scaling principles to adjust concept connections based on the emotional persistence of the speaker. Instead of computing dense self-attention values at each step, nodes associated with positive or negative reinforcement strengthen their relational weights over time.</p>
-                    <h2>Persistent Memory Windows</h2>
-                    <p>This allows the conversational agent to recall and adapt its tone to the emotional history of the conversation, even across hours of context, without inflating token consumption.</p>
-                `
+                    <p>With CMP v1.5 validated and ablations underway, we're pausing to map the next phase of research. The immediate question is no longer "does CMP work?" — it does. The question is: where does it work <em>better</em> than existing approaches?</p>
+                    <h2>The Long-Context Thesis</h2>
+                    <p>Transformers store context explicitly in growing attention windows and KV caches. CMP processes streams through a fixed-size recurrent state. This is a fundamentally different trade-off: flat memory growth versus richer per-token context. We believe this trade-off favors CMP in streaming, long-horizon, and memory-constrained scenarios.</p>
+                    <h2>What We're Building Next</h2>
+                    <p>Our next proof package includes: context-length scaling benchmarks (128 to 2048+ tokens), memory retention probes, entity state tracking across long passages, and streaming inference efficiency comparisons. The goal is not to claim CMP has "infinite memory" — fixed state has finite capacity. The goal is to show that CMP's memory stays compact while retaining useful information.</p>
+                    <blockquote>"The experiment asks: does the notebook stay compact, and does it still remember useful information?"</blockquote>
+                    <p>We'll share results as they come in. This is the honest, iterative work of building a new representation primitive.</p>
+                `,
+                author: "Ashmith Atmuri"
             },
-            "why-we-built-cts": {
-                label: "Product Note",
-                date: "April 28, 2026",
-                title: "Why we built CTS: Managing the Quadratic Cost of Context",
+            "ablations-before-scaling": {
+                label: "Research Note",
+                date: "May 16, 2026",
+                title: "Why We're Running Ablations Before Scaling to 1B",
                 content: `
-                    <p>Enterprise AI systems are heavily constrained by API token costs. As context windows grow to 128k or 1M tokens, the cost of repeating context frames during long multi-turn interactions grows quadratically. We built the Conversational Token System (CTS) to address this exact bottleneck.</p>
-                    <h2>State Compression Mechanics</h2>
-                    <p>CTS acts as a middleware layer that analyzes the conversational graph, identifies sparse semantic clusters, and compresses state parameters into lightweight representations. By stripping redundant syntactic noise while preserving relational binding structures, we reduce token overhead by up to 60%.</p>
-                `
+                    <p>After CMP v1.5 delivered a strong result on WikiText-103, the tempting next step is obvious: scale to 1 billion parameters and see what happens. We're deliberately not doing that yet.</p>
+                    <h2>The Problem with Blind Scaling</h2>
+                    <p>Scaling is expensive, and scaling the wrong architecture is a waste. Before committing serious compute, we need to know which parts of CMP are actually load-bearing. Is the relational binding term doing real work? Is the state-dependent gating essential? Would a plain feed-forward network in place of our sparse-gated refinement achieve the same improvement?</p>
+                    <h2>The Ablation Set</h2>
+                    <p>We're running six targeted ablations: the full v1.5 baseline, v1.5 without sparse-gated refinement, v1.5 with a plain FFN instead of sparse-gated refinement, v1.5 without relational binding, v1.5 without state-dependent gating, and a parameter-matched smaller v1.5 to rule out pure capacity effects.</p>
+                    <p>Each ablation answers a specific question. Together, they tell us whether CMP's architecture is genuinely novel or just bigger. We'll only scale what we can prove matters.</p>
+                `,
+                author: "Ashmith Atmuri"
             },
-            "deploying-custom-research-agent": {
-                label: "Solutions Note",
-                date: "April 15, 2026",
-                title: "Deploying a Custom Research Agent for a Biotech Client",
-                content: `
-                    <p>We recently partnered with a leading biotech firm to automate the processing and synthesis of massive patent libraries and clinical trials documents. The challenge was clear: extract complex relational entities without losing precise mapping across dense, scientific language.</p>
-                    <h2>NARA Biotech Pipeline</h2>
-                    <p>We deployed a custom instance of our NARA (Neural Agent for Relational Synthesis) system. By structuring retrieved information into a dynamic sparse concept grid, NARA successfully analyzed and mapped biochemical relationships across 10,000 PDF documents without suffering from semantic flattening.</p>
-                `
-            },
-            "failure-mode-hash-collisions": {
+            "v15-closes-gap": {
                 label: "Experiment Log",
-                date: "March 30, 2026",
-                title: "Failure Mode: Hash Collisions in CMP v1",
+                date: "May 15, 2026",
+                title: "CMP v1.5 Closes 82% of the Gap to Transformers",
                 content: `
-                    <p>Transparency is a core value at Yudi Labs. Here, we outline the primary failure mode encountered during the initial training runs of the CMP v1 architecture: severe semantic smearing due to hash collisions in the encoder module.</p>
-                    <h2>The Hash Collision Bottleneck</h2>
-                    <p>To achieve sparse representations, CMP v1 mapped input words into fixed-dimension indices using a static hash function. However, out-of-vocabulary terms and homonyms frequently mapped to identical sparse indices. This caused the recurrent hidden state to blend unrelated semantic representations, leading to incoherence during sequence completion.</p>
-                    <h2>The Solution: Learned Sparse Encoders</h2>
-                    <p>To eliminate this failure mode, we deprecated the static hash approach in favor of a trainable LearnedSparseEncoder, which separates and projects character n-grams into a soft-thresholded sparse space.</p>
-                `
+                    <p>Today we have a result worth reporting carefully. CMP v1.5 — our completed block architecture with sparse-gated refinement — achieved a test perplexity of 68.2 on WikiText-103 after 3 epochs of training.</p>
+                    <h2>The Numbers</h2>
+                    <p>For context: the original CMP v1 scored 154.3 test PPL after the same training regime. Our local causal Transformer baseline scored 49.4. That means CMP v1.5 closed roughly 82% of the absolute gap between old CMP and the Transformer baseline.</p>
+                    <h2>What This Means</h2>
+                    <p>This is a strong internal result. It confirms that the original CMP was an incomplete block, not a dead architecture. The sparse-gated refinement stage is clearly load-bearing — it nearly halved perplexity compared to v1.</p>
+                    <blockquote>"CMP v1.5 is not yet proven to beat Transformers. But the gap is now 18.8 PPL points instead of 104.9."</blockquote>
+                    <p>We're not claiming victory. CMP v1.5 is still behind Transformers on standard WikiText perplexity and is currently slower per epoch. The next steps are ablations, efficiency measurement, and benchmarks where CMP's structural representation may have a genuine advantage.</p>
+                `,
+                author: "Ashmith Atmuri"
             },
-            "yudi-labs-emerges": {
-                label: "Lab Update",
-                date: "March 10, 2026",
-                title: "Yudi Labs Emerges to Build Beyond the Token",
+            "designing-cmp-v15": {
+                label: "Research Note",
+                date: "May 14, 2026",
+                title: "Designing the CMP Block v1.5: Sparse-Gated Refinement",
                 content: `
-                    <p>We are thrilled to announce the official launch of Yudi Labs. Guided by a core leadership team including Founder Ashmith Atmuri, CTO Samatha, and COO Manish Regala, Yudi Labs is established as a dedicated AI research organization exploring the intersections of neuroscience and machine learning.</p>
-                    <h2>Our Mission</h2>
-                    <p>We believe that building next-generation intelligent systems requires moving beyond tokenized scaling. We are actively hiring researchers, developers, and interns who share our passion for sparse recurrent architectures and local predictive learning. Welcome to the future of brain-native AI.</p>
-                `
+                    <p>After Phase 3 comparisons showed CMP trailing the Transformer baseline by a wide margin, we stepped back and asked a structural question: is CMP an incomplete block?</p>
+                    <h2>The Missing Piece</h2>
+                    <p>A Transformer block has two main components: attention (global mixing) and a feed-forward network (per-position refinement). CMP had sparse relational binding and recurrence — but no equivalent of the second stage. We were comparing a half-block against a full block.</p>
+                    <h2>The Design Decision</h2>
+                    <p>We had three options: add a plain FFN (fast but philosophically weak), add second-order binding (strong but risky), or add sparse-gated refinement (balanced). We chose sparse-gated refinement because it's CMP-native — the sparse pattern gates the refinement stage, keeping the architecture true to the sparse structural thesis without introducing attention.</p>
+                    <p>The resulting CMP Block v1.5 follows the pattern: sparse input → relational mixer → residual → sparse-gated refinement → residual → output. Smoke tests showed immediate improvement over the original block.</p>
+                `,
+                author: "Ashmith Atmuri"
+            },
+            "phase3-comparison-results": {
+                label: "Experiment Log",
+                date: "May 13, 2026",
+                title: "Phase 3 Results: CMP Beats GRU, Trails Attention",
+                content: `
+                    <p>The first serious benchmark comparison is complete. Three models, same dataset, same conditions, same 3-epoch training regime on WikiText-103.</p>
+                    <h2>The Results</h2>
+                    <p>CMP achieved a test perplexity of 154.3 at 77 million parameters. The GRU baseline scored 1095.6 at 100 million parameters. The causal Transformer baseline scored 49.4 at 153 million parameters.</p>
+                    <h2>What This Tells Us</h2>
+                    <p>CMP substantially outperformed the GRU baseline under the same sparse-pattern input setup. This suggests CMP's relational recurrent architecture captures something that a plain recurrent baseline cannot. However, the Transformer baseline was much stronger on standard language modeling perplexity and also much faster per epoch.</p>
+                    <blockquote>"CMP is viable and learns real language at 77M scale. It does not currently beat attention on standard WikiText-103 perplexity."</blockquote>
+                    <p>The honest conclusion: CMP is not yet an attention replacement. But the question shifts — does CMP have advantages on tasks where structural representation matters more than raw next-word prediction?</p>
+                `,
+                author: "Ashmith Atmuri"
+            },
+            "a100-phase3-begins": {
+                label: "Lab Update",
+                date: "May 12, 2026",
+                title: "CMP Goes to the Cloud: A100 Phase 3 Begins",
+                content: `
+                    <p>Today we moved CMP training from a Colab T4 GPU to a dedicated GCP A100 instance. This is the transition from validation to real benchmarking.</p>
+                    <h2>The Setup</h2>
+                    <p>Our A100 VM runs in us-central1 with 40GB of GPU memory. The Phase 3 configuration uses 8 layers with 77 million parameters, trained on the full WikiText-103 dataset with a 50,000-word vocabulary. All runs use BF16 mixed precision and are protected by persistent sessions with durable logging.</p>
+                    <h2>Why This Matters</h2>
+                    <p>Phase 1 and Phase 2 on Colab proved that CMP trains stably and learns real language. But Colab's memory and time constraints meant we could only run small-scale experiments. Phase 3 is the first run at meaningful scale — and the first fair comparison against GRU and Transformer baselines under identical conditions.</p>
+                    <p>The comparison run is now live. CMP trains first, followed by GRU and Transformer baselines. We'll report results when all three complete.</p>
+                `,
+                author: "Ashmith Atmuri"
+            },
+            "phase2-depth-stability": {
+                label: "Experiment Log",
+                date: "May 11, 2026",
+                title: "Phase 2 Validated: Depth Stability with Residual Connections",
+                content: `
+                    <p>Scaling CMP from 2 layers (Phase 1) to 4 layers (Phase 2) revealed a common deep-learning failure mode: gradient vanishing. Without intervention, the deeper model collapsed to a validation perplexity of 508.5 — worse than the 2-layer version.</p>
+                    <h2>The Fix</h2>
+                    <p>The solution was textbook: residual connections. By adding skip connections from the input of each layer to its output, gradients flow through the network without attenuation. The fix is standard in every deep architecture, and it works just as well for CMP.</p>
+                    <h2>The Result</h2>
+                    <p>With residual connections, Phase 2 CMP achieved a validation perplexity of 236.9 — stable, learning, and ready for deeper stacking. The higher PPL compared to Phase 1's 200.2 is expected: deeper models need more training epochs to converge, not fewer.</p>
+                    <p>Depth validated. Architecture stable at 4 layers. We're ready for Phase 3.</p>
+                `,
+                author: "Ashmith Atmuri"
+            },
+            "first-wikitext-results": {
+                label: "Experiment Log",
+                date: "May 10, 2026",
+                title: "First WikiText Results: CMP Trains Stably at 7.4M Parameters",
+                content: `
+                    <p>We ran CMP on its first real language modeling benchmark: WikiText-2, the standard word-level perplexity test used across the field. The result is our first clean signal that the architecture works on real text.</p>
+                    <h2>The Setup</h2>
+                    <p>Phase 1 configuration: 2 layers, 7.4 million parameters, trained for 3 epochs on a T4 GPU. No embedding table. No tokenizer. Every word enters the model as a sparse structural fingerprint — a 512-dimensional binary vector with exactly 16 active bits.</p>
+                    <h2>The Result</h2>
+                    <p>Validation perplexity dropped from over 1000 at the start of training to 200.2 by epoch 3. The learning curve is clean and monotonic — no gradient explosions, no collapses, no instability. CMP handles word-level prediction with zero learned input representation.</p>
+                    <blockquote>"CMP is 2x worse than a standard GRU baseline — but with no embedding table, no tokenizer, and only 3 epochs of training."</blockquote>
+                    <p>The comparison isn't fully fair yet. We need to run GRU under the same conditions before drawing conclusions. But the learning signal is real.</p>
+                `,
+                author: "Ashmith Atmuri"
+            },
+            "cmp-beats-attention-conll": {
+                label: "Research Note",
+                date: "May 9, 2026",
+                title: "CMP Beats Attention on Compositional Generalization",
+                content: `
+                    <p>This is the result we were looking for. On the CoNLL-2003 Named Entity Recognition benchmark, CMP achieved a generalization gap of just 0.006 — compared to 0.009 for attention and 0.019 for GRU. That's 33% better than attention on unseen name recognition.</p>
+                    <h2>The Experiment</h2>
+                    <p>We split all person names in the CoNLL-2003 training set: 75% seen during training, 25% held out. Then we measured each model's F1 score on sentences containing seen names versus sentences containing unseen names. The gap between these two scores measures how well a model generalizes to new names.</p>
+                    <h2>Why CMP Wins Here</h2>
+                    <p>The key insight is structural similarity. "Johnson" and "Johnston" share character n-grams, which means they share hash pattern bits. When CMP learns to recognize "Johnson" as a person name, that knowledge automatically transfers to "Johnston" through overlapping sparse patterns. Attention-based models have no such mechanism — each name is a separate token sequence with no structural connection.</p>
+                    <p>This is exactly the kind of benchmark where CMP's design thesis predicts an advantage. Structural representation matters when you encounter things you haven't seen before.</p>
+                `,
+                author: "Ashmith Atmuri"
+            },
+            "building-structural-language-model": {
+                label: "Technical Essay",
+                date: "May 8, 2026",
+                title: "Why We're Building a Language Model That Reads Word Structure",
+                content: `
+                    <p>Every major language model today — GPT, Gemini, Claude — works the same way. Break text into tokens. Look each token up in a massive learned dictionary. Use attention to compare every token against every other token. This approach has three fundamental problems.</p>
+                    <h2>The Three Problems</h2>
+                    <p>First, tokenization is a hack. "Running" might be one token, but "ungoogleable" gets split into fragments the model has never seen assembled that way. The model has no understanding of word structure — it just memorizes shapes.</p>
+                    <p>Second, attention is quadratic. To process a sentence of length T, attention does T² comparisons. Double the sentence, quadruple the compute. This is why context windows are expensive and why inference costs scale badly.</p>
+                    <p>Third, there's no compositional generalization. Because the model memorizes token patterns, it struggles with genuinely new combinations — new names, new words, new phrasings it hasn't seen before.</p>
+                    <h2>A Different Approach</h2>
+                    <p>We're building a model that reads the structure of words instead of looking them up. Inspired by how the brain processes language — through sparse activation of feature detectors, explicit relational binding between active features, and a gated working memory that carries understanding forward — we represent each word as a sparse structural fingerprint derived from its character composition.</p>
+                    <blockquote>"A word the model has never seen still gets a valid fingerprint, because the hash function always works. No embedding table. No vocabulary limit. No OOV token."</blockquote>
+                    <p>We call this architecture CMP — Conversational Meaning Patterns. This blog will document our progress building it, honestly and in the open.</p>
+                `,
+                author: "Ashmith Atmuri"
             }
         };
 
@@ -391,6 +481,7 @@
             const QUERY = `*[_type == "post" && slug.current == $slug][0]{
                 title,
                 publishedAt,
+                author,
                 "category": categories[0]->title,
                 "imageUrl": mainImage.asset->url,
                 body
@@ -409,6 +500,7 @@
                         document.getElementById('post-title').textContent = post.title;
                         document.getElementById('post-badge').textContent = post.category || 'Research Note';
                         document.getElementById('post-date').textContent = new Date(post.publishedAt).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+                        document.getElementById('post-author').textContent = (post.author && post.author !== 'Yudi Labs Team') ? post.author : 'Ashmith Atmuri';
                         
                         if (post.imageUrl) {
                             const img = document.getElementById('post-image');
@@ -435,6 +527,7 @@
                 document.getElementById('post-title').textContent = fallback.title;
                 document.getElementById('post-badge').textContent = fallback.label;
                 document.getElementById('post-date').textContent = fallback.date;
+                document.getElementById('post-author').textContent = fallback.author || 'Ashmith Atmuri';
                 document.getElementById('post-content').innerHTML = fallback.content;
             } else {
                 document.getElementById('post-title').textContent = "Post Not Found";
