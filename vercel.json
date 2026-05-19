@@ -1,0 +1,15 @@
+{
+  "cleanUrls": true,
+  "redirects": [
+    {
+      "source": "/about.html",
+      "destination": "/lab",
+      "permanent": true
+    },
+    {
+      "source": "/about",
+      "destination": "/lab",
+      "permanent": true
+    }
+  ]
+}
