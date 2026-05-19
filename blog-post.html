@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Post | Yudi Labs</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Shared Styles */
+        :root {
+            --color-bg: #030303;
+            --color-surface: rgba(255, 255, 255, 0.03);
+            --color-surface-hover: rgba(255, 255, 255, 0.06);
+            --color-border: rgba(255, 255, 255, 0.08);
+            --color-text-primary: rgba(255, 255, 255, 0.95);
+            --color-text-secondary: rgba(255, 255, 255, 0.5);
+            --color-text-dim: rgba(255, 255, 255, 0.2);
+            --font-stack: 'Outfit', system-ui, -apple-system, sans-serif;
+            --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--color-bg);
+            color: var(--color-text-primary);
+            font-family: var(--font-stack);
+            line-height: 1.8;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4 { line-height: 1.2; font-weight: 600; }
+        .container { max-width: 800px; margin: 0 auto; padding: 0 5%; }
+        .text-muted { color: var(--color-text-secondary); }
+
+        /* Navigation */
+        nav {
+            position: fixed; top: 0; width: 100%; z-index: 100;
+            padding: 1.5rem 5%; transition: all 0.4s ease;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(3, 3, 3, 0.8);
+            backdrop-filter: blur(20px); border-bottom: 1px solid var(--color-border);
+        }
+        .logo { font-weight: 800; font-size: 1.5rem; letter-spacing: 0.1em; text-transform: uppercase; color: #fff; text-decoration: none; }
+        
+        .nav-links { display: flex; gap: 2rem; align-items: center; }
+        .nav-links a {
+            color: var(--color-text-secondary); text-decoration: none;
+            font-size: 0.85rem; font-weight: 500; letter-spacing: 0.05em;
+            text-transform: uppercase; transition: color 0.3s;
+        }
+        .nav-links a:hover { color: #fff; }
+        .nav-links a.active { color: #fff; }
+        .nav-links a.btn-nav {
+            background: #fff; color: #000; padding: 0.6rem 1.2rem; border-radius: 6px; font-weight: 600;
+        }
+        .nav-links a.btn-nav:hover { background: #eee; color: #000; }
+
+        /* Page Layout */
+        .page-header {
+            padding: 12rem 0 4rem 0;
+            text-align: center;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .title {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(180deg, #FFFFFF 0%, #888888 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .meta-info {
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--color-border);
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            color: #fff;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        /* Post Body */
+        .post-body {
+            padding: 4rem 0;
+            font-size: 1.15rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 300;
+        }
+
+        .post-body p {
+            margin-bottom: 2rem;
+        }
+
+        .post-body h2 {
+            font-size: 2rem;
+            color: #fff;
+            margin-top: 3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .post-body h3 {
+            font-size: 1.5rem;
+            color: #fff;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .post-body blockquote {
+            border-left: 3px solid #fff;
+            padding-left: 2rem;
+            margin: 3rem 0;
+            font-style: italic;
+            color: var(--color-text-secondary);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+            transition: color 0.3s;
+        }
+        .back-link:hover {
+            color: #fff;
+        }
+
+        /* Image styling */
+        .post-hero-image {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid var(--color-border);
+            margin-bottom: 3rem;
+            max-height: 450px;
+            object-fit: cover;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+        }
+
+        /* Footer */
+        footer { border-top: 1px solid var(--color-border); padding: 6rem 0 3rem 0; background: #000; margin-top: 5rem;}
+        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 4rem; margin-bottom: 6rem; }
+        @media (max-width: 900px) { .footer-grid { grid-template-columns: 1fr 1fr; } .footer-grid > div:first-child { grid-column: 1 / -1; } }
+        .footer-col h4 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; color: #fff; margin-bottom: 1.5rem; }
+        .footer-col ul { list-style: none; }
+        .footer-col ul li { margin-bottom: 0.8rem; }
+        .footer-col ul a { color: var(--color-text-secondary); text-decoration: none; font-size: 0.95rem; transition: color 0.3s; }
+        .footer-col ul a:hover { color: #fff; }
+        .footer-bottom { border-top: 1px solid var(--color-border); padding-top: 2rem; display: flex; justify-content: space-between; align-items: center; color: var(--color-text-dim); font-size: 0.8rem; }
+    </style>
+    <link rel="stylesheet" href="assets/animations.css">
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+
+    <nav>
+        <a href="index.html" class="logo">YUDI LABS</a>
+        <div class="nav-links">
+            <a href="research.html">Research</a>
+            <a href="products.html">Products</a>
+            <a href="solutions.html">Solutions</a>
+            <a href="blog.html" class="active">Blog</a>
+            <a href="investors.html">Investors</a>
+            <a href="lab.html">Lab</a>
+            <a href="work-with-us.html" class="btn-nav">Work With Us</a>
+        </div>
+    </nav>
+
+    <article>
+        <header class="page-header">
+            <div class="container">
+                <a href="blog.html" class="back-link">&larr; Back to Blog</a>
+                <div class="meta-info">
+                    <span class="badge" id="post-badge">Lab Update</span>
+                    <span id="post-date">May 19, 2026</span>
+                </div>
+                <h1 class="title" id="post-title">Loading Article...</h1>
+            </div>
+        </header>
+
+        <main class="container">
+            <div class="post-body">
+                <img id="post-image" class="post-hero-image" style="display: none;" src="" alt="Hero Image">
+                <div id="post-content">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+        </main>
+    </article>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <a href="index.html" class="logo" style="margin-bottom: 1rem; display: block;">YUDI LABS</a>
+                    <p style="color: var(--color-text-secondary); font-size: 0.95rem; line-height: 1.6; max-width: 250px;">Brain-native AI research, products, and solutions.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Research</h4>
+                    <ul>
+                        <li><a href="research.html">Overview</a></li>
+                        <li><a href="research-programs.html">Programs</a></li>
+                        <li><a href="research-cmp.html">CMP</a></li>
+                        <li><a href="research-predictive-coding.html">Predictive Coding</a></li>
+                        <li><a href="research-experiments.html">Experiments</a></li>
+                        <li><a href="research-publications.html">Publications</a></li>
+                        <li><a href="research-collaborate.html">Collaborate</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="solutions.html">Solutions</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                        <li><a href="investors.html">Investors</a></li>
+                        <li><a href="lab.html">Lab</a></li>
+                        <li><a href="lab-careers.html">Careers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Work With Us</h4>
+                    <ul>
+                        <li><a href="work-with-us.html">Research Collaboration</a></li>
+                        <li><a href="work-with-us.html">Business Solutions</a></li>
+                        <li><a href="work-with-us.html">Product Access</a></li>
+                        <li><a href="investors.html">Investors</a></li>
+                        <li><a href="lab-careers.html">Careers</a></li>
+                        <li><a href="work-with-us.html">General</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#">Privacy</a></li>
+                        <li><a href="#">Terms</a></li>
+                        <li><a href="#">Security</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>&copy; 2026 Yudi Labs. All rights reserved.</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const PROJECT_ID = "7xfeub9j";
+        const DATASET    = "production";
+        const API_VER    = "2023-01-01";
+        const ENDPOINT   = `https://${PROJECT_ID}.api.sanity.io/v${API_VER}/data/query/${DATASET}`;
+
+        const fallbackPostsDetail = {
+            "case-for-brain-native-architectures": {
+                label: "Technical Essay",
+                date: "May 19, 2026",
+                title: "The Case for Brain-Native Architectures Over Token-First Scaling",
+                content: `
+                    <p>Modern artificial intelligence has achieved remarkable milestones by training massive transformers with dense parameter matrices on astronomical volumes of data. However, as compute limits loom and inference energy demands skyrocket, a fundamental question emerges: Is token-first scaling the correct architectural trajectory for relational reasoning and continuous state adaptation?</p>
+                    <h2>The Bottleneck of Dense Tokens</h2>
+                    <p>Under the standard transformer paradigm, every input token must pay attention to every other input token within the context window. This quadratic attention constraint requires massive computing resources and limits long-horizon memory retrieval. Furthermore, the system remains static post-training; new information can only be incorporated via gradient updates or context window bloat.</p>
+                    <blockquote>"True brain-native intelligence depends on sparse, continuous representation states that update dynamically without global backpropagation."</blockquote>
+                    <h2>Continuous State Adaptation</h2>
+                    <p>In biological systems, the brain represents information as sparse populations of active neurons. Rather than processing dense token strings sequentially, it operates via a continuous relational state. At Yudi Labs, we believe that future architectures must transition from token-first attention toward sparse, recurrent activations with local prediction-error learning.</p>
+                `
+            },
+            "mapping-emotional-weights": {
+                label: "Research Note",
+                date: "May 12, 2026",
+                title: "Mapping Emotional Weights to Concept Nodes",
+                content: `
+                    <p>As conversational interfaces scale, capturing the nuanced emotional drift of long-horizon interactions remains a major challenge. Standard systems treat every turn independently or lose context in massive context windows. Our latest research explores the integration of emotional vectors directly into recurrent relational nodes.</p>
+                    <h2>Hebbian Synaptic Scaling</h2>
+                    <p>We leverage classic Hebbian scaling principles to adjust concept connections based on the emotional persistence of the speaker. Instead of computing dense self-attention values at each step, nodes associated with positive or negative reinforcement strengthen their relational weights over time.</p>
+                    <h2>Persistent Memory Windows</h2>
+                    <p>This allows the conversational agent to recall and adapt its tone to the emotional history of the conversation, even across hours of context, without inflating token consumption.</p>
+                `
+            },
+            "why-we-built-cts": {
+                label: "Product Note",
+                date: "April 28, 2026",
+                title: "Why we built CTS: Managing the Quadratic Cost of Context",
+                content: `
+                    <p>Enterprise AI systems are heavily constrained by API token costs. As context windows grow to 128k or 1M tokens, the cost of repeating context frames during long multi-turn interactions grows quadratically. We built the Conversational Token System (CTS) to address this exact bottleneck.</p>
+                    <h2>State Compression Mechanics</h2>
+                    <p>CTS acts as a middleware layer that analyzes the conversational graph, identifies sparse semantic clusters, and compresses state parameters into lightweight representations. By stripping redundant syntactic noise while preserving relational binding structures, we reduce token overhead by up to 60%.</p>
+                `
+            },
+            "deploying-custom-research-agent": {
+                label: "Solutions Note",
+                date: "April 15, 2026",
+                title: "Deploying a Custom Research Agent for a Biotech Client",
+                content: `
+                    <p>We recently partnered with a leading biotech firm to automate the processing and synthesis of massive patent libraries and clinical trials documents. The challenge was clear: extract complex relational entities without losing precise mapping across dense, scientific language.</p>
+                    <h2>NARA Biotech Pipeline</h2>
+                    <p>We deployed a custom instance of our NARA (Neural Agent for Relational Synthesis) system. By structuring retrieved information into a dynamic sparse concept grid, NARA successfully analyzed and mapped biochemical relationships across 10,000 PDF documents without suffering from semantic flattening.</p>
+                `
+            },
+            "failure-mode-hash-collisions": {
+                label: "Experiment Log",
+                date: "March 30, 2026",
+                title: "Failure Mode: Hash Collisions in CMP v1",
+                content: `
+                    <p>Transparency is a core value at Yudi Labs. Here, we outline the primary failure mode encountered during the initial training runs of the CMP v1 architecture: severe semantic smearing due to hash collisions in the encoder module.</p>
+                    <h2>The Hash Collision Bottleneck</h2>
+                    <p>To achieve sparse representations, CMP v1 mapped input words into fixed-dimension indices using a static hash function. However, out-of-vocabulary terms and homonyms frequently mapped to identical sparse indices. This caused the recurrent hidden state to blend unrelated semantic representations, leading to incoherence during sequence completion.</p>
+                    <h2>The Solution: Learned Sparse Encoders</h2>
+                    <p>To eliminate this failure mode, we deprecated the static hash approach in favor of a trainable LearnedSparseEncoder, which separates and projects character n-grams into a soft-thresholded sparse space.</p>
+                `
+            },
+            "yudi-labs-emerges": {
+                label: "Lab Update",
+                date: "March 10, 2026",
+                title: "Yudi Labs Emerges to Build Beyond the Token",
+                content: `
+                    <p>We are thrilled to announce the official launch of Yudi Labs. Guided by a core leadership team including Founder Ashmith Atmuri, CTO Samatha, and COO Manish Regala, Yudi Labs is established as a dedicated AI research organization exploring the intersections of neuroscience and machine learning.</p>
+                    <h2>Our Mission</h2>
+                    <p>We believe that building next-generation intelligent systems requires moving beyond tokenized scaling. We are actively hiring researchers, developers, and interns who share our passion for sparse recurrent architectures and local predictive learning. Welcome to the future of brain-native AI.</p>
+                `
+            }
+        };
+
+        // Render Portable Text to HTML
+        function renderPortableText(blocks) {
+            if (!blocks || !Array.isArray(blocks)) return '';
+
+            return blocks.map(block => {
+                if (block._type !== 'block') return '';
+
+                const inlineText = (block.children || []).map(span => {
+                    let text = span.text || '';
+                    (span.marks || []).forEach(mark => {
+                        const def = (block.markDefs || []).find(d => d._key === mark);
+                        if (def && def._type === 'link') {
+                            text = `<a href="${def.href}" target="_blank" rel="noopener">${text}</a>`;
+                        } else {
+                            switch (mark) {
+                                case 'strong': text = `<strong>${text}</strong>`; break;
+                                case 'em':     text = `<em>${text}</em>`;         break;
+                                case 'code':   text = `<code>${text}</code>`;     break;
+                            }
+                        }
+                    });
+                    return text;
+                }).join('');
+
+                switch (block.style) {
+                    case 'h2': return `<h2>${inlineText}</h2>`;
+                    case 'h3': return `<h3>${inlineText}</h3>`;
+                    case 'blockquote': return `<blockquote>${inlineText}</blockquote>`;
+                    default: return inlineText.trim() ? `<p>${inlineText}</p>` : '';
+                }
+            }).join('\n');
+        }
+
+        // Get slug from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const slug = urlParams.get('slug');
+
+        if (!slug) {
+            document.getElementById('post-title').textContent = "Post Not Found";
+            document.getElementById('post-content').innerHTML = "<p>No post slug was specified in the URL query string.</p>";
+        } else {
+            // GROQ query for single post
+            const QUERY = `*[_type == "post" && slug.current == $slug][0]{
+                title,
+                publishedAt,
+                "category": categories[0]->title,
+                "imageUrl": mainImage.asset->url,
+                body
+            }`;
+            const params = `&$slug="${encodeURIComponent(slug)}"`;
+
+            fetch(`${ENDPOINT}?query=${encodeURIComponent(QUERY)}${params}`)
+                .then(res => {
+                    if (!res.ok) throw new Error('Failed to fetch article');
+                    return res.json();
+                })
+                .then(data => {
+                    const post = data.result;
+                    if (post) {
+                        document.title = `${post.title} | Yudi Labs`;
+                        document.getElementById('post-title').textContent = post.title;
+                        document.getElementById('post-badge').textContent = post.category || 'Research Note';
+                        document.getElementById('post-date').textContent = new Date(post.publishedAt).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+                        
+                        if (post.imageUrl) {
+                            const img = document.getElementById('post-image');
+                            img.src = post.imageUrl;
+                            img.style.display = 'block';
+                        }
+                        
+                        document.getElementById('post-content').innerHTML = renderPortableText(post.body);
+                    } else {
+                        // Use fallback
+                        renderFallback(slug);
+                    }
+                })
+                .catch(err => {
+                    console.warn('Sanity fetch failed. Loading local fallback article.', err);
+                    renderFallback(slug);
+                });
+        }
+
+        function renderFallback(slug) {
+            const fallback = fallbackPostsDetail[slug];
+            if (fallback) {
+                document.title = `${fallback.title} | Yudi Labs`;
+                document.getElementById('post-title').textContent = fallback.title;
+                document.getElementById('post-badge').textContent = fallback.label;
+                document.getElementById('post-date').textContent = fallback.date;
+                document.getElementById('post-content').innerHTML = fallback.content;
+            } else {
+                document.getElementById('post-title').textContent = "Post Not Found";
+                document.getElementById('post-content').innerHTML = "<p>The requested post could not be retrieved from the server or local storage.</p>";
+            }
+        }
+    </script>
+    <script src="assets/animations.js"></script>
+</body>
+</html>
