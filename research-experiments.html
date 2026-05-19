@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Investors | Yudi Labs</title>
+    <title>Experiments | Yudi Labs Research</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -35,7 +35,7 @@
         }
 
         h1, h2, h3, h4 { line-height: 1.2; font-weight: 600; }
-        .container { max-width: 900px; margin: 0 auto; padding: 0 5%; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 5%; }
         .text-muted { color: var(--color-text-secondary); }
 
         /* Navigation */
@@ -88,34 +88,40 @@
 
         .content-section { padding: 4rem 0; }
         .content-section h2 { font-size: 2rem; margin-bottom: 1.5rem; color: #fff; border-bottom: 1px solid var(--color-border); padding-bottom: 1rem;}
-        .content-section h3 { font-size: 1.3rem; margin-top: 2rem; margin-bottom: 1rem; color: #fff; }
-        .content-section p { font-size: 1.1rem; color: rgba(255,255,255,0.7); margin-bottom: 1.5rem; font-weight: 300; }
         
-        .list-box {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid var(--color-border);
-            border-radius: 12px;
-            padding: 2rem;
-            margin-top: 1rem;
+        .timeline { margin-left: 1.5rem; border-left: 2px solid var(--color-border); padding-left: 2rem; margin-top: 2rem; }
+        .timeline-item { position: relative; margin-bottom: 3rem; }
+        .timeline-item::before {
+            content: ''; position: absolute; left: -2.4rem; top: 0.3rem;
+            width: 12px; height: 12px; background: #fff; border-radius: 50%;
         }
-        
-        .list-box ul { list-style: none; margin: 0; padding: 0; }
-        .list-box li { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; color: rgba(255,255,255,0.8); font-size: 1.1rem; }
-        .list-box li::before { content: '→'; font-weight: bold; color: #fff; display: flex; justify-content: center; align-items: center; flex-shrink: 0;}
 
-        .warning-box {
-            background: rgba(255,0,0,0.05);
-            border: 1px solid rgba(255,0,0,0.2);
-            border-radius: 8px;
-            padding: 2.5rem;
+        /* Tables */
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
             margin: 3rem 0;
-            text-align: center;
+            background: var(--color-surface);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--color-border);
         }
+        .results-table th, .results-table td {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--color-border);
+        }
+        .results-table th {
+            background: rgba(0,0,0,0.5);
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .results-table tr:last-child td { border-bottom: none; }
+        .results-table td { color: rgba(255,255,255,0.8); font-size: 0.95rem; }
 
-        .warning-box h3 { margin-top: 0; color: #ff8888; margin-bottom: 1.5rem; font-size: 1.5rem; }
-        .warning-box ul { list-style: none; padding: 0; margin: 0; }
-        .warning-box li { color: rgba(255,255,255,0.8); font-size: 1.1rem; margin-bottom: 0.5rem; }
-        
         /* Accordions */
         details {
             background: var(--color-surface);
@@ -150,14 +156,15 @@
         }
 
         .btn-primary {
-            padding: 1.2rem 3rem; border-radius: 8px; text-decoration: none; display: inline-block;
-            font-size: 0.95rem; font-weight: 600; text-transform: uppercase;
+            padding: 1rem 2.5rem; border-radius: 8px; text-decoration: none; display: inline-block;
+            font-size: 0.85rem; font-weight: 600; text-transform: uppercase;
             letter-spacing: 0.1em; transition: all 0.3s var(--ease-spring); border: none; cursor: pointer; text-align: center;
-            background: #ffffff; color: #000000;
+            background: #ffffff; color: #000000; margin-top: 2rem;
         }
 
         @media (max-width: 768px) {
             .nav-links { display: none; }
+            .results-table { display: block; overflow-x: auto; }
         }
 
         /* Footer */
@@ -177,11 +184,11 @@
     <nav>
         <a href="index.html" class="logo">YUDI LABS</a>
         <div class="nav-links">
-            <a href="research.html">Research</a>
+            <a href="research.html" class="active">Research</a>
             <a href="products.html">Products</a>
             <a href="solutions.html">Solutions</a>
             <a href="blog.html">Blog</a>
-            <a href="investors.html" class="active">Investors</a>
+            <a href="investors.html">Investors</a>
             <a href="lab.html">Lab</a>
             <a href="work-with-us.html" class="btn-nav">Work With Us</a>
         </div>
@@ -189,82 +196,125 @@
 
     <header class="page-header">
         <div class="container">
-            <h1 class="title">Investing in brain-native AI.</h1>
-            <p class="subtitle">Yudi Labs is building a research-led AI company with long-term frontier ambition and near-term product and solutions pathways.</p>
+            <h1 class="title">Experiment Logs</h1>
+            <p class="subtitle">We publish successful results, failures, corrections, and open questions. The goal is to test the research thesis, not protect a narrative.</p>
         </div>
     </header>
 
     <main class="container">
         
         <section class="content-section">
-            <h2>Investor Overview</h2>
+            <h2>CMP Architecture Timeline</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <h3 style="color:#fff; margin-bottom:0.5rem;">Early CMP</h3>
+                    <p style="color:var(--color-text-secondary);">Initial tests validating the relational binding matrix. High memory footprint, unstable gradients over long horizons.</p>
+                </div>
+                <div class="timeline-item">
+                    <h3 style="color:#fff; margin-bottom:0.5rem;">CMP v1</h3>
+                    <p style="color:var(--color-text-secondary);">Introduced the Hash Encoder. Proved token-savings hypothesis but struggled with OOV (Out of Vocabulary) generalization and morphology.</p>
+                </div>
+                <div class="timeline-item">
+                    <h3 style="color:#fff; margin-bottom:0.5rem;">CMP v1.5</h3>
+                    <p style="color:var(--color-text-secondary);">Sparse-gated refinement introduced. Stabilized the recurrent state, allowing for deeper networks.</p>
+                </div>
+                <div class="timeline-item">
+                    <h3 style="color:#fff; margin-bottom:0.5rem;">CMP v1.9</h3>
+                    <p style="color:var(--color-text-secondary);">Deprecated the Hash Encoder. Introduced character n-gram features and LearnedSparseEncoder. Current focus on predictive output head.</p>
+                </div>
+                <div class="timeline-item">
+                    <h3 style="color:#fff; margin-bottom:0.5rem;">PC-CMP Direction</h3>
+                    <p style="color:var(--color-text-secondary);">Active experiments testing Predictive Coding (local prediction-error updates) as a replacement for global backpropagation in CMP.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <h2>Recent Results</h2>
+            <div style="overflow-x: auto;">
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>Model Version</th>
+                            <th>Params</th>
+                            <th>Dataset</th>
+                            <th>Training Method</th>
+                            <th>Result</th>
+                            <th>Interpretation / Caveat</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>CMP v1.5</td>
+                            <td>12M</td>
+                            <td>WikiText-103 (Sub)</td>
+                            <td>Global BPTT</td>
+                            <td>Converged faster than dense baseline.</td>
+                            <td>Transformer PPL gap remains high on this specific task.</td>
+                        </tr>
+                        <tr>
+                            <td>CMP v1.9</td>
+                            <td>34M</td>
+                            <td>Synthetic Relational</td>
+                            <td>Global BPTT</td>
+                            <td>Perfect recall on bounded entity-role mapping.</td>
+                            <td>Does not prove generalization to unstructured natural language.</td>
+                        </tr>
+                        <tr>
+                            <td>PC-CMP (Toy)</td>
+                            <td>1M</td>
+                            <td>MNIST Sequences</td>
+                            <td>Predictive Coding</td>
+                            <td>Local updates reached 92% of BPTT accuracy.</td>
+                            <td>Predictive coding open questions remain at 10M+ scale.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <h2>Failure Modes & Corrections</h2>
+            <p style="color: var(--color-text-secondary); margin-bottom: 2rem;">Honest documentation of what hasn't worked.</p>
             
-            <details open>
-                <summary>What Yudi Labs Is</summary>
+            <details>
+                <summary>Hash Encoder Limitations</summary>
                 <div class="details-content">
-                    A research-led AI company building brain-native AI systems, products, and applied solutions. We treat research as our core engine, and our commercial viability is proven through custom enterprise deployments and proprietary SaaS tools.
+                    In CMP v1, we utilized a Hash Encoder to rapidly sparsify token inputs. While computationally cheap, we discovered severe failure modes regarding Out-of-Vocabulary (OOV) terms and morphologically rich languages. The hash collisions created semantic smearing that was impossible to recover from in later layers. This led to the v1.9 correction: replacing it entirely with a LearnedSparseEncoder.
                 </div>
             </details>
             
             <details>
-                <summary>Why Now?</summary>
+                <summary>Transformer Perplexity (PPL) Gap</summary>
                 <div class="details-content">
-                    Current AI is powerful, but questions remain around continual learning, compositional generalization, interpretability, memory, and cross-modal grounding. As dense models hit diminishing returns on raw scaling, Yudi Labs is pursuing parallel architectural directions that target these specific gaps.
+                    Despite theoretical memory advantages, our dense-matching baselines (like standard LLaMA-architecture Transformers) still drastically outperform current CMP versions on pure next-token prediction perplexity. We are investigating whether this is an architectural flaw in CMP or simply a symptom of using token-optimized datasets for a non-token architecture.
                 </div>
             </details>
             
             <details>
-                <summary>Technical Thesis</summary>
+                <summary>Need for Matched Baselines</summary>
                 <div class="details-content">
-                    The next frontier in AI may require new substrates: sparse representation, local predictive learning, recurrent state, and relational structure. Our CMP architecture is the testing ground for this thesis.
+                    Early experiments compared highly-optimized Transformer code against unoptimized PyTorch CMP implementations. We have since corrected our evaluation framework to ensure FLOPS-matched baselines, which reduced some of the "miraculous" efficiency gains we initially observed.
                 </div>
             </details>
         </section>
 
         <section class="content-section">
-            <h2>Evidence So Far</h2>
-            <div class="list-box">
-                <ul>
-                    <li>Working CMP research line with continuous iteration.</li>
-                    <li>Architecture iterations (v1.5 to v1.9) demonstrating adaptability.</li>
-                    <li>Semantic representation experiments mapped.</li>
-                    <li>Predictive coding toy-scale validation completed.</li>
-                    <li>Clear roadmap toward capability benchmarks.</li>
-                </ul>
-            </div>
-        </section>
-
-        <section class="content-section">
-            <h2>What This Is Not</h2>
+            <h2>Open Benchmarks</h2>
+            <p style="color: var(--color-text-secondary); margin-bottom: 2rem;">Areas where we are actively seeking collaboration or developing new evaluation metrics:</p>
             
-            <div class="warning-box">
-                <h3>Clarity in our claims:</h3>
-                <ul>
-                    <li>Not a claim that CMP replaces Transformers today.</li>
-                    <li>Not a claim that we have AGI.</li>
-                    <li>Not a bet that we beat backprop on ordinary next-token accuracy.</li>
-                    <li>Not only a chatbot company.</li>
-                </ul>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                <div style="background: var(--color-surface); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--color-border); color: #fff;">Continual Learning</div>
+                <div style="background: var(--color-surface); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--color-border); color: #fff;">Few-Shot Learning</div>
+                <div style="background: var(--color-surface); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--color-border); color: #fff;">Cross-Modal Grounding</div>
+                <div style="background: var(--color-surface); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--color-border); color: #fff;">Interpretability</div>
+                <div style="background: var(--color-surface); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--color-border); color: #fff;">OOV and Morphology</div>
+                <div style="background: var(--color-surface); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--color-border); color: #fff;">Memory and State Tracking</div>
             </div>
-        </section>
-
-        <section class="content-section">
-            <h2>Roadmap to Seed</h2>
-            <div class="list-box">
-                <ul>
-                    <li><strong>Phase 1:</strong> Research validation and architecture stability (Current)</li>
-                    <li><strong>Phase 2:</strong> Capability benchmarks on continual learning and few-shot tasks</li>
-                    <li><strong>Phase 3:</strong> Product/prototype development (CTS Beta)</li>
-                    <li><strong>Phase 4:</strong> Formal research collaborations with academic institutions</li>
-                    <li><strong>Phase 5:</strong> Pre-seed/seed funding milestones</li>
-                </ul>
+            
+            <div style="text-align: center; margin-top: 3rem;">
+                <a href="research-collaborate.html" class="btn-primary">Collaborate on Benchmarks</a>
             </div>
-        </section>
-
-        <section class="content-section" style="text-align: center; border-top: 1px solid var(--color-border); padding-top: 6rem;">
-            <h2>Data Room</h2>
-            <p style="font-size: 1.1rem; color: var(--color-text-secondary); margin-bottom: 2rem;">Our secure data room includes our pitch deck, technical memo, research summary, product roadmap, solutions revenue plan, and company formation documents.</p>
-            <a href="work-with-us.html" class="btn-primary" onclick="localStorage.setItem('inquiryPrefill', 'investor');">Request Investor Memo</a>
         </section>
 
     </main>

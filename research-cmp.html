@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solutions | Yudi Labs</title>
+    <title>CMP | Yudi Labs Research</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -35,7 +35,7 @@
         }
 
         h1, h2, h3, h4 { line-height: 1.2; font-weight: 600; }
-        .container { max-width: 1000px; margin: 0 auto; padding: 0 5%; }
+        .container { max-width: 900px; margin: 0 auto; padding: 0 5%; }
         .text-muted { color: var(--color-text-secondary); }
 
         /* Navigation */
@@ -87,34 +87,39 @@
         }
 
         .content-section { padding: 4rem 0; }
+        .content-section h2 { font-size: 2rem; margin-bottom: 1.5rem; color: #fff; border-bottom: 1px solid var(--color-border); padding-bottom: 1rem;}
+        .content-section h3 { font-size: 1.3rem; margin-top: 2rem; margin-bottom: 1rem; color: #fff; }
+        .content-section p { font-size: 1.1rem; color: rgba(255,255,255,0.7); margin-bottom: 1.5rem; font-weight: 300; }
         
-        .solution-card {
-            background: var(--color-surface);
-            border: 1px solid var(--color-border);
-            border-radius: 12px;
-            padding: 3rem;
-            margin-bottom: 3rem;
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 3rem;
+        .timeline { margin-left: 1.5rem; border-left: 2px solid var(--color-border); padding-left: 2rem; margin-top: 2rem; }
+        .timeline-item { position: relative; margin-bottom: 3rem; }
+        .timeline-item::before {
+            content: ''; position: absolute; left: -2.4rem; top: 0.3rem;
+            width: 12px; height: 12px; background: #fff; border-radius: 50%;
         }
-        
-        .solution-card h3 { font-size: 1.8rem; margin-bottom: 0.5rem; color: #fff; }
-        .solution-card .meta { font-size: 0.9rem; color: var(--color-text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
-        
-        .solution-card ul { margin-left: 1.5rem; margin-top: 1rem; color: var(--color-text-secondary); font-size: 1.1rem; }
-        .solution-card li { margin-bottom: 0.5rem; }
-        
-        .btn-primary {
-            padding: 1.2rem 3rem; border-radius: 8px; text-decoration: none; display: inline-block;
-            font-size: 0.95rem; font-weight: 600; text-transform: uppercase;
-            letter-spacing: 0.1em; transition: all 0.3s var(--ease-spring); border: none; cursor: pointer; text-align: center;
-            background: #ffffff; color: #000000;
+
+        .warning-box {
+            background: rgba(255,0,0,0.05);
+            border: 1px solid rgba(255,0,0,0.2);
+            border-radius: 8px;
+            padding: 2rem;
+            margin: 3rem 0;
         }
+
+        .warning-box ul { list-style: none; }
+        .warning-box li { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.8rem; color: #ff8888; font-size: 1.1rem; }
+        .warning-box li::before { content: '✕'; font-weight: bold; }
+
+        .btn-secondary {
+            padding: 1rem 2.5rem; border-radius: 8px; text-decoration: none; display: inline-block;
+            font-size: 0.85rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.1em; transition: all 0.3s var(--ease-spring); border: 1px solid var(--color-border);
+            background: var(--color-surface); color: #ffffff;
+        }
+        .btn-secondary:hover { background: var(--color-surface-hover); border-color: rgba(255,255,255,0.2); }
 
         @media (max-width: 768px) {
             .nav-links { display: none; }
-            .solution-card { grid-template-columns: 1fr; gap: 1rem; padding: 2rem;}
         }
 
         /* Footer */
@@ -127,6 +132,7 @@
         .footer-col ul a { color: var(--color-text-secondary); text-decoration: none; font-size: 0.95rem; transition: color 0.3s; }
         .footer-col ul a:hover { color: #fff; }
         .footer-bottom { border-top: 1px solid var(--color-border); padding-top: 2rem; display: flex; justify-content: space-between; align-items: center; color: var(--color-text-dim); font-size: 0.8rem; }
+
     </style>
 </head>
 <body>
@@ -134,9 +140,9 @@
     <nav>
         <a href="index.html" class="logo">YUDI LABS</a>
         <div class="nav-links">
-            <a href="research.html">Research</a>
+            <a href="research.html" class="active">Research</a>
             <a href="products.html">Products</a>
-            <a href="solutions.html" class="active">Solutions</a>
+            <a href="solutions.html">Solutions</a>
             <a href="blog.html">Blog</a>
             <a href="investors.html">Investors</a>
             <a href="lab.html">Lab</a>
@@ -146,107 +152,84 @@
 
     <header class="page-header">
         <div class="container">
-            <h1 class="title">AI systems for businesses.</h1>
-            <p class="subtitle">Yudi Labs works with companies to design and build AI systems, automation workflows, custom agents, and growth infrastructure.</p>
+            <div style="font-size:0.85rem; font-weight:600; text-transform:uppercase; letter-spacing:0.2em; color:var(--color-text-secondary); margin-bottom:1rem;">Research Project</div>
+            <h1 class="title">CMP: Conversational Meaning Patterns</h1>
+            <p class="subtitle">A Yudi Labs research project exploring sparse recurrent architectures, predictive coding, and relational internal state for brain-native AI.</p>
         </div>
     </header>
 
     <main class="container">
         
         <section class="content-section">
+            <h2>What CMP Is</h2>
+            <p>CMP is a research architecture for studying whether AI systems can represent information as sparse, evolving internal states rather than only token streams.</p>
             
-            <div class="solution-card">
-                <div>
-                    <h3>AI Strategy</h3>
-                    <div class="meta">For Founders & Product Teams</div>
-                </div>
-                <div>
-                    <p style="color: var(--color-text-secondary); font-size: 1.1rem; margin-bottom: 1rem;">For founders and teams deciding how to adopt AI meaningfully inside products and operations.</p>
-                    <ul>
-                        <li>AI roadmap development</li>
-                        <li>Product strategy & scoping</li>
-                        <li>Workflow audit & optimization</li>
-                        <li>AI implementation planning</li>
-                        <li>Research-to-product advisory</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="solution-card">
-                <div>
-                    <h3>Business Automation</h3>
-                    <div class="meta">For Operators & Operations</div>
-                </div>
-                <div>
-                    <p style="color: var(--color-text-secondary); font-size: 1.1rem; margin-bottom: 1rem;">Transform manual overhead into intelligent pipelines.</p>
-                    <ul>
-                        <li>Internal dashboards & reporting</li>
-                        <li>CRM systems & integration</li>
-                        <li>Google Sheets / Airtable automation</li>
-                        <li>Document processing pipelines</li>
-                        <li>Operations copilots</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="solution-card">
-                <div>
-                    <h3>Custom AI Agents</h3>
-                    <div class="meta">For Support & Knowledge Teams</div>
-                </div>
-                <div>
-                    <p style="color: var(--color-text-secondary); font-size: 1.1rem; margin-bottom: 1rem;">Deploy persistent agents tuned to your internal knowledge base and brand guidelines.</p>
-                    <ul>
-                        <li>Research agents</li>
-                        <li>Support agents (L1/L2)</li>
-                        <li>Content generation agents</li>
-                        <li>Operations agents</li>
-                        <li>Internal knowledge copilots</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="solution-card">
-                <div>
-                    <h3>AI Product Development</h3>
-                    <div class="meta">For Startups & Enterprises</div>
-                </div>
-                <div>
-                    <p style="color: var(--color-text-secondary); font-size: 1.1rem; margin-bottom: 1rem;">End-to-end engineering to bring new AI capabilities to life.</p>
-                    <ul>
-                        <li>Rapid MVPs</li>
-                        <li>AI-native web apps</li>
-                        <li>Prototype-to-product scaling</li>
-                        <li>LLM integration (OpenAI, Anthropic, Open-source)</li>
-                        <li>Backend + database + deployment infrastructure</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="solution-card" style="border-color: rgba(255,255,255,0.2);">
-                <div>
-                    <h3>Marketing & Growth Systems</h3>
-                    <div class="meta">For Growth & Marketing Teams</div>
-                </div>
-                <div>
-                    <p style="color: var(--color-text-secondary); font-size: 1.1rem; margin-bottom: 1rem;">We do not offer generic marketing services. We build AI-powered growth systems and operational infrastructure to scale your reach.</p>
-                    <ul>
-                        <li>AI content systems at scale</li>
-                        <li>Social media workflow automation</li>
-                        <li>Campaign automation triggers</li>
-                        <li>Influencer & outreach operations</li>
-                        <li>Lead qualification systems</li>
-                        <li>Analytics dashboards & content calendars</li>
-                    </ul>
-                </div>
-            </div>
-
+            <h2 style="margin-top: 4rem;">Why CMP Exists</h2>
+            <p>Current AI systems are powerful, but many depend heavily on tokenized inputs, dense representations, global backpropagation, and attention-based comparison. CMP explores a different path: learned sparse codes, relational binding, recurrent state, and predictive learning.</p>
         </section>
-        
-        <section class="content-section" style="text-align: center; border-top: 1px solid var(--color-border); padding-top: 6rem;">
-            <h2 style="font-size: 3rem; margin-bottom: 1.5rem; color: #fff;">Work With Yudi</h2>
-            <p style="font-size: 1.1rem; color: var(--color-text-secondary); margin-bottom: 3rem;">Ready to build a solution with us? Initiate a conversation to outline your requirements.</p>
-            <a href="work-with-us.html" class="btn-primary" onclick="localStorage.setItem('inquiryPrefill', 'solutions');">Build a Solution With Us</a>
+
+        <section class="content-section">
+            <h2>Architecture Evolution</h2>
+            
+            <div class="timeline">
+                <div class="timeline-item">
+                    <h3>Early CMP</h3>
+                    <p>Relied on hash-based sparse patterns, basic relational binding, and gated recurrent state.</p>
+                </div>
+                <div class="timeline-item">
+                    <h3>CMP v1.5</h3>
+                    <p>Introduced sparse-gated refinement, improving the completeness and stability of the core CMP block.</p>
+                </div>
+                <div class="timeline-item">
+                    <h3>Current Direction: CMP v1.9</h3>
+                    <p>The current forward-looking direction replaces the old hash encoder entirely. It uses character n-gram features, a LearnedSparseEncoder, CMP blocks with fixed binding, SparseGatedRefinement, and a predictive output head.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <h2>CMP v1.9 Architecture</h2>
+            <p>CMP v1.9 uses character n-gram features as input preparation, a trainable learned sparse encoder, fixed binding between previous hidden state and current sparse pattern, gated recurrence, sparse-gated refinement, and a predictive output head that predicts next sparse patterns.</p>
+            
+            <ul style="color: rgba(255,255,255,0.7); font-size: 1.1rem; line-height: 2; margin-left: 2rem; margin-top: 1rem;">
+                <li>Char n-gram features</li>
+                <li>LearnedSparseEncoder</li>
+                <li>Fixed memory/input binding</li>
+                <li>Gated recurrent state</li>
+                <li>SparseGatedRefinement</li>
+                <li>Predictive output head</li>
+            </ul>
+
+            <div style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-left: 4px solid #fff; margin-top: 2rem;">
+                <p style="margin: 0; font-size: 0.95rem;"><strong>Important Note:</strong> Do not describe current CMP as hash-encoder-first. The current forward-looking architecture explicitly replaces the old hash encoder with a learned sparse encoder, completely eliminating Token-ID cross-entropy as the core future path.</p>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <h2>Predictive Coding in CMP</h2>
+            <p>The current training direction studies Predictive Coding as a way to train CMP through local prediction-error updates rather than only global backpropagation.</p>
+            <a href="research-predictive-coding.html" class="btn-secondary" style="margin-top: 1rem;">Explore Predictive Coding &rarr;</a>
+        </section>
+
+        <section class="content-section">
+            <h2>Experiments</h2>
+            <p>Our ongoing ablation studies and benchmark tests summarize what worked, what failed, current open questions, and our next experiment tracks. We do not overclaim our results.</p>
+            <a href="research-experiments.html" class="btn-secondary" style="margin-top: 1rem;">View Experiment Logs &rarr;</a>
+        </section>
+
+        <section class="content-section">
+            <h2>What CMP Is Not</h2>
+            
+            <div class="warning-box">
+                <p style="color: #fff; margin-bottom: 1rem; font-weight: 600;">Yudi Labs does not claim that CMP replaces Transformers today. CMP is an active research program exploring sparse, predictive, recurrent architectures as a possible path toward brain-native AI.</p>
+                <ul>
+                    <li>CMP is not currently a Transformer replacement.</li>
+                    <li>CMP is not AGI.</li>
+                    <li>CMP is not a claim that we copied the brain.</li>
+                    <li>CMP is not only a memory trick.</li>
+                    <li>CMP is not only a language model.</li>
+                </ul>
+            </div>
         </section>
 
     </main>

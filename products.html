@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YUDI Ecosystem — AI Research Lab</title>
+    <title>Products | Yudi Labs</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,7 +16,6 @@
             --color-surface: rgba(255, 255, 255, 0.03);
             --color-surface-hover: rgba(255, 255, 255, 0.06);
             --color-border: rgba(255, 255, 255, 0.08);
-            --color-border-hover: rgba(255, 255, 255, 0.2);
             --color-text-primary: rgba(255, 255, 255, 0.95);
             --color-text-secondary: rgba(255, 255, 255, 0.5);
             --color-text-dim: rgba(255, 255, 255, 0.2);
@@ -30,132 +29,253 @@
             background-color: var(--color-bg);
             color: var(--color-text-primary);
             font-family: var(--font-stack);
-            line-height: 1.7;
-            overflow-x: hidden;
+            line-height: 1.8;
             -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
         }
 
         h1, h2, h3, h4 { line-height: 1.2; font-weight: 600; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 5%; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 5%; }
         .text-muted { color: var(--color-text-secondary); }
-        
-        .btn {
-            padding: 0.9rem 2.5rem; border-radius: 8px; text-decoration: none;
-            font-size: 0.85rem; font-weight: 600; text-transform: uppercase;
-            letter-spacing: 0.15em; transition: all 0.3s var(--ease-spring);
-            border: none; cursor: pointer; display: inline-block;
-        }
-        .btn-primary { background: #ffffff; color: #000000; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(255,255,255,0.15); }
 
-        .glass {
-            background: var(--color-surface);
-            border: 1px solid var(--color-border);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border-radius: 1.2rem;
-        }
-
-        .glass-hover:hover {
-            background: var(--color-surface-hover);
-            border-color: var(--color-border-hover);
-            transform: translateY(-4px);
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-        }
-
-        /* Navbar */
+        /* Navigation */
         nav {
             position: fixed; top: 0; width: 100%; z-index: 100;
             padding: 1.5rem 5%; transition: all 0.4s ease;
             display: flex; justify-content: space-between; align-items: center;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(3, 3, 3, 0.8);
             backdrop-filter: blur(20px); border-bottom: 1px solid var(--color-border);
         }
-        .logo img { height: 48px; width: auto; object-fit: contain; }
-        .nav-links { display: flex; gap: 2.5rem; align-items: center; }
+        .logo { font-weight: 800; font-size: 1.5rem; letter-spacing: 0.1em; text-transform: uppercase; color: #fff; text-decoration: none; }
+        
+        .nav-links { display: flex; gap: 2rem; align-items: center; }
         .nav-links a {
             color: var(--color-text-secondary); text-decoration: none;
-            font-size: 0.85rem; font-weight: 500; letter-spacing: 0.1em;
+            font-size: 0.85rem; font-weight: 500; letter-spacing: 0.05em;
             text-transform: uppercase; transition: color 0.3s;
         }
         .nav-links a:hover { color: #fff; }
+        .nav-links a.active { color: #fff; }
+        .nav-links a.btn-nav {
+            background: #fff; color: #000; padding: 0.6rem 1.2rem; border-radius: 6px; font-weight: 600;
+        }
+        .nav-links a.btn-nav:hover { background: #eee; color: #000; }
 
+        /* Page Layout */
         .page-header {
             padding: 12rem 0 6rem 0;
             text-align: center;
-            position: relative;
+            border-bottom: 1px solid var(--color-border);
         }
 
         .title {
             font-size: clamp(3rem, 6vw, 5rem);
             font-weight: 800;
             letter-spacing: -0.04em;
+            background: linear-gradient(180deg, #FFFFFF 0%, #888888 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin-bottom: 1.5rem;
         }
 
-        /* Products Grid */
-        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-bottom: 5rem; }
-        
-        .feature-card { 
-            text-decoration:none; display:flex; flex-direction:column; 
-            justify-content:center; align-items:center; text-align:center; padding:4rem 3rem; cursor:pointer;
+        .subtitle {
+            font-size: 1.3rem;
+            color: var(--color-text-secondary);
+            font-weight: 300;
+            max-width: 700px;
+            margin: 0 auto;
         }
+
+        .content-section { padding: 4rem 0; }
+        .content-section h2 { font-size: 2rem; margin-bottom: 1.5rem; color: #fff; border-bottom: 1px solid var(--color-border); padding-bottom: 1rem;}
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem; }
+        
+        .product-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+        .product-card h3 { font-size: 1.5rem; margin-bottom: 1rem; color: #fff; }
+        .product-card p { font-size: 1rem; color: var(--color-text-secondary); margin-bottom: 2rem; }
+        
+        .meta-list { list-style: none; margin-bottom: 2rem; padding: 0; font-size: 0.9rem; color: var(--color-text-dim); }
+        .meta-list li { margin-bottom: 0.5rem; display: flex; gap: 0.5rem; }
+        .meta-list li strong { color: rgba(255,255,255,0.7); min-width: 80px;}
+        
+        .btn-text { color: #fff; text-decoration: none; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; display: inline-flex; align-items: center; gap: 0.5rem; margin-top: auto; border: 1px solid var(--color-border); padding: 0.8rem 1.5rem; border-radius: 6px; text-align: center; justify-content: center; transition: all 0.3s;}
+        .btn-text:hover { background: #fff; color: #000; }
 
         @media (max-width: 768px) {
             .nav-links { display: none; }
+            .grid-2 { grid-template-columns: 1fr; }
         }
 
-        footer { text-align: center; padding: 4rem 5%; border-top: 1px solid var(--color-border); margin-top: 5rem;}
+        /* Footer */
+        footer { border-top: 1px solid var(--color-border); padding: 6rem 0 3rem 0; background: #000; margin-top: 5rem;}
+        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 4rem; margin-bottom: 6rem; }
+        @media (max-width: 900px) { .footer-grid { grid-template-columns: 1fr 1fr; } .footer-grid > div:first-child { grid-column: 1 / -1; } }
+        .footer-col h4 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; color: #fff; margin-bottom: 1.5rem; }
+        .footer-col ul { list-style: none; }
+        .footer-col ul li { margin-bottom: 0.8rem; }
+        .footer-col ul a { color: var(--color-text-secondary); text-decoration: none; font-size: 0.95rem; transition: color 0.3s; }
+        .footer-col ul a:hover { color: #fff; }
+        .footer-bottom { border-top: 1px solid var(--color-border); padding-top: 2rem; display: flex; justify-content: space-between; align-items: center; color: var(--color-text-dim); font-size: 0.8rem; }
     </style>
 </head>
 <body>
 
-    <nav id="navbar">
-        <a href="index.html" class="logo">
-            <img src="logo.png" alt="YUDI Logo" onerror="this.outerHTML='<span style=\'font-weight:800; font-size:1.5rem; letter-spacing:0.1em; text-transform:uppercase; color:#fff;\'>YUDI.</span>'">
-        </a>
+    <nav>
+        <a href="index.html" class="logo">YUDI LABS</a>
         <div class="nav-links">
-            <a href="index.html">Home</a>
-            <a href="about.html">About</a>
-            <a href="cmp.html">Research</a>
-            <a href="products.html" style="color: #fff;">Ecosystem</a>
-            <a href="team.html">The Lab</a>
+            <a href="research.html">Research</a>
+            <a href="products.html" class="active">Products</a>
+            <a href="solutions.html">Solutions</a>
+            <a href="blog.html">Blog</a>
+            <a href="investors.html">Investors</a>
+            <a href="lab.html">Lab</a>
+            <a href="work-with-us.html" class="btn-nav">Work With Us</a>
         </div>
     </nav>
 
-    <header class="page-header container">
-        <h1 class="title">The Ecosystem</h1>
-        <p class="text-muted" style="font-size: 1.2rem; max-width: 600px; margin: 0 auto;">Specialized computational entities and infrastructural layers built upon our internal neuromorphic architectures.</p>
+    <header class="page-header">
+        <div class="container">
+            <h1 class="title">Products from the lab.</h1>
+            <p class="subtitle">Yudi Labs builds tools, systems, and experimental products from its research and engineering work.</p>
+        </div>
     </header>
 
     <main class="container">
-        <div class="cards-grid">
-            <a href="cts.html" class="feature-card glass glass-hover">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:2rem; opacity:0.8;"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
-                <h3 style="font-size:2rem; margin-bottom:1rem; color:#fff;">CTS</h3>
-                <p class="text-muted" style="margin-bottom:2.5rem; font-size:1rem;">Conversational Token System.<br>An infrastructural top-layer for any AI model, engineered to reduce token cost by up to 80% through smart context compression.</p>
-                <span class="btn" style="border: 1px solid var(--color-border); padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.8rem; color: #fff;">Explore CTS</span>
-            </a>
-            
-            <a href="nara.html" class="feature-card glass glass-hover">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:2rem; opacity:0.8;"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                <h3 style="font-size:2rem; margin-bottom:1rem; color:#fff;">NARA</h3>
-                <p class="text-muted" style="margin-bottom:2.5rem; font-size:1rem;">Research AI Agent.<br>Designed for academic and scientific researchers to parse incredibly dense data using optimized retrieval structures.</p>
-                <span class="btn" style="border: 1px solid var(--color-border); padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.8rem; color: #fff;">Explore NARA</span>
-            </a>
-            
-            <a href="sam.html" class="feature-card glass glass-hover">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:2rem; opacity:0.8;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                <h3 style="font-size:2rem; margin-bottom:1rem; color:#fff;">Sam</h3>
-                <p class="text-muted" style="margin-bottom:2.5rem; font-size:1rem;">Content Generation Agent.<br>An advanced creative agent bridging persistent state-tracking with fluent, hyper-personalized generative synthesis.</p>
-                <span class="btn" style="border: 1px solid var(--color-border); padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.8rem; color: #fff;">Explore Sam</span>
-            </a>
-        </div>
+        
+        <section class="content-section">
+            <h2>Active Products</h2>
+            <div class="grid-2">
+                <div class="product-card">
+                    <h3>Conversational Token System (CTS)</h3>
+                    <ul class="meta-list">
+                        <li><strong>Status:</strong> Beta</li>
+                        <li><strong>Built from:</strong> Engineering</li>
+                        <li><strong>Audience:</strong> Enterprise & API Developers</li>
+                        <li><strong>Access:</strong> Waitlist / Private Pilot</li>
+                    </ul>
+                    <p>An infrastructural API layer that compresses conversational state to reduce token overhead for long-horizon context windows. Designed for heavy chatbot deployments.</p>
+                    <a href="cts.html" class="btn-text">View Product Detail</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <h2>Research Prototypes</h2>
+            <div class="grid-2">
+                <div class="product-card">
+                    <h3>NARA (Research Agent)</h3>
+                    <ul class="meta-list">
+                        <li><strong>Status:</strong> Internal Prototype</li>
+                        <li><strong>Built from:</strong> Research (CMP)</li>
+                        <li><strong>Audience:</strong> Researchers & Academics</li>
+                        <li><strong>Access:</strong> Closed Beta</li>
+                    </ul>
+                    <p>An experimental research agent utilizing our sparse relational architecture to synthesize dense documents without semantic flattening. Used internally for mapping literature.</p>
+                    <a href="nara.html" class="btn-text">View Prototype Detail</a>
+                </div>
+                
+                <div class="product-card">
+                    <h3>Sam (Content Agent)</h3>
+                    <ul class="meta-list">
+                        <li><strong>Status:</strong> Internal Prototype</li>
+                        <li><strong>Built from:</strong> Engineering + Research</li>
+                        <li><strong>Audience:</strong> Content Operations Teams</li>
+                        <li><strong>Access:</strong> Internal Only</li>
+                    </ul>
+                    <p>A self-updating content generation agent designed to maintain brand voice and context over long timeframes without requiring massive system prompts for every interaction.</p>
+                    <a href="sam.html" class="btn-text">View Prototype Detail</a>
+                </div>
+            </div>
+        </section>
+        
+        <section class="content-section">
+            <h2>Open Source</h2>
+            <div class="grid-2">
+                <div class="product-card">
+                    <h3>CMP Core (Coming Soon)</h3>
+                    <ul class="meta-list">
+                        <li><strong>Status:</strong> Unreleased</li>
+                        <li><strong>Built from:</strong> Research</li>
+                        <li><strong>Audience:</strong> ML Researchers & Developers</li>
+                        <li><strong>Access:</strong> GitHub (Pending)</li>
+                    </ul>
+                    <p>The core PyTorch implementation of the CMP v1.9 architecture, including the LearnedSparseEncoder and SparseGatedRefinement components, built for ablation studies.</p>
+                    <a href="#" class="btn-text" style="opacity: 0.5; pointer-events: none;">Coming Soon</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" style="text-align: center; border-top: 1px solid var(--color-border); padding-top: 6rem;">
+            <h2>Request Access</h2>
+            <p style="font-size: 1.1rem; color: var(--color-text-secondary); margin-bottom: 2rem;">Interested in piloting CTS or exploring our research prototypes?</p>
+            <a href="work-with-us.html" class="btn-text" style="background: #fff; color: #000;" onclick="localStorage.setItem('inquiryPrefill', 'product');">Request Product Access</a>
+        </section>
+
     </main>
 
-    <footer><div class="container" style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:2rem;"><div style="text-align:left;"><p style="font-weight: 800; letter-spacing: 0.2em; color: var(--color-text-dim); margin-bottom: 0.5rem;">YUDI.</p><p style="color: var(--color-text-dim); font-size: 0.8rem;">&copy; 2026 YUDI AI Research Lab. All rights reserved.</p></div><div style="display:flex; gap:2rem; font-size:0.85rem; text-transform:uppercase; letter-spacing:0.1em;"><a href="investors.html" style="color:var(--color-text-secondary); text-decoration:none;">Investors</a><a href="solutions.html" style="color:var(--color-text-secondary); text-decoration:none;">Use Cases</a><a href="faq.html" style="color:var(--color-text-secondary); text-decoration:none;">FAQ</a><a href="blog.html" style="color:var(--color-text-secondary); text-decoration:none;">Blog</a></div></div></footer>
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <a href="index.html" class="logo" style="margin-bottom: 1rem; display: block;">YUDI LABS</a>
+                    <p style="color: var(--color-text-secondary); font-size: 0.95rem; line-height: 1.6; max-width: 250px;">Brain-native AI research, products, and solutions.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Research</h4>
+                    <ul>
+                        <li><a href="research.html">Overview</a></li>
+                        <li><a href="research-programs.html">Programs</a></li>
+                        <li><a href="research-cmp.html">CMP</a></li>
+                        <li><a href="research-predictive-coding.html">Predictive Coding</a></li>
+                        <li><a href="research-experiments.html">Experiments</a></li>
+                        <li><a href="research-publications.html">Publications</a></li>
+                        <li><a href="research-collaborate.html">Collaborate</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="solutions.html">Solutions</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                        <li><a href="investors.html">Investors</a></li>
+                        <li><a href="lab.html">Lab</a></li>
+                        <li><a href="lab-careers.html">Careers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Work With Us</h4>
+                    <ul>
+                        <li><a href="work-with-us.html">Research Collaboration</a></li>
+                        <li><a href="work-with-us.html">Business Solutions</a></li>
+                        <li><a href="work-with-us.html">Product Access</a></li>
+                        <li><a href="investors.html">Investors</a></li>
+                        <li><a href="lab-careers.html">Careers</a></li>
+                        <li><a href="work-with-us.html">General</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#">Privacy</a></li>
+                        <li><a href="#">Terms</a></li>
+                        <li><a href="#">Security</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>&copy; 2026 Yudi Labs. All rights reserved.</span>
+            </div>
+        </div>
+    </footer>
 
 </body>
 </html>
-

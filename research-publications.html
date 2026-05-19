@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solutions | Yudi Labs</title>
+    <title>Publications & Logs | Yudi Labs Research</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -86,35 +86,44 @@
             margin: 0 auto;
         }
 
-        .content-section { padding: 4rem 0; }
+        /* Filter Controls */
+        .filter-bar {
+            display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 3rem; padding: 1rem;
+            background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 8px;
+        }
+        .filter-btn {
+            background: transparent; border: none; color: var(--color-text-secondary);
+            font-family: inherit; font-size: 0.9rem; cursor: pointer; padding: 0.5rem 1rem;
+            border-radius: 4px; transition: all 0.3s; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase;
+        }
+        .filter-btn:hover, .filter-btn.active { background: rgba(255,255,255,0.1); color: #fff; }
+
+        /* Publication Cards */
+        .pub-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
         
-        .solution-card {
+        .pub-card {
             background: var(--color-surface);
             border: 1px solid var(--color-border);
             border-radius: 12px;
-            padding: 3rem;
-            margin-bottom: 3rem;
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 3rem;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s var(--ease-spring), border-color 0.3s;
         }
+        .pub-card:hover { border-color: rgba(255,255,255,0.2); }
         
-        .solution-card h3 { font-size: 1.8rem; margin-bottom: 0.5rem; color: #fff; }
-        .solution-card .meta { font-size: 0.9rem; color: var(--color-text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
+        .pub-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;}
+        .pub-type { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: #fff; background: rgba(255,255,255,0.1); padding: 0.3rem 0.8rem; border-radius: 4px;}
+        .pub-date { font-size: 0.85rem; color: var(--color-text-dim); }
+        .pub-status { font-size: 0.8rem; border: 1px solid var(--color-border); padding: 0.2rem 0.6rem; border-radius: 4px; color: var(--color-text-secondary);}
         
-        .solution-card ul { margin-left: 1.5rem; margin-top: 1rem; color: var(--color-text-secondary); font-size: 1.1rem; }
-        .solution-card li { margin-bottom: 0.5rem; }
+        .pub-card h3 { font-size: 1.4rem; margin-bottom: 0.5rem; color: #fff; }
+        .pub-card p { font-size: 1rem; color: var(--color-text-secondary); margin-bottom: 2rem; }
         
-        .btn-primary {
-            padding: 1.2rem 3rem; border-radius: 8px; text-decoration: none; display: inline-block;
-            font-size: 0.95rem; font-weight: 600; text-transform: uppercase;
-            letter-spacing: 0.1em; transition: all 0.3s var(--ease-spring); border: none; cursor: pointer; text-align: center;
-            background: #ffffff; color: #000000;
-        }
+        .btn-text { color: #fff; text-decoration: none; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; display: inline-flex; align-items: center; gap: 0.5rem; margin-top: auto;}
 
         @media (max-width: 768px) {
             .nav-links { display: none; }
-            .solution-card { grid-template-columns: 1fr; gap: 1rem; padding: 2rem;}
         }
 
         /* Footer */
@@ -134,9 +143,9 @@
     <nav>
         <a href="index.html" class="logo">YUDI LABS</a>
         <div class="nav-links">
-            <a href="research.html">Research</a>
+            <a href="research.html" class="active">Research</a>
             <a href="products.html">Products</a>
-            <a href="solutions.html" class="active">Solutions</a>
+            <a href="solutions.html">Solutions</a>
             <a href="blog.html">Blog</a>
             <a href="investors.html">Investors</a>
             <a href="lab.html">Lab</a>
@@ -146,110 +155,97 @@
 
     <header class="page-header">
         <div class="container">
-            <h1 class="title">AI systems for businesses.</h1>
-            <p class="subtitle">Yudi Labs works with companies to design and build AI systems, automation workflows, custom agents, and growth infrastructure.</p>
+            <h1 class="title">Publications & Logs</h1>
+            <p class="subtitle">Public research material, technical memos, architecture notes, and experiment reports.</p>
         </div>
     </header>
 
-    <main class="container">
+    <main class="container" style="padding: 4rem 0;">
         
-        <section class="content-section">
+        <div class="filter-bar">
+            <button class="filter-btn active" onclick="filterPubs('all')">All</button>
+            <button class="filter-btn" onclick="filterPubs('log')">Research Logs</button>
+            <button class="filter-btn" onclick="filterPubs('memo')">Technical Memos</button>
+            <button class="filter-btn" onclick="filterPubs('arch')">Architecture Notes</button>
+            <button class="filter-btn" onclick="filterPubs('experiment')">Experiment Reports</button>
+            <button class="filter-btn" onclick="filterPubs('paper')">Papers</button>
+        </div>
+
+        <div class="pub-grid">
             
-            <div class="solution-card">
-                <div>
-                    <h3>AI Strategy</h3>
-                    <div class="meta">For Founders & Product Teams</div>
+            <div class="pub-card" data-type="arch">
+                <div class="pub-header">
+                    <div>
+                        <span class="pub-type">Architecture Note</span>
+                        <span class="pub-date" style="margin-left: 1rem;">May 2026</span>
+                    </div>
+                    <span class="pub-status">Active</span>
                 </div>
-                <div>
-                    <p style="color: var(--color-text-secondary); font-size: 1.1rem; margin-bottom: 1rem;">For founders and teams deciding how to adopt AI meaningfully inside products and operations.</p>
-                    <ul>
-                        <li>AI roadmap development</li>
-                        <li>Product strategy & scoping</li>
-                        <li>Workflow audit & optimization</li>
-                        <li>AI implementation planning</li>
-                        <li>Research-to-product advisory</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="solution-card">
-                <div>
-                    <h3>Business Automation</h3>
-                    <div class="meta">For Operators & Operations</div>
-                </div>
-                <div>
-                    <p style="color: var(--color-text-secondary); font-size: 1.1rem; margin-bottom: 1rem;">Transform manual overhead into intelligent pipelines.</p>
-                    <ul>
-                        <li>Internal dashboards & reporting</li>
-                        <li>CRM systems & integration</li>
-                        <li>Google Sheets / Airtable automation</li>
-                        <li>Document processing pipelines</li>
-                        <li>Operations copilots</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="solution-card">
-                <div>
-                    <h3>Custom AI Agents</h3>
-                    <div class="meta">For Support & Knowledge Teams</div>
-                </div>
-                <div>
-                    <p style="color: var(--color-text-secondary); font-size: 1.1rem; margin-bottom: 1rem;">Deploy persistent agents tuned to your internal knowledge base and brand guidelines.</p>
-                    <ul>
-                        <li>Research agents</li>
-                        <li>Support agents (L1/L2)</li>
-                        <li>Content generation agents</li>
-                        <li>Operations agents</li>
-                        <li>Internal knowledge copilots</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="solution-card">
-                <div>
-                    <h3>AI Product Development</h3>
-                    <div class="meta">For Startups & Enterprises</div>
-                </div>
-                <div>
-                    <p style="color: var(--color-text-secondary); font-size: 1.1rem; margin-bottom: 1rem;">End-to-end engineering to bring new AI capabilities to life.</p>
-                    <ul>
-                        <li>Rapid MVPs</li>
-                        <li>AI-native web apps</li>
-                        <li>Prototype-to-product scaling</li>
-                        <li>LLM integration (OpenAI, Anthropic, Open-source)</li>
-                        <li>Backend + database + deployment infrastructure</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="solution-card" style="border-color: rgba(255,255,255,0.2);">
-                <div>
-                    <h3>Marketing & Growth Systems</h3>
-                    <div class="meta">For Growth & Marketing Teams</div>
-                </div>
-                <div>
-                    <p style="color: var(--color-text-secondary); font-size: 1.1rem; margin-bottom: 1rem;">We do not offer generic marketing services. We build AI-powered growth systems and operational infrastructure to scale your reach.</p>
-                    <ul>
-                        <li>AI content systems at scale</li>
-                        <li>Social media workflow automation</li>
-                        <li>Campaign automation triggers</li>
-                        <li>Influencer & outreach operations</li>
-                        <li>Lead qualification systems</li>
-                        <li>Analytics dashboards & content calendars</li>
-                    </ul>
-                </div>
+                <h3>Deprecating the Hash Encoder: The Transition to CMP v1.9</h3>
+                <p>A detailed breakdown of why the hash encoder failed to generalize across OOV and morphologically rich structures, and how the LearnedSparseEncoder solves these specific failure modes while maintaining state efficiency.</p>
+                <a href="#" class="btn-text">Read Architecture Note &rarr;</a>
             </div>
 
-        </section>
-        
-        <section class="content-section" style="text-align: center; border-top: 1px solid var(--color-border); padding-top: 6rem;">
-            <h2 style="font-size: 3rem; margin-bottom: 1.5rem; color: #fff;">Work With Yudi</h2>
-            <p style="font-size: 1.1rem; color: var(--color-text-secondary); margin-bottom: 3rem;">Ready to build a solution with us? Initiate a conversation to outline your requirements.</p>
-            <a href="work-with-us.html" class="btn-primary" onclick="localStorage.setItem('inquiryPrefill', 'solutions');">Build a Solution With Us</a>
-        </section>
+            <div class="pub-card" data-type="log">
+                <div class="pub-header">
+                    <div>
+                        <span class="pub-type">Research Log</span>
+                        <span class="pub-date" style="margin-left: 1rem;">April 2026</span>
+                    </div>
+                    <span class="pub-status">Archived</span>
+                </div>
+                <h3>Hebbian Updates in Conversational State</h3>
+                <p>Initial findings from attempting to map emotional weights to concept nodes across 1,000-turn conversational histories using localized Hebbian updates instead of full-context backpropagation.</p>
+                <a href="#" class="btn-text">View Log &rarr;</a>
+            </div>
+
+            <div class="pub-card" data-type="experiment">
+                <div class="pub-header">
+                    <div>
+                        <span class="pub-type">Experiment Report</span>
+                        <span class="pub-date" style="margin-left: 1rem;">February 2026</span>
+                    </div>
+                    <span class="pub-status">Completed</span>
+                </div>
+                <h3>Predictive Coding vs BPTT on Sequence Memorization</h3>
+                <p>We tested a toy PC-CMP model against a standard LSTM on a sequence memorization task. Local prediction-error updates reached 92% of the accuracy achieved by global BPTT, but struggled with sequences longer than 50 steps.</p>
+                <a href="#" class="btn-text">Read Report &rarr;</a>
+            </div>
+
+            <div class="pub-card" data-type="memo">
+                <div class="pub-header">
+                    <div>
+                        <span class="pub-type">Technical Memo</span>
+                        <span class="pub-date" style="margin-left: 1rem;">January 2026</span>
+                    </div>
+                    <span class="pub-status">Reference</span>
+                </div>
+                <h3>The Relational Binding Matrix Formulation</h3>
+                <p>The core mathematical formulation for our early relational state binder, detailing how entity-role pairs are compressed into a fixed-size state vector without catastrophic interference.</p>
+                <a href="#" class="btn-text">Download PDF &rarr;</a>
+            </div>
+
+        </div>
 
     </main>
+
+    <script>
+        function filterPubs(type) {
+            // Update active button state
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Filter cards
+            const cards = document.querySelectorAll('.pub-card');
+            cards.forEach(card => {
+                if (type === 'all' || card.dataset.type === type) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
 
     <footer>
         <div class="container">

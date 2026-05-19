@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solutions | Yudi Labs</title>
+    <title>Careers | Yudi Labs</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -35,7 +35,7 @@
         }
 
         h1, h2, h3, h4 { line-height: 1.2; font-weight: 600; }
-        .container { max-width: 1000px; margin: 0 auto; padding: 0 5%; }
+        .container { max-width: 900px; margin: 0 auto; padding: 0 5%; }
         .text-muted { color: var(--color-text-secondary); }
 
         /* Navigation */
@@ -87,34 +87,40 @@
         }
 
         .content-section { padding: 4rem 0; }
+        .content-section h2 { font-size: 2rem; margin-bottom: 1.5rem; color: #fff; border-bottom: 1px solid var(--color-border); padding-bottom: 1rem;}
         
-        .solution-card {
+        .philosophy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 3rem; }
+        .phil-card { background: var(--color-surface); padding: 2rem; border-radius: 12px; border: 1px solid var(--color-border); }
+        .phil-card h3 { color: #fff; font-size: 1.2rem; margin-bottom: 1rem; }
+        
+        .role-list { margin-top: 3rem; }
+        .role-card {
             background: var(--color-surface);
             border: 1px solid var(--color-border);
             border-radius: 12px;
-            padding: 3rem;
-            margin-bottom: 3rem;
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 3rem;
+            padding: 2.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: border-color 0.3s;
         }
-        
-        .solution-card h3 { font-size: 1.8rem; margin-bottom: 0.5rem; color: #fff; }
-        .solution-card .meta { font-size: 0.9rem; color: var(--color-text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
-        
-        .solution-card ul { margin-left: 1.5rem; margin-top: 1rem; color: var(--color-text-secondary); font-size: 1.1rem; }
-        .solution-card li { margin-bottom: 0.5rem; }
-        
-        .btn-primary {
-            padding: 1.2rem 3rem; border-radius: 8px; text-decoration: none; display: inline-block;
-            font-size: 0.95rem; font-weight: 600; text-transform: uppercase;
-            letter-spacing: 0.1em; transition: all 0.3s var(--ease-spring); border: none; cursor: pointer; text-align: center;
-            background: #ffffff; color: #000000;
+        .role-card:hover { border-color: rgba(255,255,255,0.2); }
+        .role-info h3 { font-size: 1.4rem; color: #fff; margin-bottom: 0.3rem; }
+        .role-info p { color: var(--color-text-secondary); font-size: 0.95rem; margin-bottom: 0; }
+        .role-tags { display: flex; gap: 0.5rem; margin-top: 1rem; }
+        .role-tag { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; padding: 0.3rem 0.8rem; background: rgba(255,255,255,0.05); border-radius: 4px; color: var(--color-text-secondary); }
+
+        .btn-apply {
+            padding: 0.8rem 2rem; border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;
+            background: #fff; color: #000; transition: all 0.3s;
         }
+        .btn-apply:hover { opacity: 0.9; }
 
         @media (max-width: 768px) {
             .nav-links { display: none; }
-            .solution-card { grid-template-columns: 1fr; gap: 1rem; padding: 2rem;}
+            .philosophy-grid { grid-template-columns: 1fr; }
+            .role-card { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
         }
 
         /* Footer */
@@ -136,117 +142,95 @@
         <div class="nav-links">
             <a href="research.html">Research</a>
             <a href="products.html">Products</a>
-            <a href="solutions.html" class="active">Solutions</a>
+            <a href="solutions.html">Solutions</a>
             <a href="blog.html">Blog</a>
             <a href="investors.html">Investors</a>
-            <a href="lab.html">Lab</a>
+            <a href="lab.html" class="active">Lab</a>
             <a href="work-with-us.html" class="btn-nav">Work With Us</a>
         </div>
     </nav>
 
     <header class="page-header">
         <div class="container">
-            <h1 class="title">AI systems for businesses.</h1>
-            <p class="subtitle">Yudi Labs works with companies to design and build AI systems, automation workflows, custom agents, and growth infrastructure.</p>
+            <div style="font-size:0.85rem; font-weight:600; text-transform:uppercase; letter-spacing:0.2em; color:var(--color-text-secondary); margin-bottom:1rem;">Join The Lab</div>
+            <h1 class="title">Build beyond the token.</h1>
+            <p class="subtitle">We are a high-density, low-ego team of researchers, engineers, and operators.</p>
         </div>
     </header>
 
     <main class="container">
         
         <section class="content-section">
+            <h2>Hiring Philosophy</h2>
             
-            <div class="solution-card">
-                <div>
-                    <h3>AI Strategy</h3>
-                    <div class="meta">For Founders & Product Teams</div>
+            <div class="philosophy-grid">
+                <div class="phil-card">
+                    <h3>No Proxy Metrics</h3>
+                    <p style="color: var(--color-text-secondary); margin-bottom: 0;">We do not hire based on pedigree, paper counts, or past affiliations. We hire based on clarity of thought, engineering velocity, and ability to navigate high ambiguity.</p>
                 </div>
-                <div>
-                    <p style="color: var(--color-text-secondary); font-size: 1.1rem; margin-bottom: 1rem;">For founders and teams deciding how to adopt AI meaningfully inside products and operations.</p>
-                    <ul>
-                        <li>AI roadmap development</li>
-                        <li>Product strategy & scoping</li>
-                        <li>Workflow audit & optimization</li>
-                        <li>AI implementation planning</li>
-                        <li>Research-to-product advisory</li>
-                    </ul>
+                <div class="phil-card">
+                    <h3>Radical Ownership</h3>
+                    <p style="color: var(--color-text-secondary); margin-bottom: 0;">We expect team members to push back on bad ideas, own their research tracks end-to-end, and build tools that actually work.</p>
+                </div>
+                <div class="phil-card">
+                    <h3>Depth over Hype</h3>
+                    <p style="color: var(--color-text-secondary); margin-bottom: 0;">We do not chase the latest weekly trend. We are working on a multi-year thesis requiring deep focus on sparse coding, predictive models, and memory.</p>
+                </div>
+                <div class="phil-card">
+                    <h3>Open to Interns</h3>
+                    <p style="color: var(--color-text-secondary); margin-bottom: 0;">We regularly onboard highly motivated interns who want to bypass the standard curriculum and work directly on frontier architectures.</p>
                 </div>
             </div>
+        </section>
+
+        <section class="content-section">
+            <h2>Open Roles</h2>
             
-            <div class="solution-card">
-                <div>
-                    <h3>Business Automation</h3>
-                    <div class="meta">For Operators & Operations</div>
+            <div class="role-list">
+                
+                <div class="role-card">
+                    <div class="role-info">
+                        <h3>Research Engineer (Sparse Architecture)</h3>
+                        <p>Work directly on the CMP v1.9 architecture, running ablation studies on LearnedSparseEncoders.</p>
+                        <div class="role-tags">
+                            <span class="role-tag">Engineering</span>
+                            <span class="role-tag">Remote / India</span>
+                        </div>
+                    </div>
+                    <a href="mailto:team@yudi.co.in?subject=Application:%20Research%20Engineer" class="btn-apply">Apply</a>
                 </div>
-                <div>
-                    <p style="color: var(--color-text-secondary); font-size: 1.1rem; margin-bottom: 1rem;">Transform manual overhead into intelligent pipelines.</p>
-                    <ul>
-                        <li>Internal dashboards & reporting</li>
-                        <li>CRM systems & integration</li>
-                        <li>Google Sheets / Airtable automation</li>
-                        <li>Document processing pipelines</li>
-                        <li>Operations copilots</li>
-                    </ul>
+
+                <div class="role-card">
+                    <div class="role-info">
+                        <h3>Full Stack Engineer (Products)</h3>
+                        <p>Build and scale the API infrastructure for the Conversational Token System (CTS).</p>
+                        <div class="role-tags">
+                            <span class="role-tag">Engineering</span>
+                            <span class="role-tag">Remote / India</span>
+                        </div>
+                    </div>
+                    <a href="mailto:team@yudi.co.in?subject=Application:%20Full%20Stack%20Engineer" class="btn-apply">Apply</a>
                 </div>
-            </div>
-            
-            <div class="solution-card">
-                <div>
-                    <h3>Custom AI Agents</h3>
-                    <div class="meta">For Support & Knowledge Teams</div>
+
+                <div class="role-card">
+                    <div class="role-info">
+                        <h3>Research Intern (Spring/Summer)</h3>
+                        <p>Join the lab to study predictive coding and run benchmark evaluations.</p>
+                        <div class="role-tags">
+                            <span class="role-tag">Internship</span>
+                            <span class="role-tag">Remote</span>
+                        </div>
+                    </div>
+                    <a href="mailto:team@yudi.co.in?subject=Application:%20Research%20Intern" class="btn-apply">Apply</a>
                 </div>
-                <div>
-                    <p style="color: var(--color-text-secondary); font-size: 1.1rem; margin-bottom: 1rem;">Deploy persistent agents tuned to your internal knowledge base and brand guidelines.</p>
-                    <ul>
-                        <li>Research agents</li>
-                        <li>Support agents (L1/L2)</li>
-                        <li>Content generation agents</li>
-                        <li>Operations agents</li>
-                        <li>Internal knowledge copilots</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="solution-card">
-                <div>
-                    <h3>AI Product Development</h3>
-                    <div class="meta">For Startups & Enterprises</div>
-                </div>
-                <div>
-                    <p style="color: var(--color-text-secondary); font-size: 1.1rem; margin-bottom: 1rem;">End-to-end engineering to bring new AI capabilities to life.</p>
-                    <ul>
-                        <li>Rapid MVPs</li>
-                        <li>AI-native web apps</li>
-                        <li>Prototype-to-product scaling</li>
-                        <li>LLM integration (OpenAI, Anthropic, Open-source)</li>
-                        <li>Backend + database + deployment infrastructure</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="solution-card" style="border-color: rgba(255,255,255,0.2);">
-                <div>
-                    <h3>Marketing & Growth Systems</h3>
-                    <div class="meta">For Growth & Marketing Teams</div>
-                </div>
-                <div>
-                    <p style="color: var(--color-text-secondary); font-size: 1.1rem; margin-bottom: 1rem;">We do not offer generic marketing services. We build AI-powered growth systems and operational infrastructure to scale your reach.</p>
-                    <ul>
-                        <li>AI content systems at scale</li>
-                        <li>Social media workflow automation</li>
-                        <li>Campaign automation triggers</li>
-                        <li>Influencer & outreach operations</li>
-                        <li>Lead qualification systems</li>
-                        <li>Analytics dashboards & content calendars</li>
-                    </ul>
-                </div>
+
             </div>
 
-        </section>
-        
-        <section class="content-section" style="text-align: center; border-top: 1px solid var(--color-border); padding-top: 6rem;">
-            <h2 style="font-size: 3rem; margin-bottom: 1.5rem; color: #fff;">Work With Yudi</h2>
-            <p style="font-size: 1.1rem; color: var(--color-text-secondary); margin-bottom: 3rem;">Ready to build a solution with us? Initiate a conversation to outline your requirements.</p>
-            <a href="work-with-us.html" class="btn-primary" onclick="localStorage.setItem('inquiryPrefill', 'solutions');">Build a Solution With Us</a>
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--color-border); padding: 2.5rem; border-radius: 12px; text-align: center; margin-top: 3rem;">
+                <h3 style="color: #fff; margin-bottom: 1rem; font-size: 1.5rem;">Don't see a fit?</h3>
+                <p style="color: var(--color-text-secondary); margin-bottom: 2rem;">If you have a strong thesis on brain-native architecture and want to build it, we want to talk.</p>
+                <a href="mailto:team@yudi.co.in" style="color: #fff; text-decoration: underline; font-weight: 600;">team@yudi.co.in</a>
+            </div>
         </section>
 
     </main>

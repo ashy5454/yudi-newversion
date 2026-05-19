@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Work With Us | Yudi Labs</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Shared Styles */
+        :root {
+            --color-bg: #030303;
+            --color-surface: rgba(255, 255, 255, 0.03);
+            --color-surface-hover: rgba(255, 255, 255, 0.06);
+            --color-border: rgba(255, 255, 255, 0.08);
+            --color-text-primary: rgba(255, 255, 255, 0.95);
+            --color-text-secondary: rgba(255, 255, 255, 0.5);
+            --color-text-dim: rgba(255, 255, 255, 0.2);
+            --font-stack: 'Outfit', system-ui, -apple-system, sans-serif;
+            --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--color-bg);
+            color: var(--color-text-primary);
+            font-family: var(--font-stack);
+            line-height: 1.8;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4 { line-height: 1.2; font-weight: 600; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 5%; }
+        .text-muted { color: var(--color-text-secondary); }
+
+        /* Navigation */
+        nav {
+            position: fixed; top: 0; width: 100%; z-index: 100;
+            padding: 1.5rem 5%; transition: all 0.4s ease;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(3, 3, 3, 0.8);
+            backdrop-filter: blur(20px); border-bottom: 1px solid var(--color-border);
+        }
+        .logo { font-weight: 800; font-size: 1.5rem; letter-spacing: 0.1em; text-transform: uppercase; color: #fff; text-decoration: none; }
+        
+        .nav-links { display: flex; gap: 2rem; align-items: center; }
+        .nav-links a {
+            color: var(--color-text-secondary); text-decoration: none;
+            font-size: 0.85rem; font-weight: 500; letter-spacing: 0.05em;
+            text-transform: uppercase; transition: color 0.3s;
+        }
+        .nav-links a:hover { color: #fff; }
+        .nav-links a.btn-nav {
+            background: #fff; color: #000; padding: 0.6rem 1.2rem; border-radius: 6px; font-weight: 600;
+        }
+        .nav-links a.btn-nav:hover { background: #eee; color: #000; }
+
+        /* Page Layout */
+        .page-header {
+            padding: 12rem 0 6rem 0;
+            text-align: center;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .title {
+            font-size: clamp(3rem, 6vw, 5rem);
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            background: linear-gradient(180deg, #FFFFFF 0%, #888888 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: var(--color-text-secondary);
+            font-weight: 300;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .section { padding: 5rem 0; }
+        
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; margin-bottom: 4rem; }
+        
+        .pathway-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s var(--ease-spring), border-color 0.3s;
+        }
+        .pathway-card:hover { border-color: rgba(255,255,255,0.2); transform: translateY(-4px); }
+        .pathway-card h3 { font-size: 1.4rem; margin-bottom: 1rem; color: #fff; }
+        .pathway-card p { font-size: 0.95rem; color: var(--color-text-secondary); margin-bottom: 2rem; flex-grow: 1; }
+        .pathway-card .meta { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: #888; margin-bottom: 1rem; }
+        
+        .btn-select {
+            padding: 0.8rem 1.5rem; border-radius: 6px; text-decoration: none; display: inline-block;
+            font-size: 0.8rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.1em; border: 1px solid var(--color-border); color: #fff; cursor: pointer; text-align: center;
+            background: rgba(255,255,255,0.02); transition: all 0.3s;
+        }
+        .btn-select:hover { background: #fff; color: #000; }
+
+        /* Form Styles */
+        .form-container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 4rem;
+        }
+
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-text-secondary); margin-bottom: 0.5rem; }
+        input, select, textarea {
+            width: 100%; padding: 1rem 1.2rem; background: rgba(0,0,0,0.4);
+            border: 1px solid var(--color-border); color: #fff; border-radius: 8px;
+            font-family: inherit; font-size: 1rem; transition: border-color 0.3s;
+        }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.02); }
+        textarea { resize: vertical; min-height: 120px; }
+        
+        .btn-primary {
+            background: #ffffff; color: #000000; width: 100%;
+            padding: 1.2rem; border-radius: 8px; border: none; cursor: pointer;
+            font-size: 0.9rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.1em; transition: all 0.3s; margin-top: 1rem; font-family: inherit;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(255,255,255,0.15); }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .form-container { padding: 2rem; }
+        }
+
+        /* Footer */
+        footer { border-top: 1px solid var(--color-border); padding: 6rem 0 3rem 0; background: #000; margin-top: 5rem;}
+        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 4rem; margin-bottom: 6rem; }
+        @media (max-width: 900px) { .footer-grid { grid-template-columns: 1fr 1fr; } .footer-grid > div:first-child { grid-column: 1 / -1; } }
+        .footer-col h4 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; color: #fff; margin-bottom: 1.5rem; }
+        .footer-col ul { list-style: none; }
+        .footer-col ul li { margin-bottom: 0.8rem; }
+        .footer-col ul a { color: var(--color-text-secondary); text-decoration: none; font-size: 0.95rem; transition: color 0.3s; }
+        .footer-col ul a:hover { color: #fff; }
+        .footer-bottom { border-top: 1px solid var(--color-border); padding-top: 2rem; display: flex; justify-content: space-between; align-items: center; color: var(--color-text-dim); font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="logo">YUDI LABS</a>
+        <div class="nav-links">
+            <a href="research.html">Research</a>
+            <a href="products.html">Products</a>
+            <a href="solutions.html">Solutions</a>
+            <a href="blog.html">Blog</a>
+            <a href="investors.html">Investors</a>
+            <a href="lab.html">Lab</a>
+            <a href="work-with-us.html" class="btn-nav">Work With Us</a>
+        </div>
+    </nav>
+
+    <header class="page-header">
+        <div class="container">
+            <h1 class="title">Work with Yudi Labs.</h1>
+            <p class="subtitle">Research collaboration, business solutions, product access, investment, careers, or partnerships — choose the path that fits.</p>
+        </div>
+    </header>
+
+    <main class="container section">
+        
+        <div class="grid-3">
+            <div class="pathway-card">
+                <div class="meta">For: Researchers & Academics</div>
+                <h3>Research Collaboration</h3>
+                <p>Collaborate on sparse coding, predictive coding, memory, and cognitive architectures.</p>
+                <button class="btn-select" onclick="selectInquiry('research')">Collaborate on Research</button>
+            </div>
+            
+            <div class="pathway-card">
+                <div class="meta">For: Founders & Teams</div>
+                <h3>Business Solutions</h3>
+                <p>Build custom AI systems, automation workflows, and marketing growth infrastructure.</p>
+                <button class="btn-select" onclick="selectInquiry('solutions')">Build an AI System</button>
+            </div>
+            
+            <div class="pathway-card">
+                <div class="meta">For: Developers & Users</div>
+                <h3>Product Access</h3>
+                <p>Request access to Yudi Labs active products, betas, and internal prototypes.</p>
+                <button class="btn-select" onclick="selectInquiry('product')">Request Product Access</button>
+            </div>
+            
+            <div class="pathway-card">
+                <div class="meta">For: Investors & Advisors</div>
+                <h3>Investors & Advisors</h3>
+                <p>Explore our thesis, evidence, roadmap, and request access to our data room.</p>
+                <button class="btn-select" onclick="selectInquiry('investor')">Request Investor Memo</button>
+            </div>
+            
+            <div class="pathway-card">
+                <div class="meta">For: Talent & Builders</div>
+                <h3>Join the Lab</h3>
+                <p>Apply for roles as researchers, engineers, designers, writers, and operators.</p>
+                <button class="btn-select" onclick="selectInquiry('careers')">Apply to Join</button>
+            </div>
+            
+            <div class="pathway-card">
+                <div class="meta">For: Media & Events</div>
+                <h3>General Partnership</h3>
+                <p>Connect regarding media, events, universities, communities, and general inquiries.</p>
+                <button class="btn-select" onclick="selectInquiry('partnership')">Start a Conversation</button>
+            </div>
+        </div>
+
+        <div class="form-container" id="contact-form">
+            <h2 style="font-size: 2rem; margin-bottom: 2rem; color: #fff; text-align: center;">Initiate Contact</h2>
+            <p style="text-align: center; color: var(--color-text-secondary); margin-bottom: 2rem;">Or email us directly at <a href="mailto:team@yudi.co.in" style="color: #fff;">team@yudi.co.in</a></p>
+            
+            <form action="https://formspree.io/f/mqewlawk" method="POST">
+                <div class="form-group">
+                    <label>Inquiry Type</label>
+                    <select name="inquiry_type" id="inquiry-select" required>
+                        <option value="" disabled selected>Select a path...</option>
+                        <option value="research">Research Collaboration</option>
+                        <option value="solutions">Business Solutions</option>
+                        <option value="product">Product Access</option>
+                        <option value="investor">Investor / Advisor</option>
+                        <option value="careers">Careers (Join the Lab)</option>
+                        <option value="partnership">General Partnership</option>
+                        <option value="general">General</option>
+                    </select>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" name="email" required>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Organization / Company</label>
+                        <input type="text" name="organization">
+                    </div>
+                    <div class="form-group">
+                        <label>Your Role</label>
+                        <input type="text" name="role">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Optional Link (LinkedIn, GitHub, Website)</label>
+                    <input type="url" name="link" placeholder="https://...">
+                </div>
+                
+                <div class="form-group">
+                    <label>Message</label>
+                    <textarea name="message" placeholder="Provide details about your inquiry..." required></textarea>
+                </div>
+                
+                <button type="submit" class="btn-primary">Send Inquiry</button>
+            </form>
+        </div>
+
+    </main>
+
+    <script>
+        function selectInquiry(value) {
+            const select = document.getElementById('inquiry-select');
+            select.value = value;
+            document.getElementById('contact-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    </script>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <a href="index.html" class="logo" style="margin-bottom: 1rem; display: block;">YUDI LABS</a>
+                    <p style="color: var(--color-text-secondary); font-size: 0.95rem; line-height: 1.6; max-width: 250px;">Brain-native AI research, products, and solutions.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Research</h4>
+                    <ul>
+                        <li><a href="research.html">Overview</a></li>
+                        <li><a href="research-programs.html">Programs</a></li>
+                        <li><a href="research-cmp.html">CMP</a></li>
+                        <li><a href="research-predictive-coding.html">Predictive Coding</a></li>
+                        <li><a href="research-experiments.html">Experiments</a></li>
+                        <li><a href="research-publications.html">Publications</a></li>
+                        <li><a href="research-collaborate.html">Collaborate</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="solutions.html">Solutions</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                        <li><a href="investors.html">Investors</a></li>
+                        <li><a href="lab.html">Lab</a></li>
+                        <li><a href="lab-careers.html">Careers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Work With Us</h4>
+                    <ul>
+                        <li><a href="work-with-us.html">Research Collaboration</a></li>
+                        <li><a href="work-with-us.html">Business Solutions</a></li>
+                        <li><a href="work-with-us.html">Product Access</a></li>
+                        <li><a href="investors.html">Investors</a></li>
+                        <li><a href="lab-careers.html">Careers</a></li>
+                        <li><a href="work-with-us.html">General</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#">Privacy</a></li>
+                        <li><a href="#">Terms</a></li>
+                        <li><a href="#">Security</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>&copy; 2026 Yudi Labs. All rights reserved.</span>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
