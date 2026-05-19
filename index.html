@@ -4,16 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YUDI — AI Research Lab</title>
-    <meta name="description" content="YUDI is an AI research lab building LCoMs — Large Conversational Models. Brain-native AI architecture grounded in neuroscience.">
+    <meta name="description" content="YUDI is an AI research lab building Brain-native AI architecture grounded in neuroscience.">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <style>
-        /* ==========================================================================
-           1. CSS VARIABLES & RESET (ULTRA-PREMIUM DARK THEME)
-           ========================================================================== */
+        /* Shared Styles */
         :root {
             --color-bg: #030303;
             --color-surface: rgba(255, 255, 255, 0.03);
@@ -23,16 +21,11 @@
             --color-text-primary: rgba(255, 255, 255, 0.95);
             --color-text-secondary: rgba(255, 255, 255, 0.5);
             --color-text-dim: rgba(255, 255, 255, 0.2);
-            
             --font-stack: 'Outfit', system-ui, -apple-system, sans-serif;
             --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             background-color: var(--color-bg);
@@ -41,16 +34,16 @@
             line-height: 1.7;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
-            overflow-y: hidden; /* Hide overflow during loading */
+            overflow-y: hidden;
         }
 
-        body.loaded {
-            overflow-y: auto;
-        }
+        body.loaded { overflow-y: auto; }
 
-        /* ==========================================================================
-           2. PRE-LOADER
-           ========================================================================== */
+        h1, h2, h3, h4 { line-height: 1.2; font-weight: 600; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 5%; }
+        .text-muted { color: var(--color-text-secondary); }
+
+        /* Pre-loader */
         #loader {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: #000000; z-index: 9999; display: flex;
@@ -69,11 +62,7 @@
         }
         @keyframes fillLoader { 0% { width: 0%; } 50% { width: 60%; } 100% { width: 100%; } }
 
-        /* ==========================================================================
-           3. TYPOGRAPHY & UTILITIES
-           ========================================================================== */
-        h1, h2, h3, h4 { line-height: 1.2; font-weight: 600; }
-        
+        /* Typography */
         .display-title {
             font-size: clamp(4rem, 10vw, 8rem);
             font-weight: 800;
@@ -84,7 +73,6 @@
             filter: drop-shadow(0px 0px 30px rgba(255, 255, 255, 0.1));
             margin-bottom: 0.5rem;
         }
-
         .subtitle {
             font-size: 1.2rem;
             text-transform: uppercase;
@@ -93,7 +81,6 @@
             color: var(--color-text-secondary);
             font-weight: 500;
         }
-
         .section-title {
             font-size: clamp(2rem, 4vw, 3rem);
             font-weight: 700;
@@ -101,9 +88,6 @@
             margin-bottom: 3rem;
         }
 
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 5%; }
-        .text-muted { color: var(--color-text-secondary); }
-        
         /* Premium Glassmorphism */
         .glass {
             background: var(--color-surface);
@@ -112,7 +96,6 @@
             -webkit-backdrop-filter: blur(24px);
             border-radius: 1.2rem;
         }
-
         .glass-hover:hover {
             background: var(--color-surface-hover);
             border-color: var(--color-border-hover);
@@ -128,9 +111,6 @@
         .delay-2 { transition-delay: 0.2s; }
         .delay-3 { transition-delay: 0.3s; }
 
-        /* ==========================================================================
-           4. COMPONENTS
-           ========================================================================== */
         /* Navbar */
         nav {
             position: fixed; top: 0; width: 100%; z-index: 100;
@@ -139,8 +119,7 @@
         }
         nav.scrolled {
             background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--color-border); padding: 1rem 5%;
+            backdrop-filter: blur(20px); border-bottom: 1px solid var(--color-border); padding: 1rem 5%;
         }
         .logo img { height: 48px; width: auto; object-fit: contain; }
         .nav-links { display: flex; gap: 2.5rem; align-items: center; }
@@ -150,7 +129,6 @@
             text-transform: uppercase; transition: color 0.3s;
         }
         .nav-links a:hover { color: #fff; }
-        .nav-highlight { border: 1px solid var(--color-border); padding: 0.5rem 1rem; border-radius: 6px; }
 
         /* Hero */
         .hero {
@@ -165,26 +143,14 @@
             font-size: 1.15rem; font-weight: 300; color: var(--color-text-secondary);
             max-width: 650px; margin: 1.5rem auto 3.5rem auto;
         }
-        
         .btn {
             padding: 0.9rem 2.5rem; border-radius: 8px; text-decoration: none;
             font-size: 0.85rem; font-weight: 600; text-transform: uppercase;
             letter-spacing: 0.15em; transition: all 0.3s var(--ease-spring);
             border: none; cursor: pointer; display: inline-block;
         }
-        .btn-primary { background: #ffffff; color: #000000; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(255,255,255,0.15); }
         .btn-secondary { border: 1px solid var(--color-border); background: var(--color-surface); color: #ffffff; }
         .btn-secondary:hover { background: var(--color-surface-hover); transform: translateY(-2px); }
-
-        /* Marquee */
-        .marquee-wrapper {
-            border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border);
-            padding: 1rem 0; overflow: hidden; background: rgba(0,0,0,0.3); backdrop-filter: blur(5px);
-        }
-        .marquee { display: flex; white-space: nowrap; animation: marquee 30s linear infinite; }
-        .marquee span { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--color-text-secondary); margin: 0 2.5rem; }
-        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
         section { padding: 8rem 0; position: relative; z-index: 1; }
 
@@ -200,53 +166,52 @@
         .stat-number { font-size: clamp(3rem, 5vw, 4.5rem); font-weight: 800; letter-spacing: -0.04em; margin-bottom: 0.5rem; }
         .stat-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--color-text-secondary); font-weight: 500; }
 
-        /* Features */
-        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; }
-        .feature-card { padding: 2.5rem; }
-        .feature-card svg { margin-bottom: 1.5rem; color: #fff; opacity: 0.8; }
-        .feature-card h3 { font-size: 1.1rem; margin-bottom: 1rem; }
-
-        /* Architecture */
-        .arch-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
-        #graph-wrapper { width: 100%; height: 450px; position: relative; border-radius: 1.2rem; overflow: hidden; }
-        canvas#graph-canvas { width: 100%; height: 100%; display: block; }
-        .arch-bullets li { list-style: none; padding: 1.5rem; margin-bottom: 1rem; border-left: 2px solid var(--color-border); transition: border-color 0.3s; }
-        .arch-bullets li:hover { border-color: #fff; }
-
-        /* Recruitment Banner */
-        .recruitment-banner {
-            background: radial-gradient(circle at center, rgba(255,255,255,0.05) 0%, transparent 100%);
-            border: 1px solid var(--color-border); padding: 4rem; border-radius: 1.2rem; text-align: center;
-        }
-        .recruitment-banner h2 { margin-bottom: 1rem; }
-        .recruitment-banner p { color: var(--color-text-secondary); max-width: 700px; margin: 0 auto 2rem auto; }
-
-        /* Contact Form */
-        .contact-form { max-width: 600px; margin: 0 auto; padding: 3.5rem; }
-        .form-group { margin-bottom: 1.5rem; }
-        .form-group label { display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-text-secondary); margin-bottom: 0.5rem; }
-        input, textarea {
-            width: 100%; padding: 1rem 1.2rem; background: rgba(0,0,0,0.4);
-            border: 1px solid var(--color-border); color: #fff; border-radius: 8px;
-            font-family: inherit; font-size: 1rem; transition: border-color 0.3s;
-        }
-        input:focus, textarea:focus { outline: none; border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.02); }
-        textarea { resize: vertical; min-height: 120px; }
-        
-        .success-message {
-            display: none; text-align: center; padding: 4rem 2rem;
-            background: var(--color-surface); border-radius: 1.2rem; border: 1px solid var(--color-border);
-            max-width: 600px; margin: 0 auto;
+        /* Site Directory Grid */
+        .directory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
         }
 
-        footer { text-align: center; padding: 4rem 5%; border-top: 1px solid var(--color-border); }
+        .dir-card {
+            padding: 3rem;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .dir-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .dir-card p {
+            font-size: 1rem;
+            color: var(--color-text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .dir-link {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #fff;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
 
         @media (max-width: 768px) {
             .nav-links { display: none; }
-            .split-grid, .arch-grid { grid-template-columns: 1fr; gap: 2rem; }
+            .split-grid { grid-template-columns: 1fr; gap: 2rem; }
             section { padding: 5rem 0; }
-            .recruitment-banner, .contact-form { padding: 2rem; }
         }
+
+        footer { text-align: center; padding: 4rem 5%; border-top: 1px solid var(--color-border); }
     </style>
 </head>
 <body>
@@ -267,10 +232,10 @@
             <img src="logo.png" alt="YUDI Logo" onerror="this.outerHTML='<span style=\'font-weight:800; font-size:1.5rem; letter-spacing:0.1em; text-transform:uppercase; color:#fff;\'>YUDI.</span>'">
         </a>
         <div class="nav-links">
-            <a href="blogs.html">Blogs</a>
-            <a href="#products">Products</a>
-            <a href="#architecture">Architecture</a>
-            <a href="#recruit" class="nav-highlight">Join the Lab</a>
+            <a href="index.html" style="color: #fff;">Home</a>
+            <a href="cmp.html">Our Research</a>
+            <a href="products.html">Products</a>
+            <a href="team.html">Team & Contact</a>
         </div>
     </nav>
 
@@ -280,25 +245,17 @@
             <h2 class="subtitle">AI Research Lab</h2>
             <p>Building a new class of Artificial Intelligence. Brain-native architecture grounded in neuroscience and emotional intelligence.</p>
             <div class="cta-group" style="justify-content: center;">
-                <a href="#research" class="btn btn-secondary">Our Research</a>
-                <a href="#contact" class="btn btn-primary">Get in Touch</a>
+                <a href="#explore" class="btn btn-secondary">Explore The Lab</a>
             </div>
         </div>
     </section>
-
-    <!-- <div class="marquee-wrapper reveal delay-2">
-        <div class="marquee">
-            <span>Tokenless Architecture</span> <span>♦</span> <span>Emotional Intelligence</span> <span>♦</span> <span>Persistent States</span> <span>♦</span> <span>Brain-Native Core</span> <span>♦</span> <span>LCoMs Paradigm</span> <span>♦</span>
-            <span>Tokenless Architecture</span> <span>♦</span> <span>Emotional Intelligence</span> <span>♦</span> <span>Persistent States</span> <span>♦</span> <span>Brain-Native Core</span> <span>♦</span> <span>LCoMs Paradigm</span> <span>♦</span>
-        </div>
-    </div> -->
 
     <section id="research" class="container">
         <h2 class="section-title reveal">The Paradigm Shift</h2>
         <div class="split-grid">
             <div class="split-panel panel-yudi glass reveal delay-1">
                 <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.15em; color:var(--color-text-secondary); margin-bottom:1rem;">Our Approach</div>
-                <h3>Brain-Native Architcture</h3>
+                <h3>Brain-Native Architecture</h3>
                 <p class="text-muted" style="margin-top:1rem;">Information is processed experientially, mapping conceptual nodes directly to emotional weights and relational edges.</p>
             </div>
             <div class="split-panel panel-traditional glass reveal delay-2">
@@ -309,7 +266,7 @@
         </div>
     </section>
 
-    <section class="container border-top">
+    <section class="container border-top" style="padding-top: 0;">
         <div class="stats-grid">
             <div class="stat-card glass reveal delay-1">
                 <div class="stat-number">80×</div>
@@ -326,128 +283,32 @@
         </div>
     </section>
 
-    <section id="lcoms" class="container">
-        <!-- <div style="max-width: 600px; margin-bottom: 4rem;" class="reveal">
-            <h2 class="section-title" style="margin-bottom: 1rem;">Large Conversational Models</h2>
-            <p class="text-muted">Moving beyond text prediction. LCoMs are designed to interact, remember, and empathize organically.</p>
-        </div> -->
-        
-        <div class="cards-grid">
-            <div class="feature-card glass glass-hover reveal delay-1">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                <h3>Emotional Intelligence</h3>
-                <p class="text-muted">Natively maps sentiment and emotional weight to semantic concepts, enabling genuine empathetic processing.</p>
-            </div>
-            <div class="feature-card glass glass-hover reveal delay-2">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                <h3>Persistent States</h3>
-                <p class="text-muted">Continuous learning state retains conversational context for up to a decade without context-window drop-offs.</p>
-            </div>
-            <div class="feature-card glass glass-hover reveal delay-3">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line></svg>
-                <h3>Tokenless Design</h3>
-                <p class="text-muted">Eliminates the arbitrary token bottleneck. Processes semantic chunks holistically, drastically reducing latency.</p>
-            </div>
-            <div class="feature-card glass glass-hover reveal delay-1">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                <h3>Hyper-Efficient</h3>
-                <p class="text-muted">Optimized architecture yields an 80x reduction in compute costs compared to legacy frontier LLMs.</p>
-            </div>
-        </div>
-    </section>
-
-    <section id="products" class="container">
-        <div style="text-align: center; margin-bottom: 3rem;">
-            <h2 class="section-title reveal">Our Products</h2>
-            <p class="text-muted reveal delay-1">Specialized computational entities and infrastructural layers designed for absolute precision.</p>
-        </div>
-        <div class="cards-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
-            <a href="https://cts.yudi.co.in" target="_blank" class="feature-card glass glass-hover reveal delay-1" style="text-decoration:none; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:3rem; cursor:pointer;">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:1.5rem; opacity:0.8;"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
-                <h3 style="font-size:1.8rem; margin-bottom:0.5rem; color:#fff;">CTS</h3>
-                <p class="text-muted" style="margin-bottom:2rem; font-size:0.9rem;">Conversational Token System.<br>Top layer for any model, reduces token cost by 80%.</p>
-                <span class="btn" style="border: 1px solid var(--color-border); padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.8rem; color: #fff;">Explore CTS</span>
+    <section id="explore" class="container">
+        <h2 class="section-title reveal" style="text-align: center;">Lab Directory</h2>
+        <div class="directory-grid">
+            
+            <a href="cmp.html" class="dir-card glass glass-hover reveal delay-1">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:1.5rem; color:#fff;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <h3>Our Research</h3>
+                <p>Deep dive into Conversational Meaning Patterns (CMP) and our neuro-inspired architecture.</p>
+                <div class="dir-link">Read the Paper &rarr;</div>
             </a>
-            <a href="#" class="feature-card glass glass-hover reveal delay-2" style="text-decoration:none; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:3rem; cursor:pointer;">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:1.5rem; opacity:0.8;"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                <h3 style="font-size:1.8rem; margin-bottom:0.5rem; color:#fff;">NARA</h3>
-                <p class="text-muted" style="margin-bottom:2rem; font-size:0.9rem;">Research AI Agent</p>
-                <span class="btn" style="border: 1px solid var(--color-border); padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.8rem; color: #fff;">Launch NARA</span>
+
+            <a href="products.html" class="dir-card glass glass-hover reveal delay-2">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:1.5rem; color:#fff;"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                <h3>Ecosystem</h3>
+                <p>Explore the deployable products built on top of our internal research, including CTS and NARA.</p>
+                <div class="dir-link">View Products &rarr;</div>
             </a>
-            <a href="#" class="feature-card glass glass-hover reveal delay-3" style="text-decoration:none; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:3rem; cursor:pointer;">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:1.5rem; opacity:0.8;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                <h3 style="font-size:1.8rem; margin-bottom:0.5rem; color:#fff;">Sam</h3>
-                <p class="text-muted" style="margin-bottom:2rem; font-size:0.9rem;">Content Generation Agent</p>
-                <span class="btn" style="border: 1px solid var(--color-border); padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.8rem; color: #fff;">Launch Sam</span>
+
+            <a href="team.html" class="dir-card glass glass-hover reveal delay-3">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:1.5rem; color:#fff;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                <h3>The Lab</h3>
+                <p>Meet the computational neuroscientists and architects behind YUDI. Initiate contact.</p>
+                <div class="dir-link">Connect &rarr;</div>
             </a>
-        </div>
-    </section>
 
-    <section id="architecture" class="container">
-        <h2 class="section-title reveal">Architecture Graph</h2>
-        <div class="arch-grid">
-            <div id="graph-wrapper" class="glass reveal delay-1">
-                <canvas id="graph-canvas"></canvas>
-            </div>
-            <ul class="arch-bullets reveal delay-2">
-                <li>
-                    <h4>Concept Nodes</h4>
-                    <p class="text-muted text-sm">Ideas are stored as localized data points rather than distributed weights.</p>
-                </li>
-                <li>
-                    <h4>Relational Edges</h4>
-                    <p class="text-muted text-sm">Dynamic connections form based on conversational proximity and logic.</p>
-                </li>
-                <li>
-                    <h4>Emotional Weighting</h4>
-                    <p class="text-muted text-sm">Node activation is modulated by detected human emotional states.</p>
-                </li>
-                <li>
-                    <h4>Memory Consolidation</h4>
-                    <p class="text-muted text-sm">Short-term context solidifies into long-term architectural pathways.</p>
-                </li>
-            </ul>
         </div>
-    </section>
-
-    <section id="recruit" class="container reveal">
-        <div class="recruitment-banner glass">
-            <h2>Calling Neuroscientists</h2>
-            <p>Are you working on AI research that directly challenges Transformer models? If your focus is on <strong>sparse coding</strong>, <strong>nascent neurobiology</strong>, or <strong>computational neuroscience</strong>, we want to collaborate.</p>
-            <a href="#contact" class="btn btn-secondary">Direct Message Us</a>
-        </div>
-    </section>
-
-    <section id="contact" class="container reveal">
-        <div style="text-align: center; margin-bottom: 3rem;">
-            <h2 class="section-title">Initiate Contact</h2>
-            <p class="text-muted">For investor inquiries, academic collaboration, and competition panels.</p>
-        </div>
-        
-        <div id="form-success" class="success-message">
-            <h3 style="margin-bottom: 1rem; font-size: 1.5rem;">Transmission Received.</h3>
-            <p class="text-muted">Thank you. Our research team has received your inquiry and will respond shortly.</p>
-        </div>
-
-        <form id="yudi-contact-form" class="contact-form glass" action="https://formspree.io/f/mqewlawk" method="POST">
-            <div class="form-group">
-                <label>Full Name</label>
-                <input type="text" name="name" required>
-            </div>
-            <div class="form-group">
-                <label>Work Email</label>
-                <input type="email" name="email" required>
-            </div>
-            <div class="form-group">
-                <label>Organization / Role</label>
-                <input type="text" name="organization">
-            </div>
-            <div class="form-group">
-                <label>Message</label>
-                <textarea name="message" required></textarea>
-            </div>
-            <button type="submit" id="submit-btn" class="btn btn-primary" style="width: 100%; border: none;">Send Transmission</button>
-        </form>
     </section>
 
     <footer>
@@ -458,7 +319,7 @@
     </footer>
 
     <script>
-        // 1. Pre-loader Logic
+        // Pre-loader
         window.addEventListener('load', () => {
             setTimeout(() => {
                 const loader = document.getElementById('loader');
@@ -468,14 +329,14 @@
             }, 1900);
         });
 
-        // 2. Navbar Scroll Effect
+        // Navbar Scroll
         const nav = document.getElementById('navbar');
         window.addEventListener('scroll', () => {
             if (window.scrollY > 60) nav.classList.add('scrolled');
             else nav.classList.remove('scrolled');
         });
 
-        // 3. Scroll Reveal Observer
+        // Scroll Reveal
         const observer = new IntersectionObserver(entries => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -489,7 +350,7 @@
             document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
         }, 1500);
 
-        // 4. Background Neural Canvas
+        // Background Neural Canvas
         const bgCanvas = document.getElementById('neural-canvas');
         const bgCtx = bgCanvas.getContext('2d');
         let bgNodes = [];
@@ -544,114 +405,6 @@
 
         window.addEventListener('resize', initBgCanvas);
         initBgCanvas(); drawBgCanvas();
-
-        // 5. Concept Graph Canvas (Architecture)
-        const graphCanvas = document.getElementById('graph-canvas');
-        const gCtx = graphCanvas.getContext('2d');
-        let gNodes = []; let time = 0;
-
-        function initGraph() {
-            const wrapper = document.getElementById('graph-wrapper');
-            graphCanvas.width = wrapper.offsetWidth; graphCanvas.height = wrapper.offsetHeight;
-            const cx = graphCanvas.width / 2; const cy = graphCanvas.height / 2;
-            gNodes = [];
-            gNodes.push({ bx: cx, by: cy, r: 8, isCore: true });
-
-            const count = 9;
-            for(let i = 0; i < count; i++) {
-                let angle = (i / count) * Math.PI * 2;
-                let rad = 90 + Math.random() * 50;
-                gNodes.push({
-                    bx: cx + Math.cos(angle) * rad, by: cy + Math.sin(angle) * rad,
-                    r: 4, offsetAngle: Math.random() * Math.PI * 2, isCore: false
-                });
-            }
-        }
-
-        function drawGraph() {
-            gCtx.clearRect(0, 0, graphCanvas.width, graphCanvas.height);
-            time += 0.015;
-
-            gNodes.forEach(n => {
-                if(!n.isCore) {
-                    n.x = n.bx + Math.cos(time + n.offsetAngle) * 15;
-                    n.y = n.by + Math.sin(time + n.offsetAngle) * 15;
-                } else { n.x = n.bx; n.y = n.by; }
-            });
-
-            const core = gNodes[0]; gCtx.lineWidth = 1;
-            
-            for(let i = 1; i < gNodes.length; i++) {
-                let n = gNodes[i];
-                gCtx.beginPath(); gCtx.strokeStyle = 'rgba(255,255,255,0.2)';
-                gCtx.moveTo(core.x, core.y); gCtx.lineTo(n.x, n.y); gCtx.stroke();
-
-                if(i < gNodes.length - 1) {
-                    gCtx.beginPath(); gCtx.strokeStyle = 'rgba(255,255,255,0.05)';
-                    gCtx.moveTo(n.x, n.y); gCtx.lineTo(gNodes[i+1].x, gNodes[i+1].y); gCtx.stroke();
-                }
-            }
-
-            gNodes.forEach((n, idx) => {
-                let pulse = Math.abs(Math.sin(time + (n.offsetAngle||0))) * 0.5 + 0.5;
-                gCtx.beginPath(); gCtx.fillStyle = `rgba(255,255,255,${pulse})`;
-                gCtx.arc(n.x, n.y, n.r, 0, Math.PI * 2); gCtx.fill();
-
-                if(!n.isCore) {
-                    gCtx.fillStyle = 'rgba(255,255,255,0.4)'; gCtx.font = '10px Outfit, sans-serif';
-                    gCtx.fillText(`N_${idx}`, n.x + 8, n.y + 8);
-                }
-            });
-            requestAnimationFrame(drawGraph);
-        }
-
-        setTimeout(() => { initGraph(); drawGraph(); }, 1000);
-        window.addEventListener('resize', initGraph);
-
-        // 6. AJAX Form Submission
-        const contactForm = document.getElementById('yudi-contact-form');
-        const submitBtn = document.getElementById('submit-btn');
-        const formSuccess = document.getElementById('form-success');
-
-        if (contactForm) {
-            contactForm.addEventListener('submit', async function(e) {
-                e.preventDefault(); 
-                
-                const originalBtnText = submitBtn.innerText;
-                submitBtn.innerText = "Transmitting...";
-                submitBtn.style.opacity = "0.7";
-                submitBtn.style.pointerEvents = "none"; 
-
-                try {
-                    const response = await fetch(contactForm.action, {
-                        method: contactForm.method,
-                        body: new FormData(contactForm),
-                        headers: { 'Accept': 'application/json' }
-                    });
-
-                    if (response.ok) {
-                        contactForm.style.display = 'none';
-                        formSuccess.style.display = 'block';
-                        contactForm.reset(); 
-                    } else {
-                        const data = await response.json();
-                        let errorMsg = "Transmission failed. Please try again.";
-                        if (Object.hasOwn(data, 'errors')) {
-                            errorMsg = data["errors"].map(error => error["message"]).join(", ");
-                        }
-                        alert(errorMsg);
-                        submitBtn.innerText = originalBtnText;
-                        submitBtn.style.opacity = "1";
-                        submitBtn.style.pointerEvents = "auto";
-                    }
-                } catch (error) {
-                    alert("Network anomaly detected. Please try again later.");
-                    submitBtn.innerText = originalBtnText;
-                    submitBtn.style.opacity = "1";
-                    submitBtn.style.pointerEvents = "auto";
-                }
-            });
-        }
     </script>
 </body>
 </html>

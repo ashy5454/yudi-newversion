@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CMP Architecture — YUDI Lab</title>
+    <meta name="description" content="Discover Conversational Meaning Patterns (CMP). A neuro-inspired brain architecture for general ML representation.">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Shared Styles from Index */
+        :root {
+            --color-bg: #030303;
+            --color-surface: rgba(255, 255, 255, 0.03);
+            --color-surface-hover: rgba(255, 255, 255, 0.06);
+            --color-border: rgba(255, 255, 255, 0.08);
+            --color-text-primary: rgba(255, 255, 255, 0.95);
+            --color-text-secondary: rgba(255, 255, 255, 0.5);
+            --font-stack: 'Outfit', system-ui, -apple-system, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--color-bg);
+            color: var(--color-text-primary);
+            font-family: var(--font-stack);
+            line-height: 1.8;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4 { line-height: 1.2; font-weight: 600; }
+        .container { max-width: 900px; margin: 0 auto; padding: 0 5%; }
+        .text-muted { color: var(--color-text-secondary); }
+
+        /* Navigation */
+        nav {
+            position: fixed; top: 0; width: 100%; z-index: 100;
+            padding: 1.5rem 5%; transition: all 0.4s ease;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--color-border);
+        }
+        .logo img { height: 48px; width: auto; object-fit: contain; }
+        .nav-links { display: flex; gap: 2.5rem; align-items: center; }
+        .nav-links a {
+            color: var(--color-text-secondary); text-decoration: none;
+            font-size: 0.85rem; font-weight: 500; letter-spacing: 0.1em;
+            text-transform: uppercase; transition: color 0.3s;
+        }
+        .nav-links a:hover { color: #fff; }
+
+        /* Typography & Layout for Reading */
+        .page-header {
+            padding: 12rem 0 6rem 0;
+            text-align: center;
+            border-bottom: 1px solid var(--color-border);
+            position: relative;
+        }
+
+        #neural-canvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; opacity: 0.3; pointer-events: none;
+        }
+
+        .title {
+            font-size: clamp(3rem, 6vw, 5rem);
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            background: linear-gradient(180deg, #FFFFFF 0%, #777777 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: var(--color-text-secondary);
+            font-weight: 300;
+            max-width: 750px;
+            margin: 0 auto;
+        }
+
+        .content-section {
+            padding: 5rem 0;
+        }
+
+        .content-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            letter-spacing: -0.02em;
+            color: #fff;
+        }
+
+        .content-section p {
+            font-size: 1.15rem;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 1.5rem;
+            font-weight: 300;
+        }
+
+        .content-section strong {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .glass-box {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            backdrop-filter: blur(24px);
+            border-radius: 1.2rem;
+            padding: 3rem;
+            margin: 3rem 0;
+        }
+
+        .glass-box h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-item {
+            padding: 2rem;
+            border-left: 2px solid var(--color-border);
+            background: rgba(255,255,255,0.02);
+            border-radius: 0 1rem 1rem 0;
+            transition: border-color 0.3s ease;
+        }
+
+        .feature-item:hover {
+            border-left-color: #ffffff;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .feature-item h4 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-item p {
+            font-size: 1rem !important;
+            margin-bottom: 0 !important;
+            color: var(--color-text-secondary) !important;
+        }
+
+        @media (max-width: 768px) {
+            .feature-grid { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+        }
+
+        footer { text-align: center; padding: 4rem 5%; border-top: 1px solid var(--color-border); margin-top: 5rem;}
+    </style>
+</head>
+<body>
+
+    <nav id="navbar">
+        <a href="index.html" class="logo">
+            <img src="logo.png" alt="YUDI Logo" onerror="this.outerHTML='<span style=\'font-weight:800; font-size:1.5rem; letter-spacing:0.1em; text-transform:uppercase; color:#fff;\'>YUDI.</span>'">
+        </a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="cmp.html" style="color: #fff;">Our Research</a>
+        </div>
+    </nav>
+
+    <header class="page-header">
+        <canvas id="neural-canvas"></canvas>
+        <div class="container">
+            <div style="font-size:0.85rem; font-weight:600; text-transform:uppercase; letter-spacing:0.2em; color:var(--color-text-secondary); margin-bottom:1rem;">The New Industry Standard</div>
+            <h1 class="title">Conversational Meaning Patterns</h1>
+            <p class="subtitle">A neuro-inspired brain architecture designed to serve as a general representation primitive for Machine Learning. We are moving beyond the statistical limitations of legacy models.</p>
+        </div>
+    </header>
+
+    <main class="container">
+        
+        <section class="content-section">
+            <h2>Opening a New Industry</h2>
+            <p>Current Artificial Intelligence paradigms are fundamentally constrained. They rely on vast, brute-force statistical prediction and computationally explosive attention mechanisms. While powerful, these systems are fundamentally un-biological and reach hard scaling limits.</p>
+            <p>At YUDI, we are not building another statistical engine. We are opening an entirely new industry. <strong>Conversational Meaning Patterns (CMP)</strong> is a neuro-inspired architecture designed from the ground up to be a universal, general representation primitive for ML. It is built to natively process, understand, and retain context in the same streaming, experiential way that biological systems do.</p>
+        </section>
+
+        <section class="content-section">
+            <h2>A General Representation Primitive</h2>
+            <div class="glass-box">
+                <p>To truly advance AI, we must stop forcing information into unnatural matrices. CMP serves as a foundational primitive that unifies how data—whether linguistic, visual, or structural—is encoded and related.</p>
+                <p style="margin-bottom: 0;">By capturing the implicit geometry of information through structural patterns, CMP provides a continuous, organic way for neural networks to process streams of data. It is not just a language model; it is an architectural framework for generalized intelligence.</p>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <h2>The Neuromorphic Core</h2>
+            <p>We did not invent these paradigms in a vacuum. CMP is deeply rooted in computational neuroscience, shifting the focus from standard backpropagation statistics toward biologically plausible architectural principles. We are mimicking the elegant, highly efficient mechanisms found in the human brain.</p>
+            
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <h4>Sparse Distributed Representations</h4>
+                    <p>Following Kanerva and Olshausen, information is stored as overlapping, sparse neural fingerprints. Shared active nodes inherently encode semantic similarity. Only a tiny, highly relevant fraction of the network activates at any given time, identical to biological neural firing.</p>
+                </div>
+                <div class="feature-item">
+                    <h4>Hebbian Learning & Predictive Coding</h4>
+                    <p>In our architecture, structural binding depends on dynamic co-activation ("cells that fire together, wire together"). Our layers actively propagate prediction error and surprise, learning continuously from structural mismatches rather than static signal gradients.</p>
+                </div>
+                <div class="feature-item">
+                    <h4>Hippocampal Mechanics</h4>
+                    <p>Inspired by the brain's pattern separation (creating distinct memory traces for similar events) and associative pattern completion (using partial cues to retrieve a fuller stored state). This allows CMP to retain incredibly robust working memory across unbounded streams.</p>
+                </div>
+                <div class="feature-item">
+                    <h4>Cortical Hierarchy</h4>
+                    <p>Stacked CMP layers mirror the V1 to IT pathway in the visual cortex. They transform raw structural signals into progressively abstract, high-level conceptual representations, building genuine understanding across multiple modalities.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p style="font-weight: 800; letter-spacing: 0.2em; color: var(--color-text-dim); margin-bottom: 0.5rem;">YUDI.</p>
+            <p style="color: var(--color-text-dim); font-size: 0.8rem;">&copy; 2026 YUDI AI Research Lab. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Background Neural Canvas (Simplified version for header)
+        const bgCanvas = document.getElementById('neural-canvas');
+        if (bgCanvas) {
+            const bgCtx = bgCanvas.getContext('2d');
+            let bgNodes = [];
+            
+            function initBgCanvas() {
+                bgCanvas.width = bgCanvas.parentElement.offsetWidth;
+                bgCanvas.height = bgCanvas.parentElement.offsetHeight;
+                bgNodes = [];
+                for(let i = 0; i < 60; i++) {
+                    bgNodes.push({
+                        x: Math.random() * bgCanvas.width, y: Math.random() * bgCanvas.height,
+                        vx: (Math.random() - 0.5) * 0.4, vy: (Math.random() - 0.5) * 0.4,
+                        r: Math.random() * 1.5 + 0.5
+                    });
+                }
+            }
+
+            function drawBgCanvas() {
+                bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+                bgCtx.fillStyle = 'rgba(255,255,255,0.4)';
+
+                for(let i = 0; i < bgNodes.length; i++) {
+                    let n1 = bgNodes[i];
+                    n1.x += n1.vx; n1.y += n1.vy;
+                    
+                    if(n1.x < 0 || n1.x > bgCanvas.width) n1.vx *= -1;
+                    if(n1.y < 0 || n1.y > bgCanvas.height) n1.vy *= -1;
+
+                    bgCtx.beginPath();
+                    bgCtx.arc(n1.x, n1.y, n1.r, 0, Math.PI * 2);
+                    bgCtx.fill();
+
+                    for(let j = i + 1; j < bgNodes.length; j++) {
+                        let n2 = bgNodes[j];
+                        let dx = n1.x - n2.x; let dy = n1.y - n2.y;
+                        let dist = Math.sqrt(dx*dx + dy*dy);
+
+                        if(dist < 150) {
+                            bgCtx.beginPath();
+                            bgCtx.strokeStyle = `rgba(255,255,255,${0.1 * (1 - dist/150)})`;
+                            bgCtx.lineWidth = 0.5;
+                            bgCtx.moveTo(n1.x, n1.y);
+                            bgCtx.lineTo(n2.x, n2.y);
+                            bgCtx.stroke();
+                        }
+                    }
+                }
+                requestAnimationFrame(drawBgCanvas);
+            }
+
+            window.addEventListener('resize', initBgCanvas);
+            initBgCanvas(); drawBgCanvas();
+        }
+    </script>
+</body>
+</html>
