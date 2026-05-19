@@ -142,6 +142,24 @@
             .hero { padding: 12rem 0 6rem 0; }
         }
 
+        /* Animated Visual Styles */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .animated-visual {
+            animation: float 6s ease-in-out infinite;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 50px rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            width: 100%;
+            transition: border-color 0.3s;
+        }
+        .animated-visual:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
         /* Footer */
         footer { border-top: 1px solid var(--color-border); padding: 6rem 0 3rem 0; background: #000; }
         .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 4rem; margin-bottom: 6rem; }
@@ -228,13 +246,13 @@
                     <p style="font-size: 1.15rem; color: var(--color-text-secondary); margin-bottom: 2rem; max-width: 500px;">Modern AI systems are powerful, but most still depend on tokenized inputs, large-scale backpropagation, and attention-heavy processing. Yudi Labs studies alternative paths inspired by sparse neural activity, predictive coding, recurrent state, relational binding, and memory.</p>
                     <a href="research.html" class="btn btn-secondary">Explore the Research</a>
                 </div>
-                <div>
-                    <ul class="list-clean" style="background: var(--color-surface); padding: 3rem; border-radius: 12px; border: 1px solid var(--color-border);">
-                        <li>Sparse representations</li>
-                        <li>Predictive coding</li>
-                        <li>Relational state</li>
-                        <li>Memory and continual learning</li>
-                        <li>Human-AI interaction</li>
+                <div style="text-align: center; position: relative;">
+                    <img src="assets/cmp_diagram.png" alt="Sparse Activations Diagram" class="animated-visual" style="max-height: 400px; object-fit: cover;">
+                    <ul class="list-clean" style="background: rgba(3, 3, 3, 0.85); backdrop-filter: blur(10px); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--color-border); position: absolute; bottom: -20px; right: -10px; text-align: left; font-size: 0.9rem;">
+                        <li>• Sparse representations</li>
+                        <li>• Predictive coding</li>
+                        <li>• Relational state</li>
+                        <li>• Continual memory</li>
                     </ul>
                 </div>
             </div>

@@ -120,7 +120,10 @@
 
         @media (max-width: 768px) {
             .nav-links { display: none; }
+            .grid-split { grid-template-columns: 1fr !important; }
         }
+
+        .grid-split { display: grid; grid-template-columns: 1.2fr 1fr; gap: 3rem; align-items: center; }
 
         /* Footer */
         footer { border-top: 1px solid var(--color-border); padding: 6rem 0 3rem 0; background: #000; margin-top: 5rem;}
@@ -192,17 +195,25 @@
 
         <section class="content-section">
             <h2>CMP v1.9 Architecture</h2>
-            <p>CMP v1.9 uses character n-gram features as input preparation, a trainable learned sparse encoder, fixed binding between previous hidden state and current sparse pattern, gated recurrence, sparse-gated refinement, and a predictive output head that predicts next sparse patterns.</p>
             
-            <ul style="color: rgba(255,255,255,0.7); font-size: 1.1rem; line-height: 2; margin-left: 2rem; margin-top: 1rem;">
-                <li>Char n-gram features</li>
-                <li>LearnedSparseEncoder</li>
-                <li>Fixed memory/input binding</li>
-                <li>Gated recurrent state</li>
-                <li>SparseGatedRefinement</li>
-                <li>Predictive output head</li>
-            </ul>
-
+            <div class="grid-split">
+                <div>
+                    <p>CMP v1.9 uses character n-gram features as input preparation, a trainable learned sparse encoder, fixed binding between previous hidden state and current sparse pattern, gated recurrence, sparse-gated refinement, and a predictive output head that predicts next sparse patterns.</p>
+                    
+                    <ul style="color: rgba(255,255,255,0.7); font-size: 1.1rem; line-height: 2; margin-left: 2rem; margin-top: 1rem;">
+                        <li>Char n-gram features</li>
+                        <li>LearnedSparseEncoder</li>
+                        <li>Fixed memory/input binding</li>
+                        <li>Gated recurrent state</li>
+                        <li>SparseGatedRefinement</li>
+                        <li>Predictive output head</li>
+                    </ul>
+                </div>
+                <div>
+                    <img src="assets/cmp_diagram.png" alt="CMP v1.9 Sparse Activation Diagram" class="animated-visual">
+                </div>
+            </div>
+            
             <div style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-left: 4px solid #fff; margin-top: 2rem;">
                 <p style="margin: 0; font-size: 0.95rem;"><strong>Important Note:</strong> Do not describe current CMP as hash-encoder-first. The current forward-looking architecture explicitly replaces the old hash encoder with a learned sparse encoder, completely eliminating Token-ID cross-entropy as the core future path.</p>
             </div>

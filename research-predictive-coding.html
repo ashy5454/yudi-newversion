@@ -128,7 +128,10 @@
         @media (max-width: 768px) {
             .nav-links { display: none; }
             .link-grid { grid-template-columns: 1fr; }
+            .grid-split { grid-template-columns: 1fr !important; }
         }
+
+        .grid-split { display: grid; grid-template-columns: 1.2fr 1fr; gap: 3rem; align-items: center; }
 
         /* Footer */
         footer { border-top: 1px solid var(--color-border); padding: 6rem 0 3rem 0; background: #000; margin-top: 5rem;}
@@ -194,7 +197,14 @@
 
         <section class="content-section">
             <h2>How It Connects to CMP</h2>
-            <p>CMP v1.9 uses predictive sparse-pattern output as part of the research direction. The goal is to test whether local predictive learning can train sparse representation systems at progressive scale.</p>
+            <div class="grid-split">
+                <div>
+                    <p>CMP v1.9 uses predictive sparse-pattern output as part of the research direction. The goal is to test whether local predictive learning can train sparse representation systems at progressive scale.</p>
+                </div>
+                <div>
+                    <img src="assets/predictive_coding.png" alt="Predictive Coding Activation Diagram" class="animated-visual">
+                </div>
+            </div>
         </section>
 
         <section class="content-section">
