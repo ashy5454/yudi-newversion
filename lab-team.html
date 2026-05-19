@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Products | Yudi Labs</title>
+    <title>Team | Yudi Labs</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -89,9 +89,9 @@
         .content-section { padding: 4rem 0; }
         .content-section h2 { font-size: 2rem; margin-bottom: 1.5rem; color: #fff; border-bottom: 1px solid var(--color-border); padding-bottom: 1rem;}
         
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 3rem; }
         
-        .product-card {
+        .team-card {
             background: var(--color-surface);
             border: 1px solid var(--color-border);
             border-radius: 12px;
@@ -99,15 +99,14 @@
             display: flex;
             flex-direction: column;
         }
-        .product-card h3 { font-size: 1.5rem; margin-bottom: 1rem; color: #fff; }
-        .product-card p { font-size: 1rem; color: var(--color-text-secondary); margin-bottom: 2rem; }
+        .team-card h3 { font-size: 1.5rem; margin-bottom: 0.2rem; color: #fff; }
+        .team-role { font-size: 1rem; color: var(--color-text-dim); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;}
+        .team-focus { font-size: 0.9rem; color: var(--color-text-secondary); margin-bottom: 1rem; font-style: italic;}
+        .team-bio { font-size: 1rem; color: rgba(255,255,255,0.8); margin-bottom: 2rem; line-height: 1.6;}
         
-        .meta-list { list-style: none; margin-bottom: 2rem; padding: 0; font-size: 0.9rem; color: var(--color-text-dim); }
-        .meta-list li { margin-bottom: 0.5rem; display: flex; gap: 0.5rem; }
-        .meta-list li strong { color: rgba(255,255,255,0.7); min-width: 80px;}
-        
-        .btn-text { color: #fff; text-decoration: none; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; display: inline-flex; align-items: center; gap: 0.5rem; margin-top: auto; border: 1px solid var(--color-border); padding: 0.8rem 1.5rem; border-radius: 6px; text-align: center; justify-content: center; transition: all 0.3s;}
-        .btn-text:hover { background: #fff; color: #000; }
+        .social-links { display: flex; gap: 1rem; margin-top: auto; }
+        .social-links a { color: var(--color-text-secondary); text-decoration: none; font-size: 0.9rem; transition: color 0.3s; }
+        .social-links a:hover { color: #fff; }
 
         @media (max-width: 768px) {
             .nav-links { display: none; }
@@ -135,91 +134,69 @@
         <a href="index.html" class="logo">YUDI LABS</a>
         <div class="nav-links">
             <a href="research.html">Research</a>
-            <a href="products.html" class="active">Products</a>
+            <a href="products.html">Products</a>
             <a href="solutions.html">Solutions</a>
             <a href="blog.html">Blog</a>
             <a href="investors.html">Investors</a>
-            <a href="lab.html">Lab</a>
+            <a href="lab.html" class="active">Lab</a>
             <a href="work-with-us.html" class="btn-nav">Work With Us</a>
         </div>
     </nav>
 
     <header class="page-header">
         <div class="container">
-            <h1 class="title">Products from the lab.</h1>
-            <p class="subtitle">Yudi Labs builds tools, systems, and experimental products from its research and engineering work.</p>
+            <div style="font-size:0.85rem; font-weight:600; text-transform:uppercase; letter-spacing:0.2em; color:var(--color-text-secondary); margin-bottom:1rem;">Directory</div>
+            <h1 class="title">The Lab Team</h1>
+            <p class="subtitle">The founders, researchers, engineers, and operators driving Yudi Labs forward.</p>
         </div>
     </header>
 
     <main class="container">
         
         <section class="content-section">
-            <h2>Active Products</h2>
+            <h2>Leadership</h2>
+            
             <div class="grid-2">
-                <div class="product-card">
-                    <h3>Conversational Token System (CTS)</h3>
-                    <ul class="meta-list">
-                        <li><strong>Status:</strong> Beta</li>
-                        <li><strong>Built from:</strong> Engineering</li>
-                        <li><strong>Audience:</strong> Enterprise & API Developers</li>
-                        <li><strong>Access:</strong> Waitlist / Private Pilot</li>
-                    </ul>
-                    <p>An infrastructural API layer that compresses conversational state to reduce token overhead for long-horizon context windows. Designed for heavy chatbot deployments.</p>
-                    <a href="cts.html" class="btn-text">View Product Detail</a>
-                </div>
-            </div>
-        </section>
-
-        <section class="content-section">
-            <h2>Research Prototypes</h2>
-            <div class="grid-2">
-                <div class="product-card">
-                    <h3>NARA (Research Agent)</h3>
-                    <ul class="meta-list">
-                        <li><strong>Status:</strong> Internal Prototype</li>
-                        <li><strong>Built from:</strong> Research (CMP)</li>
-                        <li><strong>Audience:</strong> Researchers & Academics</li>
-                        <li><strong>Access:</strong> Closed Beta</li>
-                    </ul>
-                    <p>An experimental research agent utilizing our sparse relational architecture to synthesize dense documents without semantic flattening. Used internally for mapping literature.</p>
-                    <a href="nara.html" class="btn-text">View Prototype Detail</a>
-                </div>
                 
-                <div class="product-card">
-                    <h3>Sam (Content Agent)</h3>
-                    <ul class="meta-list">
-                        <li><strong>Status:</strong> Internal Prototype</li>
-                        <li><strong>Built from:</strong> Engineering + Research</li>
-                        <li><strong>Audience:</strong> Content Operations Teams</li>
-                        <li><strong>Access:</strong> Internal Only</li>
-                    </ul>
-                    <p>A self-updating content generation agent designed to maintain brand voice and context over long timeframes without requiring massive system prompts for every interaction.</p>
-                    <a href="sam.html" class="btn-text">View Prototype Detail</a>
+                <div class="team-card">
+                    <h3>Ashmith Atmuri</h3>
+                    <div class="team-role">Founder & CEO</div>
+                    <div class="team-focus">Focus: Lab Direction, Strategic Partnerships, Theoretical Foundations</div>
+                    <div class="team-bio">Leading the long-term vision of Yudi Labs to explore brain-native architectural constraints as the next frontier beyond token-first systems.</div>
+                    <div class="social-links">
+                        <a href="#">LinkedIn</a>
+                        <a href="#">GitHub</a>
+                    </div>
                 </div>
-            </div>
-        </section>
-        
-        <section class="content-section">
-            <h2>Open Source</h2>
-            <div class="grid-2">
-                <div class="product-card">
-                    <h3>CMP Core (Coming Soon)</h3>
-                    <ul class="meta-list">
-                        <li><strong>Status:</strong> Unreleased</li>
-                        <li><strong>Built from:</strong> Research</li>
-                        <li><strong>Audience:</strong> ML Researchers & Developers</li>
-                        <li><strong>Access:</strong> GitHub (Pending)</li>
-                    </ul>
-                    <p>The core PyTorch implementation of the CMP v1.9 architecture, including the LearnedSparseEncoder and SparseGatedRefinement components, built for ablation studies.</p>
-                    <a href="#" class="btn-text" style="opacity: 0.5; pointer-events: none;">Coming Soon</a>
+
+                <div class="team-card">
+                    <h3>S. PVS Samatha</h3>
+                    <div class="team-role">Founder & CTO</div>
+                    <div class="team-focus">Focus: CMP Architecture, Sparse Encoders, Engineering Scalability</div>
+                    <div class="team-bio">Directing the engineering and mathematical architecture of CMP, transitioning the lab's theoretical models into stable, testable prototypes.</div>
+                    <div class="social-links">
+                        <a href="#">LinkedIn</a>
+                        <a href="#">GitHub</a>
+                    </div>
                 </div>
+
+                <div class="team-card">
+                    <h3>Manish Regala</h3>
+                    <div class="team-role">Founding Member & COO</div>
+                    <div class="team-focus">Focus: Business Solutions, Client Operations, Lab Logistics</div>
+                    <div class="team-bio">Translating Yudi Labs research into viable applied AI systems for our commercial partners and managing the lab's day-to-day operational execution.</div>
+                    <div class="social-links">
+                        <a href="#">LinkedIn</a>
+                    </div>
+                </div>
+
             </div>
         </section>
 
         <section class="content-section" style="text-align: center; border-top: 1px solid var(--color-border); padding-top: 6rem;">
-            <h2>Request Access</h2>
-            <p style="font-size: 1.1rem; color: var(--color-text-secondary); margin-bottom: 2rem;">Interested in piloting CTS or exploring our research prototypes?</p>
-            <a href="work-with-us.html" class="btn-text" style="background: #fff; color: #000;" onclick="localStorage.setItem('inquiryPrefill', 'product');">Request Product Access</a>
+            <h2>Join the Team</h2>
+            <p style="font-size: 1.1rem; color: var(--color-text-secondary); margin-bottom: 2rem;">We are actively hiring researchers, engineers, and operators.</p>
+            <a href="lab-careers.html" class="btn-text" style="background: #fff; color: #000; padding: 1rem 2.5rem; border-radius: 8px; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; transition: all 0.3s;">View Open Roles</a>
         </section>
 
     </main>

@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YUDI — AI Research Lab</title>
-    <meta name="description" content="YUDI is an AI research lab building Brain-native AI architecture grounded in neuroscience.">
+    <title>Yudi Labs | Brain-Native AI Research</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,7 +16,6 @@
             --color-surface: rgba(255, 255, 255, 0.03);
             --color-surface-hover: rgba(255, 255, 255, 0.06);
             --color-border: rgba(255, 255, 255, 0.08);
-            --color-border-hover: rgba(255, 255, 255, 0.2);
             --color-text-primary: rgba(255, 255, 255, 0.95);
             --color-text-secondary: rgba(255, 255, 255, 0.5);
             --color-text-dim: rgba(255, 255, 255, 0.2);
@@ -31,376 +29,438 @@
             background-color: var(--color-bg);
             color: var(--color-text-primary);
             font-family: var(--font-stack);
-            line-height: 1.7;
-            overflow-x: hidden;
+            line-height: 1.8;
             -webkit-font-smoothing: antialiased;
-            overflow-y: hidden;
+            overflow-x: hidden;
         }
-
-        body.loaded { overflow-y: auto; }
 
         h1, h2, h3, h4 { line-height: 1.2; font-weight: 600; }
         .container { max-width: 1200px; margin: 0 auto; padding: 0 5%; }
+        .container-narrow { max-width: 900px; margin: 0 auto; padding: 0 5%; }
         .text-muted { color: var(--color-text-secondary); }
 
-        /* Pre-loader */
-        #loader {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: #000000; z-index: 9999; display: flex;
-            justify-content: center; align-items: center;
-            transition: opacity 0.8s ease, visibility 0.8s ease;
-        }
-        .loader-content { width: 240px; text-align: center; }
-        .loader-logo {
-            font-size: 1.8rem; font-weight: 800; letter-spacing: 0.3em;
-            color: #ffffff; margin-bottom: 1.5rem; text-transform: uppercase;
-        }
-        .loader-bar-bg { width: 100%; height: 1px; background: rgba(255, 255, 255, 0.1); position: relative; overflow: hidden; }
-        .loader-bar-fill {
-            position: absolute; top: 0; left: 0; height: 100%; width: 0%;
-            background: #ffffff; animation: fillLoader 1.8s cubic-bezier(0.77, 0, 0.175, 1) forwards;
-        }
-        @keyframes fillLoader { 0% { width: 0%; } 50% { width: 60%; } 100% { width: 100%; } }
-
-        /* Typography */
-        .display-title {
-            font-size: clamp(4rem, 10vw, 8rem);
-            font-weight: 800;
-            letter-spacing: -0.04em;
-            background: linear-gradient(180deg, #FFFFFF 0%, #777777 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0px 0px 30px rgba(255, 255, 255, 0.1));
-            margin-bottom: 0.5rem;
-        }
-        .subtitle {
-            font-size: 1.2rem;
-            text-transform: uppercase;
-            letter-spacing: 0.3em;
-            margin-bottom: 1.5rem;
-            color: var(--color-text-secondary);
-            font-weight: 500;
-        }
-        .section-title {
-            font-size: clamp(2rem, 4vw, 3rem);
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            margin-bottom: 3rem;
-        }
-
-        /* Premium Glassmorphism */
-        .glass {
-            background: var(--color-surface);
-            border: 1px solid var(--color-border);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border-radius: 1.2rem;
-        }
-        .glass-hover:hover {
-            background: var(--color-surface-hover);
-            border-color: var(--color-border-hover);
-            transform: translateY(-4px);
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-        }
-
-        /* Animations */
-        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s var(--ease-spring); }
-        .reveal.visible { opacity: 1; transform: translateY(0); }
-        .delay-1 { transition-delay: 0.1s; }
-        .delay-2 { transition-delay: 0.2s; }
-        .delay-3 { transition-delay: 0.3s; }
-
-        /* Navbar */
+        /* Navigation */
         nav {
             position: fixed; top: 0; width: 100%; z-index: 100;
             padding: 1.5rem 5%; transition: all 0.4s ease;
             display: flex; justify-content: space-between; align-items: center;
+            background: rgba(3, 3, 3, 0.8);
+            backdrop-filter: blur(20px); border-bottom: 1px solid var(--color-border);
         }
-        nav.scrolled {
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(20px); border-bottom: 1px solid var(--color-border); padding: 1rem 5%;
-        }
-        .logo img { height: 48px; width: auto; object-fit: contain; }
-        .nav-links { display: flex; gap: 2.5rem; align-items: center; }
+        .logo { font-weight: 800; font-size: 1.5rem; letter-spacing: 0.1em; text-transform: uppercase; color: #fff; text-decoration: none; }
+        
+        .nav-links { display: flex; gap: 2rem; align-items: center; }
         .nav-links a {
             color: var(--color-text-secondary); text-decoration: none;
-            font-size: 0.85rem; font-weight: 500; letter-spacing: 0.1em;
+            font-size: 0.85rem; font-weight: 500; letter-spacing: 0.05em;
             text-transform: uppercase; transition: color 0.3s;
         }
         .nav-links a:hover { color: #fff; }
+        .nav-links a.btn-nav {
+            background: #fff; color: #000; padding: 0.6rem 1.2rem; border-radius: 6px; font-weight: 600;
+        }
+        .nav-links a.btn-nav:hover { background: #eee; color: #000; }
 
-        /* Hero */
-        .hero {
-            height: 100vh; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; text-align: center; position: relative;
-        }
-        #neural-canvas {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            z-index: -1; opacity: 0.4; pointer-events: none;
-        }
-        .hero p {
-            font-size: 1.15rem; font-weight: 300; color: var(--color-text-secondary);
-            max-width: 650px; margin: 1.5rem auto 3.5rem auto;
-        }
+        /* Components */
         .btn {
-            padding: 0.9rem 2.5rem; border-radius: 8px; text-decoration: none;
+            padding: 1rem 2.5rem; border-radius: 8px; text-decoration: none; display: inline-block;
             font-size: 0.85rem; font-weight: 600; text-transform: uppercase;
-            letter-spacing: 0.15em; transition: all 0.3s var(--ease-spring);
-            border: none; cursor: pointer; display: inline-block;
+            letter-spacing: 0.1em; transition: all 0.3s var(--ease-spring); border: none; cursor: pointer; text-align: center;
         }
-        .btn-secondary { border: 1px solid var(--color-border); background: var(--color-surface); color: #ffffff; }
-        .btn-secondary:hover { background: var(--color-surface-hover); transform: translateY(-2px); }
+        .btn-primary { background: #ffffff; color: #000000; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(255,255,255,0.15); }
+        .btn-secondary { background: var(--color-surface); color: #fff; border: 1px solid var(--color-border); }
+        .btn-secondary:hover { background: var(--color-surface-hover); }
+        .btn-text { color: var(--color-text-secondary); text-decoration: none; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .btn-text:hover { color: #fff; }
 
-        section { padding: 8rem 0; position: relative; z-index: 1; }
+        .section { padding: 8rem 0; border-bottom: 1px solid var(--color-border); }
+        .section-no-border { border-bottom: none; }
+        
+        .section-header { margin-bottom: 4rem; }
+        .section-header h2 { font-size: 3rem; margin-bottom: 1rem; letter-spacing: -0.02em; color: #fff; }
+        .section-header p { font-size: 1.2rem; color: var(--color-text-secondary); font-weight: 300; max-width: 800px; }
 
-        /* Research Split */
-        .split-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
-        .split-panel { padding: 3rem; border-radius: 1.2rem; }
-        .panel-yudi { border: 1px solid rgba(255,255,255,0.15); background: radial-gradient(circle at top left, rgba(255,255,255,0.06), transparent); }
-        .panel-traditional { opacity: 0.5; border: 1px dashed var(--color-border); }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+        .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; }
 
-        /* Stats Grid */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 2rem; margin: 4rem 0; }
-        .stat-card { text-align: center; padding: 4rem 2rem; }
-        .stat-number { font-size: clamp(3rem, 5vw, 4.5rem); font-weight: 800; letter-spacing: -0.04em; margin-bottom: 0.5rem; }
-        .stat-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--color-text-secondary); font-weight: 500; }
-
-        /* Site Directory Grid */
-        .directory-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 4rem;
-        }
-
-        .dir-card {
-            padding: 3rem;
-            text-decoration: none;
+        .card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 2.5rem;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            transition: transform 0.3s var(--ease-spring), border-color 0.3s;
         }
+        .card:hover { border-color: rgba(255,255,255,0.2); }
+        .card h3 { font-size: 1.5rem; margin-bottom: 1rem; color: #fff; }
+        .card p { font-size: 1rem; color: var(--color-text-secondary); margin-bottom: 2rem; flex-grow: 1; }
+        .card .meta { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: #888; margin-bottom: 1rem; }
 
-        .dir-card h3 {
-            font-size: 1.8rem;
-            margin-bottom: 1rem;
-            color: #fff;
+        /* Specific Sections */
+        .hero {
+            padding: 16rem 0 10rem 0;
+            border-bottom: 1px solid var(--color-border);
+            position: relative;
+            overflow: hidden;
         }
-
-        .dir-card p {
-            font-size: 1rem;
-            color: var(--color-text-secondary);
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at 50% 0%, rgba(255,255,255,0.03) 0%, transparent 70%);
+            z-index: -1;
+        }
+        .hero h1 {
+            font-size: clamp(4rem, 8vw, 6rem);
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            line-height: 1.1;
             margin-bottom: 2rem;
+            background: linear-gradient(180deg, #FFFFFF 0%, #888888 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-
-        .dir-link {
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: #fff;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+        .hero p {
+            font-size: 1.3rem;
+            color: var(--color-text-secondary);
+            font-weight: 300;
+            max-width: 800px;
+            margin-bottom: 3rem;
         }
+        .hero-actions { display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; }
 
-        @media (max-width: 768px) {
+        .list-clean { list-style: none; }
+        .list-clean li { font-size: 1.2rem; color: #fff; margin-bottom: 1rem; display: flex; align-items: center; gap: 1rem; }
+        .list-clean li::before { content: ''; display: block; width: 6px; height: 6px; background: #fff; border-radius: 50%; }
+
+        @media (max-width: 900px) {
             .nav-links { display: none; }
-            .split-grid { grid-template-columns: 1fr; gap: 2rem; }
-            section { padding: 5rem 0; }
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+            .hero { padding: 12rem 0 6rem 0; }
         }
 
-        footer { text-align: center; padding: 4rem 5%; border-top: 1px solid var(--color-border); }
+        /* Animated Visual Styles */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .animated-visual {
+            animation: float 6s ease-in-out infinite;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 50px rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            width: 100%;
+            transition: border-color 0.3s;
+        }
+        .animated-visual:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Footer */
+        footer { border-top: 1px solid var(--color-border); padding: 6rem 0 3rem 0; background: #000; }
+        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 4rem; margin-bottom: 6rem; }
+        @media (max-width: 900px) { .footer-grid { grid-template-columns: 1fr 1fr; } .footer-grid > div:first-child { grid-column: 1 / -1; } }
+        .footer-col h4 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; color: #fff; margin-bottom: 1.5rem; }
+        .footer-col ul { list-style: none; }
+        .footer-col ul li { margin-bottom: 0.8rem; }
+        .footer-col ul a { color: var(--color-text-secondary); text-decoration: none; font-size: 0.95rem; transition: color 0.3s; }
+        .footer-col ul a:hover { color: #fff; }
+        .footer-bottom { border-top: 1px solid var(--color-border); padding-top: 2rem; display: flex; justify-content: space-between; align-items: center; color: var(--color-text-dim); font-size: 0.8rem; }
+
     </style>
+    <link rel="stylesheet" href="assets/animations.css">
 </head>
 <body>
+    <canvas id="bg-canvas"></canvas>
 
-    <div id="loader">
-        <div class="loader-content">
-            <div class="loader-logo">YUDI</div>
-            <div class="loader-bar-bg">
-                <div class="loader-bar-fill"></div>
-            </div>
-        </div>
-    </div>
 
-    <canvas id="neural-canvas"></canvas>
-
-    <nav id="navbar">
-        <a href="#" class="logo">
-            <img src="logo.png" alt="YUDI Logo" onerror="this.outerHTML='<span style=\'font-weight:800; font-size:1.5rem; letter-spacing:0.1em; text-transform:uppercase; color:#fff;\'>YUDI.</span>'">
-        </a>
+    <nav>
+        <a href="index.html" class="logo">YUDI LABS</a>
         <div class="nav-links">
-            <a href="index.html" style="color: #fff;">Home</a>
-            <a href="about.html">About</a>
-            <a href="cmp.html">Research</a>
-            <a href="products.html">Ecosystem</a>
-            <a href="team.html">The Lab</a>
+            <a href="research.html">Research</a>
+            <a href="products.html">Products</a>
+            <a href="solutions.html">Solutions</a>
+            <a href="blog.html">Blog</a>
+            <a href="investors.html">Investors</a>
+            <a href="lab.html">Lab</a>
+            <a href="work-with-us.html" class="btn-nav">Work With Us</a>
         </div>
     </nav>
 
-    <section class="hero reveal delay-1">
+    <!-- Section 1: Hero -->
+    <header class="hero">
         <div class="container">
-            <h1 class="display-title">YUDI</h1>
-            <h2 class="subtitle">AI Research Lab</h2>
-            <p>Building a new class of Artificial Intelligence. Brain-native architecture grounded in neuroscience and emotional intelligence.</p>
-            <div class="cta-group" style="justify-content: center;">
-                <a href="#explore" class="btn btn-secondary">Explore The Lab</a>
+            <h1>Building brain-<br>native AI.</h1>
+            <p>Yudi Labs is a research-led AI company building systems that process information through sparse representation, predictive learning, memory, and relational structure.</p>
+            <div class="hero-actions">
+                <a href="research.html" class="btn btn-primary">Explore Research</a>
+                <a href="work-with-us.html" class="btn btn-secondary">Work With Us</a>
+                <a href="investors.html" class="btn-text" style="margin-left: 1rem;">For Investors &rarr;</a>
             </div>
         </div>
-    </section>
+    </header>
 
-    <section id="research" class="container">
-        <h2 class="section-title reveal">The Paradigm Shift</h2>
-        <div class="split-grid">
-            <div class="split-panel panel-yudi glass reveal delay-1">
-                <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.15em; color:var(--color-text-secondary); margin-bottom:1rem;">Our Approach</div>
-                <h3>Brain-Native Architecture</h3>
-                <p class="text-muted" style="margin-top:1rem;">Information is processed experientially, mapping conceptual nodes directly to emotional weights and relational edges.</p>
+    <!-- Section 2: What Yudi Labs Does -->
+    <section class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2>A lab that researches, builds, and deploys AI systems.</h2>
+                <p>Yudi Labs is not built around one chatbot or one product. We work across research, products, applied AI systems, and business solutions — all connected by a long-term thesis: AI should move beyond token-first prediction toward brain-native information processing.</p>
             </div>
-            <div class="split-panel panel-traditional glass reveal delay-2">
-                <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.15em; color:var(--color-text-secondary); margin-bottom:1rem;">Legacy System</div>
-                <h3>Traditional LLMs</h3>
-                <p class="text-muted" style="margin-top:1rem;">Information is processed statistically, predicting next tokens via massive matrix multiplications with zero persistent context.</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="container border-top" style="padding-top: 0;">
-        <div class="stats-grid">
-            <div class="stat-card glass reveal delay-1">
-                <div class="stat-number">80×</div>
-                <div class="stat-label">More Efficient</div>
-            </div>
-            <div class="stat-card glass reveal delay-2">
-                <div class="stat-number">10yr</div>
-                <div class="stat-label">Persistent Memory</div>
-            </div>
-            <div class="stat-card glass reveal delay-3">
-                <div class="stat-number">0</div>
-                <div class="stat-label">Tokens Required</div>
-            </div>
-        </div>
-    </section>
-
-    <section id="explore" class="container">
-        <h2 class="section-title reveal" style="text-align: center;">Lab Directory</h2>
-        <div class="directory-grid">
             
-            <a href="cmp.html" class="dir-card glass glass-hover reveal delay-1">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:1.5rem; color:#fff;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                <h3>Our Research</h3>
-                <p>Deep dive into Conversational Meaning Patterns (CMP) and our neuro-inspired architecture.</p>
-                <div class="dir-link">Read the Paper &rarr;</div>
-            </a>
-
-            <a href="products.html" class="dir-card glass glass-hover reveal delay-2">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:1.5rem; color:#fff;"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
-                <h3>Ecosystem</h3>
-                <p>Explore the deployable products built on top of our internal research, including CTS and NARA.</p>
-                <div class="dir-link">View Products &rarr;</div>
-            </a>
-
-            <a href="team.html" class="dir-card glass glass-hover reveal delay-3">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:1.5rem; color:#fff;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                <h3>The Lab</h3>
-                <p>Meet the computational neuroscientists and architects behind YUDI. Initiate contact.</p>
-                <div class="dir-link">Connect &rarr;</div>
-            </a>
-
+            <div class="grid-4">
+                <div class="card">
+                    <h3>Research</h3>
+                    <p>Brain-native AI, sparse representations, predictive coding, relational state, and new architecture research.</p>
+                    <a href="research.html" class="btn-text">View Research &rarr;</a>
+                </div>
+                <div class="card">
+                    <h3>Products</h3>
+                    <p>Tools, systems, and experimental products emerging from our research and engineering work.</p>
+                    <a href="products.html" class="btn-text">View Products &rarr;</a>
+                </div>
+                <div class="card">
+                    <h3>Solutions</h3>
+                    <p>AI systems, automation, custom agents, and marketing-growth infrastructure for businesses.</p>
+                    <a href="solutions.html" class="btn-text">Explore Solutions &rarr;</a>
+                </div>
+                <div class="card">
+                    <h3>Lab</h3>
+                    <p>A team of builders, researchers, engineers, and collaborators working toward a new AI direction.</p>
+                    <a href="lab.html" class="btn-text">Meet the Lab &rarr;</a>
+                </div>
+            </div>
         </div>
     </section>
 
-    <footer><div class="container" style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:2rem;"><div style="text-align:left;"><p style="font-weight: 800; letter-spacing: 0.2em; color: var(--color-text-dim); margin-bottom: 0.5rem;">YUDI.</p><p style="color: var(--color-text-dim); font-size: 0.8rem;">&copy; 2026 YUDI AI Research Lab. All rights reserved.</p></div><div style="display:flex; gap:2rem; font-size:0.85rem; text-transform:uppercase; letter-spacing:0.1em;"><a href="investors.html" style="color:var(--color-text-secondary); text-decoration:none;">Investors</a><a href="solutions.html" style="color:var(--color-text-secondary); text-decoration:none;">Use Cases</a><a href="faq.html" style="color:var(--color-text-secondary); text-decoration:none;">FAQ</a><a href="blog.html" style="color:var(--color-text-secondary); text-decoration:none;">Blog</a></div></div></footer>
+    <!-- Section 3: Research Thesis -->
+    <section class="section">
+        <div class="container">
+            <div class="grid-2" style="align-items: center;">
+                <div>
+                    <h2 style="font-size: 3rem; margin-bottom: 1.5rem;">Beyond token-first AI.</h2>
+                    <p style="font-size: 1.15rem; color: var(--color-text-secondary); margin-bottom: 2rem; max-width: 500px;">Modern AI systems are powerful, but most still depend on tokenized inputs, large-scale backpropagation, and attention-heavy processing. Yudi Labs studies alternative paths inspired by sparse neural activity, predictive coding, recurrent state, relational binding, and memory.</p>
+                    <a href="research.html" class="btn btn-secondary">Explore the Research</a>
+                </div>
+                <div style="text-align: center; position: relative;">
+                    <img src="assets/cmp_diagram.png" alt="Sparse Activations Diagram" class="animated-visual" style="max-height: 400px; object-fit: cover;">
+                    <ul class="list-clean" style="background: rgba(3, 3, 3, 0.85); backdrop-filter: blur(10px); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--color-border); position: absolute; bottom: -20px; right: -10px; text-align: left; font-size: 0.9rem;">
+                        <li>• Sparse representations</li>
+                        <li>• Predictive coding</li>
+                        <li>• Relational state</li>
+                        <li>• Continual memory</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <script>
-        // Pre-loader
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                const loader = document.getElementById('loader');
-                loader.style.opacity = '0';
-                loader.style.visibility = 'hidden';
-                document.body.classList.add('loaded'); 
-            }, 1900);
-        });
+    <!-- Section 4: Current Research Programs -->
+    <section class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Current research programs</h2>
+                <p>Our research is organized into programs and projects. CMP is one active project inside Yudi Labs research, not the whole company.</p>
+            </div>
+            
+            <div class="grid-3">
+                <div class="card">
+                    <h3>CMP</h3>
+                    <p>Conversational Meaning Patterns is a research project exploring sparse recurrent architectures, predictive coding, and relational internal state for brain-native AI.</p>
+                    <a href="research-cmp.html" class="btn-text">Read CMP Research &rarr;</a>
+                </div>
+                <div class="card">
+                    <h3>Predictive Coding</h3>
+                    <p>We study whether local prediction-error learning can support scalable AI systems without relying only on global backpropagation.</p>
+                    <a href="research-predictive-coding.html" class="btn-text">View Predictive Coding &rarr;</a>
+                </div>
+                <div class="card">
+                    <h3>Neuroscience Foundations</h3>
+                    <p>We draw from sparse coding, working memory, predictive processing, and relational representation without claiming to copy the brain directly.</p>
+                    <a href="research-neuroscience-foundations.html" class="btn-text">View Foundations &rarr;</a>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        // Navbar Scroll
-        const nav = document.getElementById('navbar');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 60) nav.classList.add('scrolled');
-            else nav.classList.remove('scrolled');
-        });
+    <!-- Section 5: Products Preview -->
+    <section class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Products from the lab</h2>
+                <p>Yudi Labs builds products and tools from its research and engineering work. Some are public, some are experimental, and some are internal prototypes.</p>
+            </div>
+            
+            <div class="grid-2">
+                <div class="card">
+                    <div class="meta">Status: Beta | Built from: Engineering</div>
+                    <h3>CTS (Conversational Token System)</h3>
+                    <p>For: Developers & Enterprises<br><br>An infrastructural API layer that compresses conversational state to significantly reduce token overhead for long-horizon context windows.</p>
+                    <a href="products.html" class="btn-text">View Products &rarr;</a>
+                </div>
+                <div class="card">
+                    <div class="meta">Status: Prototype | Built from: Research</div>
+                    <h3>NARA</h3>
+                    <p>For: Researchers & Academics<br><br>A research agent utilizing our sparse relational architecture to synthesize dense documents without semantic flattening.</p>
+                    <a href="products.html" class="btn-text">View Products &rarr;</a>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        // Scroll Reveal
-        const observer = new IntersectionObserver(entries => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                    observer.unobserve(entry.target); 
-                }
-            });
-        }, { threshold: 0.12 });
+    <!-- Section 6: Solutions Preview -->
+    <section class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Applied AI systems for businesses.</h2>
+                <p>Alongside research and products, Yudi Labs works with companies to design and build AI systems, automation workflows, custom agents, and growth infrastructure.</p>
+            </div>
+            
+            <div class="grid-4">
+                <div class="card" style="padding: 2rem;">
+                    <h3 style="font-size: 1.2rem;">AI Strategy</h3>
+                    <p style="font-size: 0.9rem;">For founders and teams deciding how to adopt AI meaningfully inside products and operations.</p>
+                </div>
+                <div class="card" style="padding: 2rem;">
+                    <h3 style="font-size: 1.2rem;">Business Automation</h3>
+                    <p style="font-size: 0.9rem;">Internal workflow automation, dashboards, CRM systems, document pipelines, and AI-assisted operations.</p>
+                </div>
+                <div class="card" style="padding: 2rem;">
+                    <h3 style="font-size: 1.2rem;">Custom AI Agents</h3>
+                    <p style="font-size: 0.9rem;">Research agents, support agents, content agents, operations agents, and internal copilots.</p>
+                </div>
+                <div class="card" style="padding: 2rem;">
+                    <h3 style="font-size: 1.2rem;">Marketing & Growth Systems</h3>
+                    <p style="font-size: 0.9rem;">AI-assisted content systems, campaign workflows, social media operations, lead systems, and analytics loops.</p>
+                </div>
+            </div>
+            
+            <div style="margin-top: 3rem; text-align: center;">
+                <a href="solutions.html" class="btn btn-secondary">Explore Solutions</a>
+            </div>
+        </div>
+    </section>
 
-        setTimeout(() => {
-            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-        }, 1500);
+    <!-- Section 7: Research Collaborations -->
+    <section class="section" style="background: rgba(255,255,255,0.02);">
+        <div class="container-narrow" style="text-align: center;">
+            <h2 style="font-size: 2.5rem; margin-bottom: 1.5rem; color: #fff;">For researchers, neuroscientists, and collaborators.</h2>
+            <p style="font-size: 1.15rem; color: var(--color-text-secondary); margin-bottom: 2.5rem;">Yudi Labs is open to collaboration with neuroscientists, cognitive scientists, ML researchers, independent researchers, and academic labs working on sparse coding, predictive coding, memory, representation learning, cognitive architectures, and human-AI interaction.</p>
+            <a href="research-collaborate.html" class="btn btn-primary">Collaborate With the Lab</a>
+        </div>
+    </section>
 
-        // Background Neural Canvas
-        const bgCanvas = document.getElementById('neural-canvas');
-        const bgCtx = bgCanvas.getContext('2d');
-        let bgNodes = [];
-        const isMobile = window.innerWidth <= 768;
-        const NODE_COUNT = isMobile ? 40 : 80;
+    <!-- Section 8: Blog Preview -->
+    <section class="section">
+        <div class="container">
+            <div class="section-header" style="display: flex; justify-content: space-between; align-items: flex-end;">
+                <div>
+                    <h2>Latest from the lab</h2>
+                    <p>Research Notes &middot; Technical Essays &middot; Experiment Logs &middot; Product Notes &middot; Lab Updates</p>
+                </div>
+                <a href="blog.html" class="btn-text">Read the Blog &rarr;</a>
+            </div>
+            
+            <div class="grid-3">
+                <a href="blog.html" class="card" style="text-decoration: none;">
+                    <div class="meta">Research Note</div>
+                    <h3>Mapping Emotional Weights to Concept Nodes</h3>
+                    <p>How we implemented Hebbian learning mechanics to ensure LCoM agents react to the persistent emotional state of long-horizon conversations.</p>
+                </a>
+                <a href="blog.html" class="card" style="text-decoration: none;">
+                    <div class="meta">Product Note</div>
+                    <h3>Why we built CTS: Solving the Quadratic Cost</h3>
+                    <p>Enterprise AI is bottlenecked by the API bills generated by infinite context windows. How we compress state to flatten the scaling curve.</p>
+                </a>
+                <a href="blog.html" class="card" style="text-decoration: none;">
+                    <div class="meta">Technical Essay</div>
+                    <h3>The Transformer Era is Over</h3>
+                    <p>Why scaling up dense matrix multiplications will inevitably hit a wall, and why the next frontier requires a tokenless representation primitive.</p>
+                </a>
+            </div>
+        </div>
+    </section>
 
-        function initBgCanvas() {
-            bgCanvas.width = window.innerWidth;
-            bgCanvas.height = window.innerHeight;
-            bgNodes = [];
-            for(let i = 0; i < NODE_COUNT; i++) {
-                bgNodes.push({
-                    x: Math.random() * bgCanvas.width, y: Math.random() * bgCanvas.height,
-                    vx: (Math.random() - 0.5) * 0.5, vy: (Math.random() - 0.5) * 0.5,
-                    r: Math.random() * 1.5 + 0.5
-                });
-            }
-        }
+    <!-- Section 9: Investor Preview -->
+    <section class="section">
+        <div class="container">
+            <div class="card" style="align-items: center; text-align: center; padding: 5rem 3rem;">
+                <h2 style="font-size: 2.5rem; margin-bottom: 1.5rem; color: #fff;">Building a long-term AI company.</h2>
+                <p style="font-size: 1.15rem; color: var(--color-text-secondary); margin-bottom: 2.5rem; max-width: 700px;">Yudi Labs is building toward a new AI research direction while also developing products, business solutions, and applied systems. Investors and advisors can explore our thesis, evidence, roadmap, and data room.</p>
+                <a href="investors.html" class="btn btn-secondary">Investor Overview</a>
+            </div>
+        </div>
+    </section>
 
-        function drawBgCanvas() {
-            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
-            bgCtx.fillStyle = 'rgba(255,255,255,0.6)';
+    <!-- Section 10: Final CTA -->
+    <section class="section section-no-border" style="padding: 10rem 0;">
+        <div class="container" style="text-align: center;">
+            <h2 style="font-size: 4rem; font-weight: 800; letter-spacing: -0.04em; margin-bottom: 1.5rem; color: #fff;">Work with Yudi Labs.</h2>
+            <p style="font-size: 1.2rem; color: var(--color-text-secondary); margin-bottom: 3rem;">Research collaboration, products, business solutions, investment, careers, or partnerships — start here.</p>
+            <a href="work-with-us.html" class="btn btn-primary" style="padding: 1.2rem 3.5rem; font-size: 1rem;">Work With Us</a>
+        </div>
+    </section>
 
-            for(let i = 0; i < bgNodes.length; i++) {
-                let n1 = bgNodes[i];
-                n1.x += n1.vx; n1.y += n1.vy;
-                
-                if(n1.x < 0 || n1.x > bgCanvas.width) n1.vx *= -1;
-                if(n1.y < 0 || n1.y > bgCanvas.height) n1.vy *= -1;
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <a href="index.html" class="logo" style="margin-bottom: 1rem; display: block;">YUDI LABS</a>
+                    <p style="color: var(--color-text-secondary); font-size: 0.95rem; line-height: 1.6; max-width: 250px;">Brain-native AI research, products, and solutions.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Research</h4>
+                    <ul>
+                        <li><a href="research.html">Overview</a></li>
+                        <li><a href="research-programs.html">Programs</a></li>
+                        <li><a href="research-cmp.html">CMP</a></li>
+                        <li><a href="research-predictive-coding.html">Predictive Coding</a></li>
+                        <li><a href="research-experiments.html">Experiments</a></li>
+                        <li><a href="research-publications.html">Publications</a></li>
+                        <li><a href="research-collaborate.html">Collaborate</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="solutions.html">Solutions</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                        <li><a href="investors.html">Investors</a></li>
+                        <li><a href="lab.html">Lab</a></li>
+                        <li><a href="lab-careers.html">Careers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Work With Us</h4>
+                    <ul>
+                        <li><a href="work-with-us.html">Research Collaboration</a></li>
+                        <li><a href="work-with-us.html">Business Solutions</a></li>
+                        <li><a href="work-with-us.html">Product Access</a></li>
+                        <li><a href="investors.html">Investors</a></li>
+                        <li><a href="lab-careers.html">Careers</a></li>
+                        <li><a href="work-with-us.html">General</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#">Privacy</a></li>
+                        <li><a href="#">Terms</a></li>
+                        <li><a href="#">Security</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>&copy; 2026 Yudi Labs. All rights reserved.</span>
+            </div>
+        </div>
+    </footer>
 
-                bgCtx.beginPath();
-                bgCtx.arc(n1.x, n1.y, n1.r, 0, Math.PI * 2);
-                bgCtx.fill();
-
-                for(let j = i + 1; j < bgNodes.length; j++) {
-                    let n2 = bgNodes[j];
-                    let dx = n1.x - n2.x; let dy = n1.y - n2.y;
-                    let dist = Math.sqrt(dx*dx + dy*dy);
-
-                    if(dist < 150) {
-                        bgCtx.beginPath();
-                        bgCtx.strokeStyle = `rgba(255,255,255,${0.15 * (1 - dist/150)})`;
-                        bgCtx.lineWidth = 0.5;
-                        bgCtx.moveTo(n1.x, n1.y);
-                        bgCtx.lineTo(n2.x, n2.y);
-                        bgCtx.stroke();
-                    }
-                }
-            }
-            requestAnimationFrame(drawBgCanvas);
-        }
-
-        window.addEventListener('resize', initBgCanvas);
-        initBgCanvas(); drawBgCanvas();
-    </script>
+    <script src="assets/animations.js"></script>
 </body>
 </html>

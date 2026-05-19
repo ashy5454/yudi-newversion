@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blog | Yudi Labs</title>
+    <title>Work With Us | Yudi Labs</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -55,7 +55,6 @@
             text-transform: uppercase; transition: color 0.3s;
         }
         .nav-links a:hover { color: #fff; }
-        .nav-links a.active { color: #fff; }
         .nav-links a.btn-nav {
             background: #fff; color: #000; padding: 0.6rem 1.2rem; border-radius: 6px; font-weight: 600;
         }
@@ -86,22 +85,11 @@
             margin: 0 auto;
         }
 
-        /* Filter Controls */
-        .filter-bar {
-            display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 3rem; padding: 1rem;
-            background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 8px;
-        }
-        .filter-btn {
-            background: transparent; border: none; color: var(--color-text-secondary);
-            font-family: inherit; font-size: 0.85rem; cursor: pointer; padding: 0.5rem 1rem;
-            border-radius: 4px; transition: all 0.3s; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
-        }
-        .filter-btn:hover, .filter-btn.active { background: rgba(255,255,255,0.1); color: #fff; }
-
-        /* Blog Grid */
-        .blog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 2rem; }
+        .section { padding: 5rem 0; }
         
-        .blog-card {
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; margin-bottom: 4rem; }
+        
+        .pathway-card {
             background: var(--color-surface);
             border: 1px solid var(--color-border);
             border-radius: 12px;
@@ -109,22 +97,51 @@
             display: flex;
             flex-direction: column;
             transition: transform 0.3s var(--ease-spring), border-color 0.3s;
-            text-decoration: none;
-            color: inherit;
         }
-        .blog-card:hover { border-color: rgba(255,255,255,0.2); transform: translateY(-4px); }
+        .pathway-card:hover { border-color: rgba(255,255,255,0.2); transform: translateY(-4px); }
+        .pathway-card h3 { font-size: 1.4rem; margin-bottom: 1rem; color: #fff; }
+        .pathway-card p { font-size: 0.95rem; color: var(--color-text-secondary); margin-bottom: 2rem; flex-grow: 1; }
+        .pathway-card .meta { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: #888; margin-bottom: 1rem; }
         
-        .blog-meta { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: #fff; background: rgba(255,255,255,0.1); padding: 0.3rem 0.8rem; border-radius: 4px; display: inline-block; margin-bottom: 1rem; align-self: flex-start;}
-        .blog-date { font-size: 0.85rem; color: var(--color-text-dim); margin-bottom: 1rem; display: block;}
+        .btn-select {
+            padding: 0.8rem 1.5rem; border-radius: 6px; text-decoration: none; display: inline-block;
+            font-size: 0.8rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.1em; border: 1px solid var(--color-border); color: #fff; cursor: pointer; text-align: center;
+            background: rgba(255,255,255,0.02); transition: all 0.3s;
+        }
+        .btn-select:hover { background: #fff; color: #000; }
+
+        /* Form Styles */
+        .form-container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 4rem;
+        }
+
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-text-secondary); margin-bottom: 0.5rem; }
+        input, select, textarea {
+            width: 100%; padding: 1rem 1.2rem; background: rgba(0,0,0,0.4);
+            border: 1px solid var(--color-border); color: #fff; border-radius: 8px;
+            font-family: inherit; font-size: 1rem; transition: border-color 0.3s;
+        }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.02); }
+        textarea { resize: vertical; min-height: 120px; }
         
-        .blog-card h3 { font-size: 1.5rem; margin-bottom: 1rem; color: #fff; line-height: 1.3;}
-        .blog-card p { font-size: 1rem; color: var(--color-text-secondary); margin-bottom: 2rem; flex-grow: 1; }
-        
-        .btn-text { color: #fff; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .btn-primary {
+            background: #ffffff; color: #000000; width: 100%;
+            padding: 1.2rem; border-radius: 8px; border: none; cursor: pointer;
+            font-size: 0.9rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.1em; transition: all 0.3s; margin-top: 1rem; font-family: inherit;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(255,255,255,0.15); }
 
         @media (max-width: 768px) {
             .nav-links { display: none; }
-            .blog-grid { grid-template-columns: 1fr; }
+            .form-container { padding: 2rem; }
         }
 
         /* Footer */
@@ -150,7 +167,7 @@
             <a href="research.html">Research</a>
             <a href="products.html">Products</a>
             <a href="solutions.html">Solutions</a>
-            <a href="blog.html" class="active">Blog</a>
+            <a href="blog.html">Blog</a>
             <a href="investors.html">Investors</a>
             <a href="lab.html">Lab</a>
             <a href="work-with-us.html" class="btn-nav">Work With Us</a>
@@ -159,92 +176,119 @@
 
     <header class="page-header">
         <div class="container">
-            <h1 class="title">Latest from the lab.</h1>
-            <p class="subtitle">Research notes, technical essays, experiment logs, product updates, and public thinking from the Yudi Labs team.</p>
+            <h1 class="title">Work with Yudi Labs.</h1>
+            <p class="subtitle">Research collaboration, business solutions, product access, investment, careers, or partnerships — choose the path that fits.</p>
         </div>
     </header>
 
-    <main class="container" style="padding: 4rem 0;">
+    <main class="container section">
         
-        <div class="filter-bar">
-            <button class="filter-btn active" onclick="filterBlog('all')">All</button>
-            <button class="filter-btn" onclick="filterBlog('research')">Research Notes</button>
-            <button class="filter-btn" onclick="filterBlog('essay')">Technical Essays</button>
-            <button class="filter-btn" onclick="filterBlog('experiment')">Experiment Logs</button>
-            <button class="filter-btn" onclick="filterBlog('product')">Product Notes</button>
-            <button class="filter-btn" onclick="filterBlog('solutions')">Solutions Notes</button>
-            <button class="filter-btn" onclick="filterBlog('lab')">Lab Updates</button>
+        <div class="grid-3">
+            <div class="pathway-card">
+                <div class="meta">For: Researchers & Academics</div>
+                <h3>Research Collaboration</h3>
+                <p>Collaborate on sparse coding, predictive coding, memory, and cognitive architectures.</p>
+                <button class="btn-select" onclick="selectInquiry('research')">Collaborate on Research</button>
+            </div>
+            
+            <div class="pathway-card">
+                <div class="meta">For: Founders & Teams</div>
+                <h3>Business Solutions</h3>
+                <p>Build custom AI systems, automation workflows, and marketing growth infrastructure.</p>
+                <button class="btn-select" onclick="selectInquiry('solutions')">Build an AI System</button>
+            </div>
+            
+            <div class="pathway-card">
+                <div class="meta">For: Developers & Users</div>
+                <h3>Product Access</h3>
+                <p>Request access to Yudi Labs active products, betas, and internal prototypes.</p>
+                <button class="btn-select" onclick="selectInquiry('product')">Request Product Access</button>
+            </div>
+            
+            <div class="pathway-card">
+                <div class="meta">For: Investors & Advisors</div>
+                <h3>Investors & Advisors</h3>
+                <p>Explore our thesis, evidence, roadmap, and request access to our data room.</p>
+                <button class="btn-select" onclick="selectInquiry('investor')">Request Investor Memo</button>
+            </div>
+            
+            <div class="pathway-card">
+                <div class="meta">For: Talent & Builders</div>
+                <h3>Join the Lab</h3>
+                <p>Apply for roles as researchers, engineers, designers, writers, and operators.</p>
+                <button class="btn-select" onclick="selectInquiry('careers')">Apply to Join</button>
+            </div>
+            
+            <div class="pathway-card">
+                <div class="meta">For: Media & Events</div>
+                <h3>General Partnership</h3>
+                <p>Connect regarding media, events, universities, communities, and general inquiries.</p>
+                <button class="btn-select" onclick="selectInquiry('partnership')">Start a Conversation</button>
+            </div>
         </div>
 
-        <div class="blog-grid">
+        <div class="form-container" id="contact-form">
+            <h2 style="font-size: 2rem; margin-bottom: 2rem; color: #fff; text-align: center;">Initiate Contact</h2>
+            <p style="text-align: center; color: var(--color-text-secondary); margin-bottom: 2rem;">Or email us directly at <a href="mailto:team@yudi.co.in" style="color: #fff;">team@yudi.co.in</a></p>
             
-            <a href="#" class="blog-card" data-category="essay">
-                <span class="blog-meta">Technical Essay</span>
-                <span class="blog-date">May 19, 2026</span>
-                <h3>The Case for Brain-Native Architectures Over Token-First Scaling</h3>
-                <p>Why scaling up dense matrix multiplications and token-based backpropagation will inevitably hit a wall in terms of continuous learning and compositional generalization.</p>
-                <span class="btn-text">Read Essay &rarr;</span>
-            </a>
+            <form action="https://formspree.io/f/mqewlawk" method="POST">
+                <div class="form-group">
+                    <label>Inquiry Type</label>
+                    <select name="inquiry_type" id="inquiry-select" required>
+                        <option value="" disabled selected>Select a path...</option>
+                        <option value="research">Research Collaboration</option>
+                        <option value="solutions">Business Solutions</option>
+                        <option value="product">Product Access</option>
+                        <option value="investor">Investor / Advisor</option>
+                        <option value="careers">Careers (Join the Lab)</option>
+                        <option value="partnership">General Partnership</option>
+                        <option value="general">General</option>
+                    </select>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" name="email" required>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Organization / Company</label>
+                        <input type="text" name="organization">
+                    </div>
+                    <div class="form-group">
+                        <label>Your Role</label>
+                        <input type="text" name="role">
+                    </div>
+                </div>
 
-            <a href="#" class="blog-card" data-category="research">
-                <span class="blog-meta">Research Note</span>
-                <span class="blog-date">May 12, 2026</span>
-                <h3>Mapping Emotional Weights to Concept Nodes</h3>
-                <p>How we implemented Hebbian learning mechanics to ensure our relational state binder reacts to the persistent emotional trajectory of long-horizon conversations.</p>
-                <span class="btn-text">Read Note &rarr;</span>
-            </a>
-
-            <a href="#" class="blog-card" data-category="product">
-                <span class="blog-meta">Product Note</span>
-                <span class="blog-date">April 28, 2026</span>
-                <h3>Why we built CTS: Managing the Quadratic Cost of Context</h3>
-                <p>Enterprise AI is bottlenecked by the API bills generated by infinite context windows. We detail how the Conversational Token System compresses state to flatten the scaling curve.</p>
-                <span class="btn-text">Read Note &rarr;</span>
-            </a>
-
-            <a href="#" class="blog-card" data-category="solutions">
-                <span class="blog-meta">Solutions Note</span>
-                <span class="blog-date">April 15, 2026</span>
-                <h3>Deploying a Custom Research Agent for a Biotech Client</h3>
-                <p>A look at how we implemented a specialized version of the NARA prototype to help a biotech firm synthesize thousands of highly dense medical PDFs without semantic flattening.</p>
-                <span class="btn-text">Read Note &rarr;</span>
-            </a>
-            
-            <a href="#" class="blog-card" data-category="experiment">
-                <span class="blog-meta">Experiment Log</span>
-                <span class="blog-date">March 30, 2026</span>
-                <h3>Failure Mode: Hash Collisions in CMP v1</h3>
-                <p>A post-mortem on why our initial Hash Encoder failed to generalize across OOV terms, and the path forward utilizing a trainable LearnedSparseEncoder.</p>
-                <span class="btn-text">Read Log &rarr;</span>
-            </a>
-            
-            <a href="#" class="blog-card" data-category="lab">
-                <span class="blog-meta">Lab Update</span>
-                <span class="blog-date">March 10, 2026</span>
-                <h3>Yudi Labs Emerges to Build Beyond the Token</h3>
-                <p>Announcing the formal restructuring of Yudi Labs as a research-led AI company focused on sparse representation and predictive coding.</p>
-                <span class="btn-text">Read Update &rarr;</span>
-            </a>
-
+                <div class="form-group">
+                    <label>Optional Link (LinkedIn, GitHub, Website)</label>
+                    <input type="url" name="link" placeholder="https://...">
+                </div>
+                
+                <div class="form-group">
+                    <label>Message</label>
+                    <textarea name="message" placeholder="Provide details about your inquiry..." required></textarea>
+                </div>
+                
+                <button type="submit" class="btn-primary">Send Inquiry</button>
+            </form>
         </div>
 
     </main>
 
     <script>
-        function filterBlog(category) {
-            // Update active button state
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-
-            // Filter cards
-            const cards = document.querySelectorAll('.blog-card');
-            cards.forEach(card => {
-                if (category === 'all' || card.dataset.category === category) {
-                    card.style.display = 'flex';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
+        function selectInquiry(value) {
+            const select = document.getElementById('inquiry-select');
+            select.value = value;
+            document.getElementById('contact-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     </script>
 

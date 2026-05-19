@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solutions & Use Cases — YUDI Lab</title>
+    <title>Solutions | Yudi Labs</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -43,17 +43,23 @@
             position: fixed; top: 0; width: 100%; z-index: 100;
             padding: 1.5rem 5%; transition: all 0.4s ease;
             display: flex; justify-content: space-between; align-items: center;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(3, 3, 3, 0.8);
             backdrop-filter: blur(20px); border-bottom: 1px solid var(--color-border);
         }
-        .logo img { height: 48px; width: auto; object-fit: contain; }
-        .nav-links { display: flex; gap: 2.5rem; align-items: center; }
+        .logo { font-weight: 800; font-size: 1.5rem; letter-spacing: 0.1em; text-transform: uppercase; color: #fff; text-decoration: none; }
+        
+        .nav-links { display: flex; gap: 2rem; align-items: center; }
         .nav-links a {
             color: var(--color-text-secondary); text-decoration: none;
-            font-size: 0.85rem; font-weight: 500; letter-spacing: 0.1em;
+            font-size: 0.85rem; font-weight: 500; letter-spacing: 0.05em;
             text-transform: uppercase; transition: color 0.3s;
         }
         .nav-links a:hover { color: #fff; }
+        .nav-links a.active { color: #fff; }
+        .nav-links a.btn-nav {
+            background: #fff; color: #000; padding: 0.6rem 1.2rem; border-radius: 6px; font-weight: 600;
+        }
+        .nav-links a.btn-nav:hover { background: #eee; color: #000; }
 
         /* Page Layout */
         .page-header {
@@ -66,7 +72,7 @@
             font-size: clamp(3rem, 6vw, 5rem);
             font-weight: 800;
             letter-spacing: -0.04em;
-            background: linear-gradient(180deg, #FFFFFF 0%, #777777 100%);
+            background: linear-gradient(180deg, #FFFFFF 0%, #888888 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 1.5rem;
@@ -85,132 +91,225 @@
         .solution-card {
             background: var(--color-surface);
             border: 1px solid var(--color-border);
-            border-radius: 1.2rem;
-            padding: 4rem 3rem;
+            border-radius: 12px;
+            padding: 3rem;
             margin-bottom: 3rem;
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 2fr;
             gap: 3rem;
-            align-items: center;
         }
-
-        .solution-card:nth-child(even) {
-            background: rgba(255,255,255,0.01);
-        }
-
-        .solution-content h2 { font-size: 2rem; margin-bottom: 1rem; color: #fff; }
-        .solution-content p { font-size: 1.1rem; color: rgba(255,255,255,0.8); margin-bottom: 1.5rem; font-weight: 300; }
         
-        .solution-meta {
-            padding: 2rem;
-            border-left: 1px solid var(--color-border);
-            background: rgba(0,0,0,0.2);
-            border-radius: 0 1.2rem 1.2rem 0;
+        .solution-card h3 { font-size: 1.8rem; margin-bottom: 0.5rem; color: #fff; }
+        .solution-card .meta { font-size: 0.9rem; color: var(--color-text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
+        
+        .solution-card ul { margin-left: 1.5rem; margin-top: 1rem; color: var(--color-text-secondary); font-size: 1.1rem; }
+        .solution-card li { margin-bottom: 0.5rem; }
+        
+        .btn-primary {
+            padding: 1.2rem 3rem; border-radius: 8px; text-decoration: none; display: inline-block;
+            font-size: 0.95rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.1em; transition: all 0.3s var(--ease-spring); border: none; cursor: pointer; text-align: center;
+            background: #ffffff; color: #000000;
         }
-
-        .meta-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-text-secondary); margin-bottom: 0.3rem; }
-        .meta-value { font-size: 1.1rem; color: #fff; margin-bottom: 1.5rem; font-weight: 600; }
 
         @media (max-width: 768px) {
             .nav-links { display: none; }
-            .solution-card { grid-template-columns: 1fr; padding: 2rem; }
-            .solution-meta { border-left: none; border-top: 1px solid var(--color-border); border-radius: 0 0 1.2rem 1.2rem; padding: 2rem 0 0 0; }
+            .solution-card { grid-template-columns: 1fr; gap: 1rem; padding: 2rem;}
         }
 
-        footer { text-align: center; padding: 4rem 5%; border-top: 1px solid var(--color-border); margin-top: 5rem;}
+        /* Footer */
+        footer { border-top: 1px solid var(--color-border); padding: 6rem 0 3rem 0; background: #000; margin-top: 5rem;}
+        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 4rem; margin-bottom: 6rem; }
+        @media (max-width: 900px) { .footer-grid { grid-template-columns: 1fr 1fr; } .footer-grid > div:first-child { grid-column: 1 / -1; } }
+        .footer-col h4 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; color: #fff; margin-bottom: 1.5rem; }
+        .footer-col ul { list-style: none; }
+        .footer-col ul li { margin-bottom: 0.8rem; }
+        .footer-col ul a { color: var(--color-text-secondary); text-decoration: none; font-size: 0.95rem; transition: color 0.3s; }
+        .footer-col ul a:hover { color: #fff; }
+        .footer-bottom { border-top: 1px solid var(--color-border); padding-top: 2rem; display: flex; justify-content: space-between; align-items: center; color: var(--color-text-dim); font-size: 0.8rem; }
     </style>
+    <link rel="stylesheet" href="assets/animations.css">
 </head>
 <body>
+    <canvas id="bg-canvas"></canvas>
 
-    <nav id="navbar">
-        <a href="index.html" class="logo">
-            <img src="logo.png" alt="YUDI Logo" onerror="this.outerHTML='<span style=\'font-weight:800; font-size:1.5rem; letter-spacing:0.1em; text-transform:uppercase; color:#fff;\'>YUDI.</span>'">
-        </a>
+
+    <nav>
+        <a href="index.html" class="logo">YUDI LABS</a>
         <div class="nav-links">
-            <a href="index.html">Home</a>
-            <a href="about.html">About</a>
-            <a href="cmp.html">Research</a>
-            <a href="products.html">Ecosystem</a>
-            <a href="team.html">The Lab</a>
+            <a href="research.html">Research</a>
+            <a href="products.html">Products</a>
+            <a href="solutions.html" class="active">Solutions</a>
+            <a href="blog.html">Blog</a>
+            <a href="investors.html">Investors</a>
+            <a href="lab.html">Lab</a>
+            <a href="work-with-us.html" class="btn-nav">Work With Us</a>
         </div>
     </nav>
 
     <header class="page-header">
         <div class="container">
-            <div style="font-size:0.85rem; font-weight:600; text-transform:uppercase; letter-spacing:0.2em; color:var(--color-text-secondary); margin-bottom:1rem;">Use Cases</div>
-            <h1 class="title">Applied Architecture</h1>
-            <p class="subtitle">How our brain-native LCoMs translate into concrete business outcomes and superior unit economics.</p>
+            <h1 class="title">AI systems for businesses.</h1>
+            <p class="subtitle">Yudi Labs works with companies to design and build AI systems, automation workflows, custom agents, and growth infrastructure.</p>
         </div>
     </header>
 
     <main class="container">
         
-        <div class="content-section">
+        <section class="content-section">
             
             <div class="solution-card">
-                <div class="solution-content">
-                    <h2>Persistent AI Companions</h2>
-                    <p>Current companions feel robotic because they reset context. Using our Conversational Token System (CTS) layered with Sam, developers can deploy companions that remember interactions from years ago without ballooning API costs.</p>
-                    <p>The companion maps user interactions to emotional weights, allowing the agent to react with genuine empathy based on the historical relationship, not just the immediate prompt.</p>
+                <div>
+                    <h3>AI Strategy</h3>
+                    <div class="meta">For Founders & Product Teams</div>
                 </div>
-                <div class="solution-meta">
-                    <div class="meta-label">Primary Product</div>
-                    <div class="meta-value">CTS + Sam Agent</div>
-                    
-                    <div class="meta-label">Architecture Driver</div>
-                    <div class="meta-value">Emotional Weighting</div>
-
-                    <div class="meta-label">Business Outcome</div>
-                    <div class="meta-value">80% reduction in long-horizon API costs.</div>
+                <div>
+                    <p style="color: var(--color-text-secondary); font-size: 1.1rem; margin-bottom: 1rem;">For founders and teams deciding how to adopt AI meaningfully inside products and operations.</p>
+                    <ul>
+                        <li>AI roadmap development</li>
+                        <li>Product strategy & scoping</li>
+                        <li>Workflow audit & optimization</li>
+                        <li>AI implementation planning</li>
+                        <li>Research-to-product advisory</li>
+                    </ul>
                 </div>
             </div>
-
+            
             <div class="solution-card">
-                <div class="solution-content">
-                    <h2>Enterprise Knowledge Research</h2>
-                    <p>Standard RAG pipelines fail on complex, dense documents like legal contracts or clinical trial data due to semantic flattening. They retrieve fragments devoid of macro-context.</p>
-                    <p>Our NARA agent reads entire corpus sets and builds a sparse relational map. It can answer synthesis questions like "How do these 40 clinical trials contradict each other?" while providing exact, bi-directional citations to the source material.</p>
+                <div>
+                    <h3>Business Automation</h3>
+                    <div class="meta">For Operators & Operations</div>
                 </div>
-                <div class="solution-meta">
-                    <div class="meta-label">Primary Product</div>
-                    <div class="meta-value">NARA Agent</div>
-                    
-                    <div class="meta-label">Architecture Driver</div>
-                    <div class="meta-value">Sparse Relational Edges</div>
-
-                    <div class="meta-label">Business Outcome</div>
-                    <div class="meta-value">Zero hallucination in technical workflows.</div>
+                <div>
+                    <p style="color: var(--color-text-secondary); font-size: 1.1rem; margin-bottom: 1rem;">Transform manual overhead into intelligent pipelines.</p>
+                    <ul>
+                        <li>Internal dashboards & reporting</li>
+                        <li>CRM systems & integration</li>
+                        <li>Google Sheets / Airtable automation</li>
+                        <li>Document processing pipelines</li>
+                        <li>Operations copilots</li>
+                    </ul>
                 </div>
             </div>
-
+            
             <div class="solution-card">
-                <div class="solution-content">
-                    <h2>Long-Horizon Co-Pilots</h2>
-                    <p>Coding and strategy co-pilots are currently limited to immediate tasks. They cannot hold the entire 6-month architectural roadmap of a software project in their context window.</p>
-                    <p>LCoMs utilize Hippocampal-style memory consolidation. They push irrelevant details into dormant storage and only retrieve them when a partial cue is detected, allowing the co-pilot to assist on massive, multi-month projects with perfect contextual awareness.</p>
+                <div>
+                    <h3>Custom AI Agents</h3>
+                    <div class="meta">For Support & Knowledge Teams</div>
                 </div>
-                <div class="solution-meta">
-                    <div class="meta-label">Primary Product</div>
-                    <div class="meta-value">Enterprise Pilot</div>
-                    
-                    <div class="meta-label">Architecture Driver</div>
-                    <div class="meta-value">Gated Working Memory</div>
-
-                    <div class="meta-label">Business Outcome</div>
-                    <div class="meta-value">Infinite context scaling.</div>
+                <div>
+                    <p style="color: var(--color-text-secondary); font-size: 1.1rem; margin-bottom: 1rem;">Deploy persistent agents tuned to your internal knowledge base and brand guidelines.</p>
+                    <ul>
+                        <li>Research agents</li>
+                        <li>Support agents (L1/L2)</li>
+                        <li>Content generation agents</li>
+                        <li>Operations agents</li>
+                        <li>Internal knowledge copilots</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="solution-card">
+                <div>
+                    <h3>AI Product Development</h3>
+                    <div class="meta">For Startups & Enterprises</div>
+                </div>
+                <div>
+                    <p style="color: var(--color-text-secondary); font-size: 1.1rem; margin-bottom: 1rem;">End-to-end engineering to bring new AI capabilities to life.</p>
+                    <ul>
+                        <li>Rapid MVPs</li>
+                        <li>AI-native web apps</li>
+                        <li>Prototype-to-product scaling</li>
+                        <li>LLM integration (OpenAI, Anthropic, Open-source)</li>
+                        <li>Backend + database + deployment infrastructure</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="solution-card" style="border-color: rgba(255,255,255,0.2);">
+                <div>
+                    <h3>Marketing & Growth Systems</h3>
+                    <div class="meta">For Growth & Marketing Teams</div>
+                </div>
+                <div>
+                    <p style="color: var(--color-text-secondary); font-size: 1.1rem; margin-bottom: 1rem;">We do not offer generic marketing services. We build AI-powered growth systems and operational infrastructure to scale your reach.</p>
+                    <ul>
+                        <li>AI content systems at scale</li>
+                        <li>Social media workflow automation</li>
+                        <li>Campaign automation triggers</li>
+                        <li>Influencer & outreach operations</li>
+                        <li>Lead qualification systems</li>
+                        <li>Analytics dashboards & content calendars</li>
+                    </ul>
                 </div>
             </div>
 
-        </div>
-
-        <div style="text-align: center; margin-bottom: 3rem;">
-            <a href="pricing.html" style="display: inline-block; padding: 1rem 2.5rem; border-radius: 8px; background: #fff; color: #000; text-decoration: none; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.15em;">Request Pilot Access</a>
-        </div>
+        </section>
+        
+        <section class="content-section" style="text-align: center; border-top: 1px solid var(--color-border); padding-top: 6rem;">
+            <h2 style="font-size: 3rem; margin-bottom: 1.5rem; color: #fff;">Work With Yudi</h2>
+            <p style="font-size: 1.1rem; color: var(--color-text-secondary); margin-bottom: 3rem;">Ready to build a solution with us? Initiate a conversation to outline your requirements.</p>
+            <a href="work-with-us.html" class="btn-primary" onclick="localStorage.setItem('inquiryPrefill', 'solutions');">Build a Solution With Us</a>
+        </section>
 
     </main>
 
-    <footer><div class="container" style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:2rem;"><div style="text-align:left;"><p style="font-weight: 800; letter-spacing: 0.2em; color: var(--color-text-dim); margin-bottom: 0.5rem;">YUDI.</p><p style="color: var(--color-text-dim); font-size: 0.8rem;">&copy; 2026 YUDI AI Research Lab. All rights reserved.</p></div><div style="display:flex; gap:2rem; font-size:0.85rem; text-transform:uppercase; letter-spacing:0.1em;"><a href="investors.html" style="color:var(--color-text-secondary); text-decoration:none;">Investors</a><a href="solutions.html" style="color:var(--color-text-secondary); text-decoration:none;">Use Cases</a><a href="faq.html" style="color:var(--color-text-secondary); text-decoration:none;">FAQ</a><a href="blog.html" style="color:var(--color-text-secondary); text-decoration:none;">Blog</a></div></div></footer>
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <a href="index.html" class="logo" style="margin-bottom: 1rem; display: block;">YUDI LABS</a>
+                    <p style="color: var(--color-text-secondary); font-size: 0.95rem; line-height: 1.6; max-width: 250px;">Brain-native AI research, products, and solutions.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Research</h4>
+                    <ul>
+                        <li><a href="research.html">Overview</a></li>
+                        <li><a href="research-programs.html">Programs</a></li>
+                        <li><a href="research-cmp.html">CMP</a></li>
+                        <li><a href="research-predictive-coding.html">Predictive Coding</a></li>
+                        <li><a href="research-experiments.html">Experiments</a></li>
+                        <li><a href="research-publications.html">Publications</a></li>
+                        <li><a href="research-collaborate.html">Collaborate</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="solutions.html">Solutions</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                        <li><a href="investors.html">Investors</a></li>
+                        <li><a href="lab.html">Lab</a></li>
+                        <li><a href="lab-careers.html">Careers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Work With Us</h4>
+                    <ul>
+                        <li><a href="work-with-us.html">Research Collaboration</a></li>
+                        <li><a href="work-with-us.html">Business Solutions</a></li>
+                        <li><a href="work-with-us.html">Product Access</a></li>
+                        <li><a href="investors.html">Investors</a></li>
+                        <li><a href="lab-careers.html">Careers</a></li>
+                        <li><a href="work-with-us.html">General</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#">Privacy</a></li>
+                        <li><a href="#">Terms</a></li>
+                        <li><a href="#">Security</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>&copy; 2026 Yudi Labs. All rights reserved.</span>
+            </div>
+        </div>
+    </footer>
 
+    <script src="assets/animations.js"></script>
 </body>
 </html>
-
