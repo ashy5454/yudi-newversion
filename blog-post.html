@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Post | Yudi Labs</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Shared Styles */
+        :root {
+            --color-bg: #030303;
+            --color-surface: rgba(255, 255, 255, 0.03);
+            --color-surface-hover: rgba(255, 255, 255, 0.06);
+            --color-border: rgba(255, 255, 255, 0.08);
+            --color-text-primary: rgba(255, 255, 255, 0.95);
+            --color-text-secondary: rgba(255, 255, 255, 0.5);
+            --color-text-dim: rgba(255, 255, 255, 0.2);
+            --font-stack: 'Outfit', system-ui, -apple-system, sans-serif;
+            --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--color-bg);
+            color: var(--color-text-primary);
+            font-family: var(--font-stack);
+            line-height: 1.8;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4 { line-height: 1.2; font-weight: 600; }
+        .container { max-width: 800px; margin: 0 auto; padding: 0 5%; }
+        .text-muted { color: var(--color-text-secondary); }
+
+        /* Navigation */
+        nav {
+            position: fixed; top: 0; width: 100%; z-index: 100;
+            padding: 1.5rem 5%; transition: all 0.4s ease;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(3, 3, 3, 0.8);
+            backdrop-filter: blur(20px); border-bottom: 1px solid var(--color-border);
+        }
+        .logo { font-weight: 800; font-size: 1.5rem; letter-spacing: 0.1em; text-transform: uppercase; color: #fff; text-decoration: none; }
+        
+        .nav-links { display: flex; gap: 2rem; align-items: center; }
+        .nav-links a {
+            color: var(--color-text-secondary); text-decoration: none;
+            font-size: 0.85rem; font-weight: 500; letter-spacing: 0.05em;
+            text-transform: uppercase; transition: color 0.3s;
+        }
+        .nav-links a:hover { color: #fff; }
+        .nav-links a.active { color: #fff; }
+        .nav-links a.btn-nav {
+            background: #fff; color: #000; padding: 0.6rem 1.2rem; border-radius: 6px; font-weight: 600;
+        }
+        .nav-links a.btn-nav:hover { background: #eee; color: #000; }
+
+        /* Page Layout */
+        .page-header {
+            padding: 12rem 0 4rem 0;
+            text-align: center;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .title {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(180deg, #FFFFFF 0%, #888888 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .meta-info {
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--color-border);
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            color: #fff;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        .author-label {
+            color: var(--color-text-secondary);
+        }
+
+        .author-label strong {
+            color: #fff;
+            font-weight: 500;
+        }
+
+        /* Post Body */
+        .post-body {
+            padding: 4rem 0;
+            font-size: 1.15rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 300;
+        }
+
+        .post-body p {
+            margin-bottom: 2rem;
+        }
+
+        .post-body h2 {
+            font-size: 2rem;
+            color: #fff;
+            margin-top: 3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .post-body h3 {
+            font-size: 1.5rem;
+            color: #fff;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .post-body blockquote {
+            border-left: 3px solid #fff;
+            padding-left: 2rem;
+            margin: 3rem 0;
+            font-style: italic;
+            color: var(--color-text-secondary);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+            transition: color 0.3s;
+        }
+        .back-link:hover {
+            color: #fff;
+        }
+
+        /* Image styling */
+        .post-hero-image {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid var(--color-border);
+            margin-bottom: 3rem;
+            max-height: 450px;
+            object-fit: cover;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+        }
+
+        /* Footer */
+        footer { border-top: 1px solid var(--color-border); padding: 6rem 0 3rem 0; background: #000; margin-top: 5rem;}
+        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 4rem; margin-bottom: 6rem; }
+        @media (max-width: 900px) { .footer-grid { grid-template-columns: 1fr 1fr; } .footer-grid > div:first-child { grid-column: 1 / -1; } }
+        .footer-col h4 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; color: #fff; margin-bottom: 1.5rem; }
+        .footer-col ul { list-style: none; }
+        .footer-col ul li { margin-bottom: 0.8rem; }
+        .footer-col ul a { color: var(--color-text-secondary); text-decoration: none; font-size: 0.95rem; transition: color 0.3s; }
+        .footer-col ul a:hover { color: #fff; }
+        .footer-bottom { border-top: 1px solid var(--color-border); padding-top: 2rem; display: flex; justify-content: space-between; align-items: center; color: var(--color-text-dim); font-size: 0.8rem; }
+    </style>
+    <link rel="stylesheet" href="assets/animations.css">
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+
+    <nav>
+        <a href="index.html" class="logo">YUDI LABS</a>
+        <div class="nav-links">
+            <a href="research.html">Research</a>
+            <a href="products.html">Products</a>
+            <a href="solutions.html">Solutions</a>
+            <a href="blog.html" class="active">Blog</a>
+            <a href="investors.html">Investors</a>
+            <a href="lab.html">Lab</a>
+            <a href="work-with-us.html" class="btn-nav">Work With Us</a>
+        </div>
+    </nav>
+
+    <article>
+        <header class="page-header">
+            <div class="container">
+                <a href="blog.html" class="back-link">&larr; Back to Blog</a>
+                <div class="meta-info">
+                    <span class="badge" id="post-badge">Lab Update</span>
+                    <span id="post-date">May 19, 2026</span>
+                    <span class="author-label">By <strong id="post-author">Ashmith Atmuri</strong></span>
+                </div>
+                <h1 class="title" id="post-title">Loading Article...</h1>
+            </div>
+        </header>
+
+        <main class="container">
+            <div class="post-body">
+                <img id="post-image" class="post-hero-image" style="display: none;" src="" alt="Hero Image">
+                <div id="post-content">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+        </main>
+    </article>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <a href="index.html" class="logo" style="margin-bottom: 1rem; display: block;">YUDI LABS</a>
+                    <p style="color: var(--color-text-secondary); font-size: 0.95rem; line-height: 1.6; max-width: 250px;">Brain-native AI research, products, and solutions.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Research</h4>
+                    <ul>
+                        <li><a href="research.html">Overview</a></li>
+                        <li><a href="research-programs.html">Programs</a></li>
+                        <li><a href="research-cmp.html">CMP</a></li>
+                        <li><a href="research-predictive-coding.html">Predictive Coding</a></li>
+                        <li><a href="research-experiments.html">Experiments</a></li>
+                        <li><a href="research-publications.html">Publications</a></li>
+                        <li><a href="research-collaborate.html">Collaborate</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="solutions.html">Solutions</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                        <li><a href="investors.html">Investors</a></li>
+                        <li><a href="lab.html">Lab</a></li>
+                        <li><a href="lab-careers.html">Careers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Work With Us</h4>
+                    <ul>
+                        <li><a href="work-with-us.html">Research Collaboration</a></li>
+                        <li><a href="work-with-us.html">Business Solutions</a></li>
+                        <li><a href="work-with-us.html">Product Access</a></li>
+                        <li><a href="investors.html">Investors</a></li>
+                        <li><a href="lab-careers.html">Careers</a></li>
+                        <li><a href="work-with-us.html">General</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#">Privacy</a></li>
+                        <li><a href="#">Terms</a></li>
+                        <li><a href="#">Security</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>&copy; 2026 Yudi Labs. All rights reserved.</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const PROJECT_ID = "7xfeub9j";
+        const DATASET    = "production";
+        const API_VER    = "2023-01-01";
+        const ENDPOINT   = `https://${PROJECT_ID}.api.sanity.io/v${API_VER}/data/query/${DATASET}`;
+
+        const fallbackPostsDetail = {
+            "road-ahead-long-context": {
+                label: "Research Note",
+                date: "May 18, 2026",
+                title: "The Road Ahead: Long-Context Proofs and What Comes Next for CMP",
+                content: `
+                    <p>With CMP v1.5 validated and ablations underway, we're pausing to map the next phase of research. The immediate question is no longer "does CMP work?" — it does. The question is: where does it work <em>better</em> than existing approaches?</p>
+                    <h2>The Long-Context Thesis</h2>
+                    <p>Transformers store context explicitly in growing attention windows and KV caches. CMP processes streams through a fixed-size recurrent state. This is a fundamentally different trade-off: flat memory growth versus richer per-token context. We believe this trade-off favors CMP in streaming, long-horizon, and memory-constrained scenarios.</p>
+                    <h2>What We're Building Next</h2>
+                    <p>Our next proof package includes: context-length scaling benchmarks (128 to 2048+ tokens), memory retention probes, entity state tracking across long passages, and streaming inference efficiency comparisons. The goal is not to claim CMP has "infinite memory" — fixed state has finite capacity. The goal is to show that CMP's memory stays compact while retaining useful information.</p>
+                    <blockquote>"The experiment asks: does the notebook stay compact, and does it still remember useful information?"</blockquote>
+                    <p>We'll share results as they come in. This is the honest, iterative work of building a new representation primitive.</p>
+                `,
+                author: "Ashmith Atmuri"
+            },
+            "ablations-before-scaling": {
+                label: "Research Note",
+                date: "May 16, 2026",
+                title: "Why We're Running Ablations Before Scaling to 1B",
+                content: `
+                    <p>After CMP v1.5 delivered a strong result on WikiText-103, the tempting next step is obvious: scale to 1 billion parameters and see what happens. We're deliberately not doing that yet.</p>
+                    <h2>The Problem with Blind Scaling</h2>
+                    <p>Scaling is expensive, and scaling the wrong architecture is a waste. Before committing serious compute, we need to know which parts of CMP are actually load-bearing. Is the relational binding term doing real work? Is the state-dependent gating essential? Would a plain feed-forward network in place of our sparse-gated refinement achieve the same improvement?</p>
+                    <h2>The Ablation Set</h2>
+                    <p>We're running six targeted ablations: the full v1.5 baseline, v1.5 without sparse-gated refinement, v1.5 with a plain FFN instead of sparse-gated refinement, v1.5 without relational binding, v1.5 without state-dependent gating, and a parameter-matched smaller v1.5 to rule out pure capacity effects.</p>
+                    <p>Each ablation answers a specific question. Together, they tell us whether CMP's architecture is genuinely novel or just bigger. We'll only scale what we can prove matters.</p>
+                `,
+                author: "Ashmith Atmuri"
+            },
+            "v15-closes-gap": {
+                label: "Experiment Log",
+                date: "May 15, 2026",
+                title: "CMP v1.5 Closes 82% of the Gap to Transformers",
+                content: `
+                    <p>Today we have a result worth reporting carefully. CMP v1.5 — our completed block architecture with sparse-gated refinement — achieved a test perplexity of 68.2 on WikiText-103 after 3 epochs of training.</p>
+                    <h2>The Numbers</h2>
+                    <p>For context: the original CMP v1 scored 154.3 test PPL after the same training regime. Our local causal Transformer baseline scored 49.4. That means CMP v1.5 closed roughly 82% of the absolute gap between old CMP and the Transformer baseline.</p>
+                    <h2>What This Means</h2>
+                    <p>This is a strong internal result. It confirms that the original CMP was an incomplete block, not a dead architecture. The sparse-gated refinement stage is clearly load-bearing — it nearly halved perplexity compared to v1.</p>
+                    <blockquote>"CMP v1.5 is not yet proven to beat Transformers. But the gap is now 18.8 PPL points instead of 104.9."</blockquote>
+                    <p>We're not claiming victory. CMP v1.5 is still behind Transformers on standard WikiText perplexity and is currently slower per epoch. The next steps are ablations, efficiency measurement, and benchmarks where CMP's structural representation may have a genuine advantage.</p>
+                `,
+                author: "Ashmith Atmuri"
+            },
+            "designing-cmp-v15": {
+                label: "Research Note",
+                date: "May 14, 2026",
+                title: "Designing the CMP Block v1.5: Sparse-Gated Refinement",
+                content: `
+                    <p>After Phase 3 comparisons showed CMP trailing the Transformer baseline by a wide margin, we stepped back and asked a structural question: is CMP an incomplete block?</p>
+                    <h2>The Missing Piece</h2>
+                    <p>A Transformer block has two main components: attention (global mixing) and a feed-forward network (per-position refinement). CMP had sparse relational binding and recurrence — but no equivalent of the second stage. We were comparing a half-block against a full block.</p>
+                    <h2>The Design Decision</h2>
+                    <p>We had three options: add a plain FFN (fast but philosophically weak), add second-order binding (strong but risky), or add sparse-gated refinement (balanced). We chose sparse-gated refinement because it's CMP-native — the sparse pattern gates the refinement stage, keeping the architecture true to the sparse structural thesis without introducing attention.</p>
+                    <p>The resulting CMP Block v1.5 follows the pattern: sparse input → relational mixer → residual → sparse-gated refinement → residual → output. Smoke tests showed immediate improvement over the original block.</p>
+                `,
+                author: "Ashmith Atmuri"
+            },
+            "phase3-comparison-results": {
+                label: "Experiment Log",
+                date: "May 13, 2026",
+                title: "Phase 3 Results: CMP Beats GRU, Trails Attention",
+                content: `
+                    <p>The first serious benchmark comparison is complete. Three models, same dataset, same conditions, same 3-epoch training regime on WikiText-103.</p>
+                    <h2>The Results</h2>
+                    <p>CMP achieved a test perplexity of 154.3 at 77 million parameters. The GRU baseline scored 1095.6 at 100 million parameters. The causal Transformer baseline scored 49.4 at 153 million parameters.</p>
+                    <h2>What This Tells Us</h2>
+                    <p>CMP substantially outperformed the GRU baseline under the same sparse-pattern input setup. This suggests CMP's relational recurrent architecture captures something that a plain recurrent baseline cannot. However, the Transformer baseline was much stronger on standard language modeling perplexity and also much faster per epoch.</p>
+                    <blockquote>"CMP is viable and learns real language at 77M scale. It does not currently beat attention on standard WikiText-103 perplexity."</blockquote>
+                    <p>The honest conclusion: CMP is not yet an attention replacement. But the question shifts — does CMP have advantages on tasks where structural representation matters more than raw next-word prediction?</p>
+                `,
+                author: "Ashmith Atmuri"
+            },
+            "a100-phase3-begins": {
+                label: "Lab Update",
+                date: "May 12, 2026",
+                title: "CMP Goes to the Cloud: A100 Phase 3 Begins",
+                content: `
+                    <p>Today we moved CMP training from a Colab T4 GPU to a dedicated GCP A100 instance. This is the transition from validation to real benchmarking.</p>
+                    <h2>The Setup</h2>
+                    <p>Our A100 VM runs in us-central1 with 40GB of GPU memory. The Phase 3 configuration uses 8 layers with 77 million parameters, trained on the full WikiText-103 dataset with a 50,000-word vocabulary. All runs use BF16 mixed precision and are protected by persistent sessions with durable logging.</p>
+                    <h2>Why This Matters</h2>
+                    <p>Phase 1 and Phase 2 on Colab proved that CMP trains stably and learns real language. But Colab's memory and time constraints meant we could only run small-scale experiments. Phase 3 is the first run at meaningful scale — and the first fair comparison against GRU and Transformer baselines under identical conditions.</p>
+                    <p>The comparison run is now live. CMP trains first, followed by GRU and Transformer baselines. We'll report results when all three complete.</p>
+                `,
+                author: "Ashmith Atmuri"
+            },
+            "phase2-depth-stability": {
+                label: "Experiment Log",
+                date: "May 11, 2026",
+                title: "Phase 2 Validated: Depth Stability with Residual Connections",
+                content: `
+                    <p>Scaling CMP from 2 layers (Phase 1) to 4 layers (Phase 2) revealed a common deep-learning failure mode: gradient vanishing. Without intervention, the deeper model collapsed to a validation perplexity of 508.5 — worse than the 2-layer version.</p>
+                    <h2>The Fix</h2>
+                    <p>The solution was textbook: residual connections. By adding skip connections from the input of each layer to its output, gradients flow through the network without attenuation. The fix is standard in every deep architecture, and it works just as well for CMP.</p>
+                    <h2>The Result</h2>
+                    <p>With residual connections, Phase 2 CMP achieved a validation perplexity of 236.9 — stable, learning, and ready for deeper stacking. The higher PPL compared to Phase 1's 200.2 is expected: deeper models need more training epochs to converge, not fewer.</p>
+                    <p>Depth validated. Architecture stable at 4 layers. We're ready for Phase 3.</p>
+                `,
+                author: "Ashmith Atmuri"
+            },
+            "first-wikitext-results": {
+                label: "Experiment Log",
+                date: "May 10, 2026",
+                title: "First WikiText Results: CMP Trains Stably at 7.4M Parameters",
+                content: `
+                    <p>We ran CMP on its first real language modeling benchmark: WikiText-2, the standard word-level perplexity test used across the field. The result is our first clean signal that the architecture works on real text.</p>
+                    <h2>The Setup</h2>
+                    <p>Phase 1 configuration: 2 layers, 7.4 million parameters, trained for 3 epochs on a T4 GPU. No embedding table. No tokenizer. Every word enters the model as a sparse structural fingerprint — a 512-dimensional binary vector with exactly 16 active bits.</p>
+                    <h2>The Result</h2>
+                    <p>Validation perplexity dropped from over 1000 at the start of training to 200.2 by epoch 3. The learning curve is clean and monotonic — no gradient explosions, no collapses, no instability. CMP handles word-level prediction with zero learned input representation.</p>
+                    <blockquote>"CMP is 2x worse than a standard GRU baseline — but with no embedding table, no tokenizer, and only 3 epochs of training."</blockquote>
+                    <p>The comparison isn't fully fair yet. We need to run GRU under the same conditions before drawing conclusions. But the learning signal is real.</p>
+                `,
+                author: "Ashmith Atmuri"
+            },
+            "cmp-beats-attention-conll": {
+                label: "Research Note",
+                date: "May 9, 2026",
+                title: "CMP Beats Attention on Compositional Generalization",
+                content: `
+                    <p>This is the result we were looking for. On the CoNLL-2003 Named Entity Recognition benchmark, CMP achieved a generalization gap of just 0.006 — compared to 0.009 for attention and 0.019 for GRU. That's 33% better than attention on unseen name recognition.</p>
+                    <h2>The Experiment</h2>
+                    <p>We split all person names in the CoNLL-2003 training set: 75% seen during training, 25% held out. Then we measured each model's F1 score on sentences containing seen names versus sentences containing unseen names. The gap between these two scores measures how well a model generalizes to new names.</p>
+                    <h2>Why CMP Wins Here</h2>
+                    <p>The key insight is structural similarity. "Johnson" and "Johnston" share character n-grams, which means they share hash pattern bits. When CMP learns to recognize "Johnson" as a person name, that knowledge automatically transfers to "Johnston" through overlapping sparse patterns. Attention-based models have no such mechanism — each name is a separate token sequence with no structural connection.</p>
+                    <p>This is exactly the kind of benchmark where CMP's design thesis predicts an advantage. Structural representation matters when you encounter things you haven't seen before.</p>
+                `,
+                author: "Ashmith Atmuri"
+            },
+            "building-structural-language-model": {
+                label: "Technical Essay",
+                date: "May 8, 2026",
+                title: "Why We're Building a Language Model That Reads Word Structure",
+                content: `
+                    <p>Every major language model today — GPT, Gemini, Claude — works the same way. Break text into tokens. Look each token up in a massive learned dictionary. Use attention to compare every token against every other token. This approach has three fundamental problems.</p>
+                    <h2>The Three Problems</h2>
+                    <p>First, tokenization is a hack. "Running" might be one token, but "ungoogleable" gets split into fragments the model has never seen assembled that way. The model has no understanding of word structure — it just memorizes shapes.</p>
+                    <p>Second, attention is quadratic. To process a sentence of length T, attention does T² comparisons. Double the sentence, quadruple the compute. This is why context windows are expensive and why inference costs scale badly.</p>
+                    <p>Third, there's no compositional generalization. Because the model memorizes token patterns, it struggles with genuinely new combinations — new names, new words, new phrasings it hasn't seen before.</p>
+                    <h2>A Different Approach</h2>
+                    <p>We're building a model that reads the structure of words instead of looking them up. Inspired by how the brain processes language — through sparse activation of feature detectors, explicit relational binding between active features, and a gated working memory that carries understanding forward — we represent each word as a sparse structural fingerprint derived from its character composition.</p>
+                    <blockquote>"A word the model has never seen still gets a valid fingerprint, because the hash function always works. No embedding table. No vocabulary limit. No OOV token."</blockquote>
+                    <p>We call this architecture CMP — Conversational Meaning Patterns. This blog will document our progress building it, honestly and in the open.</p>
+                `,
+                author: "Ashmith Atmuri"
+            }
+        };
+
+        // Render Portable Text to HTML
+        function renderPortableText(blocks) {
+            if (!blocks || !Array.isArray(blocks)) return '';
+
+            return blocks.map(block => {
+                if (block._type !== 'block') return '';
+
+                const inlineText = (block.children || []).map(span => {
+                    let text = span.text || '';
+                    (span.marks || []).forEach(mark => {
+                        const def = (block.markDefs || []).find(d => d._key === mark);
+                        if (def && def._type === 'link') {
+                            text = `<a href="${def.href}" target="_blank" rel="noopener">${text}</a>`;
+                        } else {
+                            switch (mark) {
+                                case 'strong': text = `<strong>${text}</strong>`; break;
+                                case 'em':     text = `<em>${text}</em>`;         break;
+                                case 'code':   text = `<code>${text}</code>`;     break;
+                            }
+                        }
+                    });
+                    return text;
+                }).join('');
+
+                switch (block.style) {
+                    case 'h2': return `<h2>${inlineText}</h2>`;
+                    case 'h3': return `<h3>${inlineText}</h3>`;
+                    case 'blockquote': return `<blockquote>${inlineText}</blockquote>`;
+                    default: return inlineText.trim() ? `<p>${inlineText}</p>` : '';
+                }
+            }).join('\n');
+        }
+
+        // Get slug from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const slug = urlParams.get('slug');
+
+        if (!slug) {
+            document.getElementById('post-title').textContent = "Post Not Found";
+            document.getElementById('post-content').innerHTML = "<p>No post slug was specified in the URL query string.</p>";
+        } else {
+            // GROQ query for single post
+            const QUERY = `*[_type == "post" && slug.current == $slug][0]{
+                title,
+                publishedAt,
+                author,
+                "category": categories[0]->title,
+                "imageUrl": mainImage.asset->url,
+                body
+            }`;
+            const params = `&$slug="${encodeURIComponent(slug)}"`;
+
+            fetch(`${ENDPOINT}?query=${encodeURIComponent(QUERY)}${params}`)
+                .then(res => {
+                    if (!res.ok) throw new Error('Failed to fetch article');
+                    return res.json();
+                })
+                .then(data => {
+                    const post = data.result;
+                    if (post) {
+                        document.title = `${post.title} | Yudi Labs`;
+                        document.getElementById('post-title').textContent = post.title;
+                        document.getElementById('post-badge').textContent = post.category || 'Research Note';
+                        document.getElementById('post-date').textContent = new Date(post.publishedAt).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+                        document.getElementById('post-author').textContent = (post.author && post.author !== 'Yudi Labs Team') ? post.author : 'Ashmith Atmuri';
+                        
+                        if (post.imageUrl) {
+                            const img = document.getElementById('post-image');
+                            img.src = post.imageUrl;
+                            img.style.display = 'block';
+                        }
+                        
+                        document.getElementById('post-content').innerHTML = renderPortableText(post.body);
+                    } else {
+                        // Use fallback
+                        renderFallback(slug);
+                    }
+                })
+                .catch(err => {
+                    console.warn('Sanity fetch failed. Loading local fallback article.', err);
+                    renderFallback(slug);
+                });
+        }
+
+        function renderFallback(slug) {
+            const fallback = fallbackPostsDetail[slug];
+            if (fallback) {
+                document.title = `${fallback.title} | Yudi Labs`;
+                document.getElementById('post-title').textContent = fallback.title;
+                document.getElementById('post-badge').textContent = fallback.label;
+                document.getElementById('post-date').textContent = fallback.date;
+                document.getElementById('post-author').textContent = fallback.author || 'Ashmith Atmuri';
+                document.getElementById('post-content').innerHTML = fallback.content;
+            } else {
+                document.getElementById('post-title').textContent = "Post Not Found";
+                document.getElementById('post-content').innerHTML = "<p>The requested post could not be retrieved from the server or local storage.</p>";
+            }
+        }
+    </script>
+    <script src="assets/animations.js"></script>
+</body>
+</html>
