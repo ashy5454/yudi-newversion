@@ -3,4 +3,4 @@ Allow: /
 Disallow: /drafts/
 Disallow: /private/
 
-Sitemap: https://yudilabs.com/sitemap.xml
+Sitemap: https://yudi.co.in/sitemap.xml

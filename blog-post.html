@@ -14,7 +14,7 @@
         (function() {
             const urlParams = new URLSearchParams(window.location.search);
             const slug = urlParams.get('slug');
-            const baseUrl = 'https://yudilabs.com/blog-post';
+            const baseUrl = 'https://yudi.co.in/blog-post';
             const canonicalUrl = slug ? `${baseUrl}?slug=${encodeURIComponent(slug)}` : baseUrl;
 
             // Inject canonical link
@@ -42,7 +42,7 @@
 
     <meta property="og:title" content="Blog Post | Yudi AI Labs">
     <meta property="og:description" content="Read deep technical details and updates about Yudi AI, CMP architectures, and conversational machine learning from Yudi AI Labs.">
-    <meta property="og:image" content="https://yudilabs.com/assets/brain_hero.png">
+    <meta property="og:image" content="https://yudi.co.in/assets/brain_hero.png">
     <meta property="og:site_name" content="Yudi AI Labs">
 
     <!-- Twitter -->
@@ -50,7 +50,7 @@
 
     <meta name="twitter:title" content="Blog Post | Yudi AI Labs">
     <meta name="twitter:description" content="Read deep technical details and updates about Yudi AI, CMP architectures, and conversational machine learning from Yudi AI Labs.">
-    <meta name="twitter:image" content="https://yudilabs.com/assets/brain_hero.png">
+    <meta name="twitter:image" content="https://yudi.co.in/assets/brain_hero.png">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -245,11 +245,11 @@
     "name": "Yudi AI Labs",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://yudilabs.com/logo.png"
+      "url": "https://yudi.co.in/logo.png"
     }
   },
   "inLanguage": "en-US",
-  "image": "https://yudilabs.com/logo.png"
+  "image": "https://yudi.co.in/logo.png"
 }
     </script>
 </head>
@@ -637,7 +637,7 @@
         function renderFallback(slug) {
             const fallback = fallbackPostsDetail[slug];
             if (fallback) {
-                updateMeta(fallback.title, fallback.content, 'https://yudilabs.com/assets/brain_hero.png');
+                updateMeta(fallback.title, fallback.content, 'https://yudi.co.in/assets/brain_hero.png');
 
                 document.getElementById('post-title').textContent = fallback.title;
                 document.getElementById('post-badge').textContent = fallback.label;
