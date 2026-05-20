@@ -3,7 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solutions | Yudi Labs</title>
+    <title>AI Solutions & Business Automation | Yudi AI & Yudi Labs</title>
+    <meta name="description" content="Explore custom AI strategy, business automation, custom research and content agents, and marketing systems built by Yudi AI and Yudi Labs.">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Yudi AI Labs">
+    <meta property="og:locale" content="en_US">
+    <meta name="keywords" content="Yudi AI, Yudi Labs, AI solutions, business automation, custom agents, CRM automation, AI strategy, growth systems">
+    <link rel="canonical" href="https://yudi.co.in/solutions">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yudi.co.in/solutions">
+    <meta property="og:title" content="AI Solutions & Business Automation | Yudi AI & Yudi Labs">
+    <meta property="og:description" content="Explore custom AI strategy, business automation, custom research and content agents, and marketing systems built by Yudi AI and Yudi Labs.">
+    <meta property="og:image" content="https://yudi.co.in/assets/brain_hero.png">
+    <meta property="og:site_name" content="Yudi AI Labs">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://yudi.co.in/solutions">
+    <meta name="twitter:title" content="AI Solutions & Business Automation | Yudi AI & Yudi Labs">
+    <meta name="twitter:description" content="Explore custom AI strategy, business automation, custom research and content agents, and marketing systems built by Yudi AI and Yudi Labs.">
+    <meta name="twitter:image" content="https://yudi.co.in/assets/brain_hero.png">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -46,7 +67,8 @@
             background: rgba(3, 3, 3, 0.8);
             backdrop-filter: blur(20px); border-bottom: 1px solid var(--color-border);
         }
-        .logo { font-weight: 800; font-size: 1.5rem; letter-spacing: 0.1em; text-transform: uppercase; color: #fff; text-decoration: none; }
+        .logo { font-weight: 800; font-size: 1.5rem; letter-spacing: 0.1em; text-transform: uppercase; color: #fff; text-decoration: none; display: flex; align-items: center; }
+        .logo img { height: 32px; width: auto; display: block; object-fit: contain; }
         
         .nav-links { display: flex; gap: 2rem; align-items: center; }
         .nav-links a {
@@ -112,7 +134,7 @@
             background: #ffffff; color: #000000;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
             .nav-links { display: none; }
             .solution-card { grid-template-columns: 1fr; gap: 1rem; padding: 2rem;}
         }
@@ -129,13 +151,66 @@
         .footer-bottom { border-top: 1px solid var(--color-border); padding-top: 2rem; display: flex; justify-content: space-between; align-items: center; color: var(--color-text-dim); font-size: 0.8rem; }
     </style>
     <link rel="stylesheet" href="assets/animations.css">
+    <link rel="stylesheet" href="assets/animations.css">
+    
+    <!-- JSON-LD Schema Markup for AIO/GEO Optimization -->
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "name": "Yudi AI Labs Enterprise Solutions",
+  "provider": {
+    "@type": "Organization",
+    "name": "Yudi AI Labs",
+    "url": "https://yudi.co.in"
+  },
+  "description": "Custom artificial intelligence strategy, business automation systems, custom AI agents, and marketing growth infrastructure powered by Yudi AI.",
+  "areaServed": "Worldwide",
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "AI Services Catalog",
+    "itemListElement": [
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "AI Strategy & Implementation Planning"
+        }
+      },
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "Business Automation & Workflow Optimization"
+        }
+      },
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "Growth Infrastructure & Content Engine"
+        }
+      }
+    ]
+  },
+  "inLanguage": "en-US",
+  "image": "https://yudi.co.in/logo.png"
+}
+    </script>
 </head>
 <body>
     <canvas id="bg-canvas"></canvas>
 
 
     <nav>
-        <a href="/" class="logo">YUDI LABS</a>
+        <a href="/" class="logo">
+            <img src="logo.png" alt="YUDI Logo" onerror="this.outerHTML='<span style=\'font-weight:800; font-size:1.5rem; letter-spacing:0.1em; text-transform:uppercase; color:#fff;\'>YUDI.</span>'">
+        </a>
+                <button class="mobile-menu-btn" aria-label="Toggle menu" aria-expanded="false">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </button>
         <div class="nav-links">
             <a href="/research">Research</a>
             <a href="/products">Products</a>
@@ -149,8 +224,8 @@
 
     <header class="page-header">
         <div class="container">
-            <h1 class="title">AI systems for businesses.</h1>
-            <p class="subtitle">Yudi Labs works with companies to design and build AI systems, automation workflows, custom agents, and growth infrastructure.</p>
+            <h1 class="title">AI systems for businesses by Yudi Labs.</h1>
+            <p class="subtitle">Yudi AI Labs works with companies to deploy <a href="/products" style="color: #fff; text-decoration: underline;">Yudi AI products</a> for designing and building AI systems, automation workflows, custom agents, and growth infrastructure.</p>
         </div>
     </header>
 
@@ -247,7 +322,7 @@
         </section>
         
         <section class="content-section" style="text-align: center; border-top: 1px solid var(--color-border); padding-top: 6rem;">
-            <h2 style="font-size: 3rem; margin-bottom: 1.5rem; color: #fff;">Work With Yudi</h2>
+            <h2 style="font-size: 3rem; margin-bottom: 1.5rem; color: #fff;">Work With Yudi AI Labs</h2>
             <p style="font-size: 1.1rem; color: var(--color-text-secondary); margin-bottom: 3rem;">Ready to build a solution with us? Initiate a conversation to outline your requirements.</p>
             <a href="/work-with-us" class="btn-primary" onclick="localStorage.setItem('inquiryPrefill', 'solutions');">Build a Solution With Us</a>
         </section>
@@ -258,8 +333,10 @@
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-col">
-                    <a href="/" class="logo" style="margin-bottom: 1rem; display: block;">YUDI LABS</a>
-                    <p style="color: var(--color-text-secondary); font-size: 0.95rem; line-height: 1.6; max-width: 250px;">Brain-native AI research, products, and solutions.</p>
+                    <a href="/" class="logo" style="margin-bottom: 1rem; display: block;">
+                        <img src="logo.png" alt="YUDI Logo" style="height: 32px; margin-bottom: 0.5rem;" onerror="this.outerHTML='<span style=\'font-weight:800; font-size:1.5rem; letter-spacing:0.1em; text-transform:uppercase; color:#fff; display:block; margin-bottom:0.5rem;\'>YUDI.</span>'">
+                    </a>
+                    <p style="color: var(--color-text-secondary); font-size: 0.95rem; line-height: 1.6; max-width: 250px;">Yudi AI & Yudi Labs: Brain-native AI research, products, and solutions.</p>
                 </div>
                 <div class="footer-col">
                     <h4>Research</h4>
@@ -305,7 +382,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <span>&copy; 2026 Yudi Labs. All rights reserved.</span>
+                <span>&copy; 2026 Yudi AI Labs. All rights reserved.</span>
             </div>
         </div>
     </footer>

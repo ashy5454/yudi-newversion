@@ -3,7 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sam — YUDI Lab</title>
+    <title>Sam Content Generation Agent | Yudi AI</title>
+    <meta name="description" content="An advanced creative content agent built by Yudi AI, bridging persistent state-tracking with fluent, emotionally-aware generative synthesis.">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Yudi AI Labs">
+    <meta property="og:locale" content="en_US">
+    <meta name="keywords" content="Sam agent, content generation, Yudi AI, creative AI, emotion-aware AI, long-horizon text generation">
+    <link rel="canonical" href="https://yudi.co.in/sam">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yudi.co.in/sam">
+    <meta property="og:title" content="Sam Content Generation Agent | Yudi AI">
+    <meta property="og:description" content="An advanced creative content agent built by Yudi AI, bridging persistent state-tracking with fluent, emotionally-aware generative synthesis.">
+    <meta property="og:image" content="https://yudi.co.in/assets/brain_hero.png">
+    <meta property="og:site_name" content="Yudi AI Labs">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://yudi.co.in/sam">
+    <meta name="twitter:title" content="Sam Content Generation Agent | Yudi AI">
+    <meta name="twitter:description" content="An advanced creative content agent built by Yudi AI, bridging persistent state-tracking with fluent, emotionally-aware generative synthesis.">
+    <meta name="twitter:image" content="https://yudi.co.in/assets/brain_hero.png">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -45,7 +66,8 @@
             background: rgba(0, 0, 0, 0.8);
             backdrop-filter: blur(20px); border-bottom: 1px solid var(--color-border);
         }
-        .logo img { height: 48px; width: auto; object-fit: contain; }
+        .logo { font-weight: 800; font-size: 1.5rem; letter-spacing: 0.1em; text-transform: uppercase; color: #fff; text-decoration: none; display: flex; align-items: center; }
+        .logo img { height: 32px; width: auto; display: block; object-fit: contain; }
         .nav-links { display: flex; gap: 2.5rem; align-items: center; }
         .nav-links a {
             color: var(--color-text-secondary); text-decoration: none;
@@ -107,14 +129,45 @@
         .feature-card h3 { font-size: 1.2rem; margin-bottom: 1rem; }
         .feature-card p { font-size: 0.95rem; color: var(--color-text-secondary); margin-bottom: 0; }
 
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
             .nav-links { display: none; }
             .feature-grid { grid-template-columns: 1fr; }
         }
 
-        footer { text-align: center; padding: 4rem 5%; border-top: 1px solid var(--color-border); margin-top: 5rem;}
+        /* Footer */
+        footer { border-top: 1px solid var(--color-border); padding: 6rem 0 3rem 0; background: #000; margin-top: 5rem; text-align: left; }
+        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 4rem; margin-bottom: 6rem; }
+        @media (max-width: 900px) { .footer-grid { grid-template-columns: 1fr 1fr; } .footer-grid > div:first-child { grid-column: 1 / -1; } }
+        .footer-col h4 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; color: #fff; margin-bottom: 1.5rem; }
+        .footer-col ul { list-style: none; }
+        .footer-col ul li { margin-bottom: 0.8rem; }
+        .footer-col ul a { color: var(--color-text-secondary); text-decoration: none; font-size: 0.95rem; transition: color 0.3s; }
+        .footer-col ul a:hover { color: #fff; }
+        .footer-bottom { border-top: 1px solid var(--color-border); padding-top: 2rem; display: flex; justify-content: space-between; align-items: center; color: var(--color-text-dim); font-size: 0.8rem; }
     </style>
     <link rel="stylesheet" href="assets/animations.css">
+    
+    <!-- JSON-LD Schema Markup for AIO/GEO Optimization -->
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "SAM (Sparse Agent for Marketing)",
+  "image": "https://yudi.co.in/logo.png",
+  "description": "An advanced creative content agent built by Yudi AI, bridging persistent state-tracking with fluent, emotionally-aware generative synthesis.",
+  "brand": {
+    "@type": "Brand",
+    "name": "Yudi AI"
+  },
+  "offers": {
+    "@type": "Offer",
+    "url": "https://yudi.co.in/work-with-us",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/LimitedAvailability"
+  },
+  "inLanguage": "en-US"
+}
+    </script>
 </head>
 <body>
     <canvas id="bg-canvas"></canvas>
@@ -124,19 +177,26 @@
         <a href="/" class="logo">
             <img src="logo.png" alt="YUDI Logo" onerror="this.outerHTML='<span style=\'font-weight:800; font-size:1.5rem; letter-spacing:0.1em; text-transform:uppercase; color:#fff;\'>YUDI.</span>'">
         </a>
+                <button class="mobile-menu-btn" aria-label="Toggle menu" aria-expanded="false">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </button>
         <div class="nav-links">
-            <a href="/">Home</a>
-            <a href="/lab">About</a>
-            <a href="/cmp">Research</a>
-            <a href="/products" style="color: #fff;">Ecosystem</a>
-            <a href="/team">The Lab</a>
+            <a href="/research">Research</a>
+            <a href="/products" style="color: #fff;">Products</a>
+            <a href="/solutions">Solutions</a>
+            <a href="/blog">Blog</a>
+            <a href="/investors">Investors</a>
+            <a href="/lab">Lab</a>
+            <a href="/work-with-us" class="btn-nav">Work With Us</a>
         </div>
     </nav>
 
     <header class="page-header">
         <div class="container">
             <div style="font-size:0.85rem; font-weight:600; text-transform:uppercase; letter-spacing:0.2em; color:var(--color-text-secondary); margin-bottom:1rem;">Content Generation Agent</div>
-            <h1 class="title">Sam</h1>
+            <h1 class="title">SAM by Yudi AI</h1>
             <p class="subtitle">An advanced creative agent bridging persistent state-tracking with fluent, emotionally-aware generative synthesis.</p>
         </div>
     </header>
@@ -146,7 +206,7 @@
         <section class="content-section">
             <h2>The Emotion-Aware Stack</h2>
             <p>Most language models generate text that feels undeniably "AI". It is overly formal, mathematically average, and entirely devoid of emotional resonance. This occurs because Transformers have no native understanding of sentiment; they only predict the most statistically probable string of words.</p>
-            <p>Sam sits on top of our native LCoM infrastructure, meaning it inherently maps structural nodes to emotional weights. When Sam generates a long-form creative piece, it isn't just generating text; it is modulating its output based on a persistent internal emotional state that reacts to your prompts.</p>
+            <p>Sam sits on top of Yudi AI's native LCoM infrastructure, meaning it inherently maps structural nodes to emotional weights. When Sam generates a long-form creative piece, it isn't just generating text; it is modulating its output based on a persistent internal emotional state that reacts to your prompts.</p>
         </section>
 
         <section class="content-section">
@@ -176,14 +236,70 @@
                 <h2>Early Access</h2>
                 <p>Sam is currently in closed alpha testing for enterprise content teams and creative agencies.</p>
                 <div style="margin-top: 2rem;">
-                    <a href="/pricing" style="display: inline-block; padding: 0.8rem 2rem; border-radius: 6px; background: #fff; color: #000; text-decoration: none; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em;">Request Alpha Access</a>
+                    <a href="/work-with-us" style="display: inline-block; padding: 0.8rem 2rem; border-radius: 6px; background: #fff; color: #000; text-decoration: none; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em;" onclick="localStorage.setItem('inquiryPrefill', 'product');">Request Alpha Access</a>
                 </div>
             </div>
         </section>
 
     </main>
 
-    <footer><div class="container" style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:2rem;"><div style="text-align:left;"><p style="font-weight: 800; letter-spacing: 0.2em; color: var(--color-text-dim); margin-bottom: 0.5rem;">YUDI.</p><p style="color: var(--color-text-dim); font-size: 0.8rem;">&copy; 2026 YUDI AI Research Lab. All rights reserved.</p></div><div style="display:flex; gap:2rem; font-size:0.85rem; text-transform:uppercase; letter-spacing:0.1em;"><a href="/investors" style="color:var(--color-text-secondary); text-decoration:none;">Investors</a><a href="/solutions" style="color:var(--color-text-secondary); text-decoration:none;">Use Cases</a><a href="/faq" style="color:var(--color-text-secondary); text-decoration:none;">FAQ</a><a href="/blog" style="color:var(--color-text-secondary); text-decoration:none;">Blog</a></div></div></footer>
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <a href="/" class="logo" style="margin-bottom: 1rem; display: block;">
+                        <img src="logo.png" alt="YUDI Logo" style="height: 32px; margin-bottom: 0.5rem;" onerror="this.outerHTML='<span style=\'font-weight:800; font-size:1.5rem; letter-spacing:0.1em; text-transform:uppercase; color:#fff; display:block; margin-bottom:0.5rem;\'>YUDI.</span>'">
+                    </a>
+                    <p style="color: var(--color-text-secondary); font-size: 0.95rem; line-height: 1.6; max-width: 250px;">Yudi AI & Yudi Labs: Brain-native AI research, products, and solutions.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Research</h4>
+                    <ul>
+                        <li><a href="/research">Overview</a></li>
+                        <li><a href="/research-programs">Programs</a></li>
+                        <li><a href="/research-cmp">CMP</a></li>
+                        <li><a href="/research-predictive-coding">Predictive Coding</a></li>
+                        <li><a href="/research-experiments">Experiments</a></li>
+                        <li><a href="/research-publications">Publications</a></li>
+                        <li><a href="/research-collaborate">Collaborate</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="/products">Products</a></li>
+                        <li><a href="/solutions">Solutions</a></li>
+                        <li><a href="/blog">Blog</a></li>
+                        <li><a href="/investors">Investors</a></li>
+                        <li><a href="/lab">Lab</a></li>
+                        <li><a href="/lab-careers">Careers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Work With Us</h4>
+                    <ul>
+                        <li><a href="/work-with-us">Research Collaboration</a></li>
+                        <li><a href="/work-with-us">Business Solutions</a></li>
+                        <li><a href="/work-with-us">Product Access</a></li>
+                        <li><a href="/investors">Investors</a></li>
+                        <li><a href="/lab-careers">Careers</a></li>
+                        <li><a href="/work-with-us">General</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#">Privacy</a></li>
+                        <li><a href="#">Terms</a></li>
+                        <li><a href="#">Security</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>&copy; 2026 Yudi AI Labs. All rights reserved.</span>
+            </div>
+        </div>
+    </footer>
 
     <script src="assets/animations.js"></script>
 </body>

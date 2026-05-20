@@ -49,3 +49,115 @@
     border-color: rgba(255, 255, 255, 0.2);
 }
 
+/* --- Mobile Navigation Menu Styles --- */
+.mobile-menu-btn {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 24px;
+    height: 18px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 1001;
+    padding: 0;
+    outline: none;
+}
+.mobile-menu-btn .bar {
+    width: 100%;
+    height: 2px;
+    background-color: #fff;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (max-width: 900px) {
+    .mobile-menu-btn {
+        display: flex;
+    }
+    .nav-links {
+        display: none;
+    }
+    .nav-links.active {
+        display: flex !important;
+        flex-direction: column;
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 80%;
+        max-width: 320px;
+        height: 100vh;
+        background: rgba(3, 3, 3, 0.98);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-left: 1px solid var(--color-border);
+        padding: 8rem 2rem 2rem 2rem;
+        gap: 1.5rem;
+        z-index: 1000;
+        align-items: flex-start;
+        box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+        animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    
+    @keyframes slideIn {
+        from { transform: translateX(100%); }
+        to { transform: translateX(0); }
+    }
+    
+    /* Hamburger animations */
+    .mobile-menu-btn.active .bar:nth-child(1) {
+        transform: translateY(8px) rotate(45deg);
+    }
+    .mobile-menu-btn.active .bar:nth-child(2) {
+        opacity: 0;
+    }
+    .mobile-menu-btn.active .bar:nth-child(3) {
+        transform: translateY(-8px) rotate(-45deg);
+    }
+}
+
+/* --- Premium Button Hover Animations & Micro-Interactions --- */
+.btn, .btn-primary, .btn-secondary, .btn-nav, .btn-text, .card, .product-card, .solution-card, .pub-card, .blog-card {
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+}
+
+/* Pulse effect for main primary buttons */
+.btn-primary:hover, .btn-nav:hover, .btn-primary-glow:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(255, 255, 255, 0.15);
+    filter: brightness(1.05);
+}
+.btn-primary:active, .btn-nav:active {
+    transform: translateY(1px);
+    transform: scale(0.98);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    transform: translateY(-2px);
+}
+.btn-secondary:active {
+    transform: translateY(1px);
+    transform: scale(0.98);
+}
+
+/* Link text arrows micro-animations */
+.btn-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: color 0.3s ease;
+}
+.btn-text:hover {
+    color: #fff !important;
+}
+
+/* Card hover zoom-glow effects */
+.card:hover, .product-card:hover, .solution-card:hover, .pub-card:hover, .blog-card:hover {
+    transform: translateY(-4px);
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), 0 0 40px rgba(255, 255, 255, 0.01);
+}
+

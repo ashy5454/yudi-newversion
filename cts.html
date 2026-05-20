@@ -3,7 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CTS — YUDI Lab</title>
+    <title>Conversational Token System (CTS) | Yudi AI</title>
+    <meta name="description" content="An infrastructural top-layer built by Yudi AI that natively compresses contextual history, reducing LLM API token costs by up to 80%.">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Yudi AI Labs">
+    <meta property="og:locale" content="en_US">
+    <meta name="keywords" content="CTS, Conversational Token System, Yudi AI, context compression, LLM token reduction, API cost savings">
+    <link rel="canonical" href="https://yudi.co.in/cts">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yudi.co.in/cts">
+    <meta property="og:title" content="Conversational Token System (CTS) | Yudi AI">
+    <meta property="og:description" content="An infrastructural top-layer built by Yudi AI that natively compresses contextual history, reducing LLM API token costs by up to 80%.">
+    <meta property="og:image" content="https://yudi.co.in/assets/brain_hero.png">
+    <meta property="og:site_name" content="Yudi AI Labs">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://yudi.co.in/cts">
+    <meta name="twitter:title" content="Conversational Token System (CTS) | Yudi AI">
+    <meta name="twitter:description" content="An infrastructural top-layer built by Yudi AI that natively compresses contextual history, reducing LLM API token costs by up to 80%.">
+    <meta name="twitter:image" content="https://yudi.co.in/assets/brain_hero.png">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -47,7 +68,8 @@
             background: rgba(0, 0, 0, 0.8);
             backdrop-filter: blur(20px); border-bottom: 1px solid var(--color-border);
         }
-        .logo img { height: 48px; width: auto; object-fit: contain; }
+        .logo { font-weight: 800; font-size: 1.5rem; letter-spacing: 0.1em; text-transform: uppercase; color: #fff; text-decoration: none; display: flex; align-items: center; }
+        .logo img { height: 32px; width: auto; display: block; object-fit: contain; }
         .nav-links { display: flex; gap: 2.5rem; align-items: center; }
         .nav-links a {
             color: var(--color-text-secondary); text-decoration: none;
@@ -125,14 +147,45 @@
         .metric { font-size: 2.5rem; font-weight: 800; margin-bottom: 0.5rem; }
         .metric-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-text-secondary); }
 
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
             .nav-links { display: none; }
             .compare-grid { grid-template-columns: 1fr; }
         }
 
-        footer { text-align: center; padding: 4rem 5%; border-top: 1px solid var(--color-border); margin-top: 5rem;}
+        /* Footer */
+        footer { border-top: 1px solid var(--color-border); padding: 6rem 0 3rem 0; background: #000; margin-top: 5rem; text-align: left; }
+        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 4rem; margin-bottom: 6rem; }
+        @media (max-width: 900px) { .footer-grid { grid-template-columns: 1fr 1fr; } .footer-grid > div:first-child { grid-column: 1 / -1; } }
+        .footer-col h4 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; color: #fff; margin-bottom: 1.5rem; }
+        .footer-col ul { list-style: none; }
+        .footer-col ul li { margin-bottom: 0.8rem; }
+        .footer-col ul a { color: var(--color-text-secondary); text-decoration: none; font-size: 0.95rem; transition: color 0.3s; }
+        .footer-col ul a:hover { color: #fff; }
+        .footer-bottom { border-top: 1px solid var(--color-border); padding-top: 2rem; display: flex; justify-content: space-between; align-items: center; color: var(--color-text-dim); font-size: 0.8rem; }
     </style>
     <link rel="stylesheet" href="assets/animations.css">
+    
+    <!-- JSON-LD Schema Markup for AIO/GEO Optimization -->
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "CTS (Cognitive Task Specialist)",
+  "image": "https://yudi.co.in/logo.png",
+  "description": "An infrastructural top-layer built by Yudi AI that natively compresses contextual history, reducing LLM API token costs by up to 80%.",
+  "brand": {
+    "@type": "Brand",
+    "name": "Yudi AI"
+  },
+  "offers": {
+    "@type": "Offer",
+    "url": "https://yudi.co.in/work-with-us",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/LimitedAvailability"
+  },
+  "inLanguage": "en-US"
+}
+    </script>
 </head>
 <body>
     <canvas id="bg-canvas"></canvas>
@@ -142,19 +195,26 @@
         <a href="/" class="logo">
             <img src="logo.png" alt="YUDI Logo" onerror="this.outerHTML='<span style=\'font-weight:800; font-size:1.5rem; letter-spacing:0.1em; text-transform:uppercase; color:#fff;\'>YUDI.</span>'">
         </a>
+                <button class="mobile-menu-btn" aria-label="Toggle menu" aria-expanded="false">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </button>
         <div class="nav-links">
-            <a href="/">Home</a>
-            <a href="/lab">About</a>
-            <a href="/cmp">Research</a>
-            <a href="/products" style="color: #fff;">Ecosystem</a>
-            <a href="/team">The Lab</a>
+            <a href="/research">Research</a>
+            <a href="/products" style="color: #fff;">Products</a>
+            <a href="/solutions">Solutions</a>
+            <a href="/blog">Blog</a>
+            <a href="/investors">Investors</a>
+            <a href="/lab">Lab</a>
+            <a href="/work-with-us" class="btn-nav">Work With Us</a>
         </div>
     </nav>
 
     <header class="page-header">
         <div class="container">
             <div style="font-size:0.85rem; font-weight:600; text-transform:uppercase; letter-spacing:0.2em; color:var(--color-text-secondary); margin-bottom:1rem;">Conversational Token System</div>
-            <h1 class="title">CTS</h1>
+            <h1 class="title">CTS by Yudi AI</h1>
             <p class="subtitle">An infrastructural top-layer that natively compresses contextual history, reducing LLM API token costs by up to 80%.</p>
         </div>
     </header>
@@ -164,7 +224,7 @@
         <section class="content-section">
             <h2>The Cost of Infinite Context</h2>
             <p>Every time you send a multi-turn conversation to a commercial API (like GPT-4 or Claude), you pay to re-process the entire history. This creates an exponential cost curve that makes persistent AI agents financially unviable for enterprise scaling.</p>
-            <p>CTS sits as middleware between your application and the model API. Utilizing early paradigms from our CMP architecture, it dynamically compresses conversational state into dense semantic representations, passing only the exact context required for the current interaction.</p>
+            <p>CTS sits as middleware between your application and the model API. Utilizing early paradigms from Yudi AI's CMP architecture, it dynamically compresses conversational state into dense semantic representations, passing only the exact context required for the current interaction.</p>
         </section>
 
         <section class="content-section">
@@ -216,14 +276,70 @@ const response = await client.chat.completions.create({
 });
                 </div>
                 <div style="text-align: center;">
-                    <a href="/pricing" style="display: inline-block; padding: 0.8rem 2rem; border-radius: 6px; background: #fff; color: #000; text-decoration: none; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em;">Join the API Waitlist</a>
+                    <a href="/work-with-us" style="display: inline-block; padding: 0.8rem 2rem; border-radius: 6px; background: #fff; color: #000; text-decoration: none; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em;" onclick="localStorage.setItem('inquiryPrefill', 'product');">Join the API Waitlist</a>
                 </div>
             </div>
         </section>
 
     </main>
 
-    <footer><div class="container" style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:2rem;"><div style="text-align:left;"><p style="font-weight: 800; letter-spacing: 0.2em; color: var(--color-text-dim); margin-bottom: 0.5rem;">YUDI.</p><p style="color: var(--color-text-dim); font-size: 0.8rem;">&copy; 2026 YUDI AI Research Lab. All rights reserved.</p></div><div style="display:flex; gap:2rem; font-size:0.85rem; text-transform:uppercase; letter-spacing:0.1em;"><a href="/investors" style="color:var(--color-text-secondary); text-decoration:none;">Investors</a><a href="/solutions" style="color:var(--color-text-secondary); text-decoration:none;">Use Cases</a><a href="/faq" style="color:var(--color-text-secondary); text-decoration:none;">FAQ</a><a href="/blog" style="color:var(--color-text-secondary); text-decoration:none;">Blog</a></div></div></footer>
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <a href="/" class="logo" style="margin-bottom: 1rem; display: block;">
+                        <img src="logo.png" alt="YUDI Logo" style="height: 32px; margin-bottom: 0.5rem;" onerror="this.outerHTML='<span style=\'font-weight:800; font-size:1.5rem; letter-spacing:0.1em; text-transform:uppercase; color:#fff; display:block; margin-bottom:0.5rem;\'>YUDI.</span>'">
+                    </a>
+                    <p style="color: var(--color-text-secondary); font-size: 0.95rem; line-height: 1.6; max-width: 250px;">Yudi AI & Yudi Labs: Brain-native AI research, products, and solutions.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Research</h4>
+                    <ul>
+                        <li><a href="/research">Overview</a></li>
+                        <li><a href="/research-programs">Programs</a></li>
+                        <li><a href="/research-cmp">CMP</a></li>
+                        <li><a href="/research-predictive-coding">Predictive Coding</a></li>
+                        <li><a href="/research-experiments">Experiments</a></li>
+                        <li><a href="/research-publications">Publications</a></li>
+                        <li><a href="/research-collaborate">Collaborate</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="/products">Products</a></li>
+                        <li><a href="/solutions">Solutions</a></li>
+                        <li><a href="/blog">Blog</a></li>
+                        <li><a href="/investors">Investors</a></li>
+                        <li><a href="/lab">Lab</a></li>
+                        <li><a href="/lab-careers">Careers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Work With Us</h4>
+                    <ul>
+                        <li><a href="/work-with-us">Research Collaboration</a></li>
+                        <li><a href="/work-with-us">Business Solutions</a></li>
+                        <li><a href="/work-with-us">Product Access</a></li>
+                        <li><a href="/investors">Investors</a></li>
+                        <li><a href="/lab-careers">Careers</a></li>
+                        <li><a href="/work-with-us">General</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#">Privacy</a></li>
+                        <li><a href="#">Terms</a></li>
+                        <li><a href="#">Security</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>&copy; 2026 Yudi AI Labs. All rights reserved.</span>
+            </div>
+        </div>
+    </footer>
 
     <script src="assets/animations.js"></script>
 </body>

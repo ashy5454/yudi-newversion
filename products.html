@@ -3,7 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Products | Yudi Labs</title>
+    <title>Brain-Native AI Products & APIs | Yudi AI & Yudi Labs</title>
+    <meta name="description" content="Discover developer APIs, token compression layers (CTS), and AI research agents like NARA built by Yudi AI and Yudi Labs.">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Yudi AI Labs">
+    <meta property="og:locale" content="en_US">
+    <meta name="keywords" content="Yudi AI, Yudi Labs, CTS, NARA, Sam, brain-native products, LLM token system, AI research agent">
+    <link rel="canonical" href="https://yudi.co.in/products">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yudi.co.in/products">
+    <meta property="og:title" content="Brain-Native AI Products & APIs | Yudi AI & Yudi Labs">
+    <meta property="og:description" content="Discover developer APIs, token compression layers (CTS), and AI research agents like NARA built by Yudi AI and Yudi Labs.">
+    <meta property="og:image" content="https://yudi.co.in/assets/brain_hero.png">
+    <meta property="og:site_name" content="Yudi AI Labs">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://yudi.co.in/products">
+    <meta name="twitter:title" content="Brain-Native AI Products & APIs | Yudi AI & Yudi Labs">
+    <meta name="twitter:description" content="Discover developer APIs, token compression layers (CTS), and AI research agents like NARA built by Yudi AI and Yudi Labs.">
+    <meta name="twitter:image" content="https://yudi.co.in/assets/brain_hero.png">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -46,7 +67,8 @@
             background: rgba(3, 3, 3, 0.8);
             backdrop-filter: blur(20px); border-bottom: 1px solid var(--color-border);
         }
-        .logo { font-weight: 800; font-size: 1.5rem; letter-spacing: 0.1em; text-transform: uppercase; color: #fff; text-decoration: none; }
+        .logo { font-weight: 800; font-size: 1.5rem; letter-spacing: 0.1em; text-transform: uppercase; color: #fff; text-decoration: none; display: flex; align-items: center; }
+        .logo img { height: 32px; width: auto; display: block; object-fit: contain; }
         
         .nav-links { display: flex; gap: 2rem; align-items: center; }
         .nav-links a {
@@ -109,7 +131,7 @@
         .btn-text { color: #fff; text-decoration: none; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; display: inline-flex; align-items: center; gap: 0.5rem; margin-top: auto; border: 1px solid var(--color-border); padding: 0.8rem 1.5rem; border-radius: 6px; text-align: center; justify-content: center; transition: all 0.3s;}
         .btn-text:hover { background: #fff; color: #000; }
 
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
             .nav-links { display: none; }
             .grid-2 { grid-template-columns: 1fr; }
         }
@@ -126,13 +148,65 @@
         .footer-bottom { border-top: 1px solid var(--color-border); padding-top: 2rem; display: flex; justify-content: space-between; align-items: center; color: var(--color-text-dim); font-size: 0.8rem; }
     </style>
     <link rel="stylesheet" href="assets/animations.css">
+    <link rel="stylesheet" href="assets/animations.css">
+    
+    <!-- JSON-LD Schema Markup for AIO/GEO Optimization -->
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Yudi AI Labs Product Portfolio",
+  "description": "Enterprise AI agents and software tools developed by Yudi AI Labs, powered by our brain-native recurrent architectures.",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "item": {
+        "@type": "Product",
+        "name": "CTS (Cognitive Task Specialist)",
+        "url": "https://yudi.co.in/cts",
+        "description": "An autonomous software engineering agent that operates natively in workspace files, shells, and browser consoles to build features and fix bugs."
+      }
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "item": {
+        "@type": "Product",
+        "name": "NARA (Neural Assistant for Research & Analysis)",
+        "url": "https://yudi.co.in/nara",
+        "description": "An autonomous researcher that parses long documents, identifies key arguments, and updates knowledge bases in real-time."
+      }
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "item": {
+        "@type": "Product",
+        "name": "SAM (Sparse Agent for Marketing)",
+        "url": "https://yudi.co.in/sam",
+        "description": "A content generation and marketing agent that automates copy drafting, blog updates, and target campaign research."
+      }
+    }
+  ],
+  "inLanguage": "en-US",
+  "image": "https://yudi.co.in/logo.png"
+}
+    </script>
 </head>
 <body>
     <canvas id="bg-canvas"></canvas>
 
 
     <nav>
-        <a href="/" class="logo">YUDI LABS</a>
+        <a href="/" class="logo">
+            <img src="logo.png" alt="YUDI Logo" onerror="this.outerHTML='<span style=\'font-weight:800; font-size:1.5rem; letter-spacing:0.1em; text-transform:uppercase; color:#fff;\'>YUDI.</span>'">
+        </a>
+                <button class="mobile-menu-btn" aria-label="Toggle menu" aria-expanded="false">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </button>
         <div class="nav-links">
             <a href="/research">Research</a>
             <a href="/products" class="active">Products</a>
@@ -146,8 +220,8 @@
 
     <header class="page-header">
         <div class="container">
-            <h1 class="title">Products from the lab.</h1>
-            <p class="subtitle">Yudi Labs builds tools, systems, and experimental products from its research and engineering work.</p>
+            <h1 class="title">Yudi AI Products from the lab.</h1>
+            <p class="subtitle">Yudi AI Labs builds tools, systems, and experimental products from its research and engineering work, powered by the <a href="/research-cmp" style="color: #fff; text-decoration: underline;">Yudi AI CMP architecture</a>.</p>
         </div>
     </header>
 
@@ -181,7 +255,7 @@
                         <li><strong>Audience:</strong> Researchers & Academics</li>
                         <li><strong>Access:</strong> Closed Beta</li>
                     </ul>
-                    <p>An experimental research agent utilizing our sparse relational architecture to synthesize dense documents without semantic flattening. Used internally for mapping literature.</p>
+                    <p>An experimental research agent utilizing Yudi AI's sparse relational architecture to synthesize dense documents without semantic flattening. Used internally for mapping literature.</p>
                     <a href="/nara" class="btn-text">View Prototype Detail</a>
                 </div>
                 
@@ -228,8 +302,10 @@
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-col">
-                    <a href="/" class="logo" style="margin-bottom: 1rem; display: block;">YUDI LABS</a>
-                    <p style="color: var(--color-text-secondary); font-size: 0.95rem; line-height: 1.6; max-width: 250px;">Brain-native AI research, products, and solutions.</p>
+                    <a href="/" class="logo" style="margin-bottom: 1rem; display: block;">
+                        <img src="logo.png" alt="YUDI Logo" style="height: 32px; margin-bottom: 0.5rem;" onerror="this.outerHTML='<span style=\'font-weight:800; font-size:1.5rem; letter-spacing:0.1em; text-transform:uppercase; color:#fff; display:block; margin-bottom:0.5rem;\'>YUDI.</span>'">
+                    </a>
+                    <p style="color: var(--color-text-secondary); font-size: 0.95rem; line-height: 1.6; max-width: 250px;">Yudi AI & Yudi Labs: Brain-native AI research, products, and solutions.</p>
                 </div>
                 <div class="footer-col">
                     <h4>Research</h4>
@@ -275,7 +351,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <span>&copy; 2026 Yudi Labs. All rights reserved.</span>
+                <span>&copy; 2026 Yudi AI Labs. All rights reserved.</span>
             </div>
         </div>
     </footer>
