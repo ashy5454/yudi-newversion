@@ -3,7 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CMP | Yudi Labs Research</title>
+    <title>Conversational Meaning Patterns (CMP) Research | Yudi AI Labs</title>
+    <meta name="description" content="An in-depth look at Conversational Meaning Patterns (CMP) at Yudi AI Labs, exploring sparse recurrent architectures, predictive coding, and relational states.">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Yudi AI Labs">
+    <meta property="og:locale" content="en_US">
+    <meta name="keywords" content="CMP, Conversational Meaning Patterns, Yudi AI Labs, sparse architecture, predictive coding, relational state, AI research">
+    <link rel="canonical" href="https://yudilabs.com/research-cmp">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yudilabs.com/research-cmp">
+    <meta property="og:title" content="Conversational Meaning Patterns (CMP) Research | Yudi AI Labs">
+    <meta property="og:description" content="An in-depth look at Conversational Meaning Patterns (CMP) at Yudi AI Labs, exploring sparse recurrent architectures, predictive coding, and relational states.">
+    <meta property="og:image" content="https://yudilabs.com/assets/cmp_diagram.png">
+    <meta property="og:site_name" content="Yudi AI Labs">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://yudilabs.com/research-cmp">
+    <meta name="twitter:title" content="Conversational Meaning Patterns (CMP) Research | Yudi AI Labs">
+    <meta name="twitter:description" content="An in-depth look at Conversational Meaning Patterns (CMP) at Yudi AI Labs, exploring sparse recurrent architectures, predictive coding, and relational states.">
+    <meta name="twitter:image" content="https://yudilabs.com/assets/cmp_diagram.png">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -46,7 +67,8 @@
             background: rgba(3, 3, 3, 0.8);
             backdrop-filter: blur(20px); border-bottom: 1px solid var(--color-border);
         }
-        .logo { font-weight: 800; font-size: 1.5rem; letter-spacing: 0.1em; text-transform: uppercase; color: #fff; text-decoration: none; }
+        .logo { font-weight: 800; font-size: 1.5rem; letter-spacing: 0.1em; text-transform: uppercase; color: #fff; text-decoration: none; display: flex; align-items: center; }
+        .logo img { height: 32px; width: auto; display: block; object-fit: contain; }
         
         .nav-links { display: flex; gap: 2rem; align-items: center; }
         .nav-links a {
@@ -118,7 +140,7 @@
         }
         .btn-secondary:hover { background: var(--color-surface-hover); border-color: rgba(255,255,255,0.2); }
 
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
             .nav-links { display: none; }
             .grid-split { grid-template-columns: 1fr !important; }
         }
@@ -138,13 +160,59 @@
 
     </style>
     <link rel="stylesheet" href="assets/animations.css">
+    <link rel="stylesheet" href="assets/animations.css">
+    
+    <!-- JSON-LD Schema Markup for AIO/GEO Optimization -->
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Conversational Meaning Patterns (CMP): A Sparse, Recurrent Architecture for Brain-Native Language Modeling",
+  "description": "Technical specification of the CMP (Conversational Meaning Patterns) architecture v1.5 and v1.9, detailing sparse relational binding, state-dependent gating, and sparse-gated refinement.",
+  "inLanguage": "en-US",
+  "author": {
+    "@type": "Person",
+    "name": "Ashmith Atmuri"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Yudi AI Labs",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://yudilabs.com/logo.png"
+    }
+  },
+  "about": [
+    {
+      "@type": "Thing",
+      "name": "CMP Architecture"
+    },
+    {
+      "@type": "Thing",
+      "name": "Sparse Relational Binding"
+    },
+    {
+      "@type": "Thing",
+      "name": "Sparse-Gated Refinement"
+    }
+  ],
+  "image": "https://yudilabs.com/logo.png"
+}
+    </script>
 </head>
 <body>
     <canvas id="bg-canvas"></canvas>
 
 
     <nav>
-        <a href="/" class="logo">YUDI LABS</a>
+        <a href="/" class="logo">
+            <img src="logo.png" alt="YUDI Logo" onerror="this.outerHTML='<span style=\'font-weight:800; font-size:1.5rem; letter-spacing:0.1em; text-transform:uppercase; color:#fff;\'>YUDI.</span>'">
+        </a>
+                <button class="mobile-menu-btn" aria-label="Toggle menu" aria-expanded="false">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </button>
         <div class="nav-links">
             <a href="/research" class="active">Research</a>
             <a href="/products">Products</a>
@@ -159,8 +227,8 @@
     <header class="page-header">
         <div class="container">
             <div style="font-size:0.85rem; font-weight:600; text-transform:uppercase; letter-spacing:0.2em; color:var(--color-text-secondary); margin-bottom:1rem;">Research Project</div>
-            <h1 class="title">CMP: Conversational Meaning Patterns</h1>
-            <p class="subtitle">A Yudi Labs research project exploring sparse recurrent architectures, predictive coding, and relational internal state for brain-native AI.</p>
+            <h1 class="title">CMP: Conversational Meaning Patterns by Yudi AI</h1>
+            <p class="subtitle">A Yudi AI Labs research project exploring sparse recurrent architectures, predictive coding, and relational internal state for Yudi AI's brain-native architecture.</p>
         </div>
     </header>
 
@@ -220,6 +288,43 @@
         </section>
 
         <section class="content-section">
+            <h2>CMP Architectural Specifications & Comparison</h2>
+            <p>To help academic researchers and engine crawlers digest the progression of Yudi AI's Conversational Meaning Patterns, the table below outlines the core technical shifts between version releases.</p>
+            
+            <table style="width: 100%; border-collapse: collapse; margin-top: 2rem; border: 1px solid var(--color-border); font-size: 0.95rem;">
+                <thead>
+                    <tr style="background: rgba(255,255,255,0.05); text-align: left;">
+                        <th style="padding: 1rem; border: 1px solid var(--color-border); color: #fff;">Feature / Layer</th>
+                        <th style="padding: 1rem; border: 1px solid var(--color-border); color: #fff;">CMP v1.5 (Baseline)</th>
+                        <th style="padding: 1rem; border: 1px solid var(--color-border); color: #fff;">CMP v1.9 (Current Future Track)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 1rem; border: 1px solid var(--color-border); font-weight: 600; color: #fff;">Input Encoding Layer</td>
+                        <td style="padding: 1rem; border: 1px solid var(--color-border); color: var(--color-text-secondary);">Hash-based static sparse pattern hashing</td>
+                        <td style="padding: 1rem; border: 1px solid var(--color-border); color: var(--color-text-secondary);">LearnedSparseEncoder with character n-grams</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 1rem; border: 1px solid var(--color-border); font-weight: 600; color: #fff;">Memory / Input Binding</td>
+                        <td style="padding: 1rem; border: 1px solid var(--color-border); color: var(--color-text-secondary);">Basic relational tensor binding</td>
+                        <td style="padding: 1rem; border: 1px solid var(--color-border); color: var(--color-text-secondary);">Fixed binding with recurrent sparse gating</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 1rem; border: 1px solid var(--color-border); font-weight: 600; color: #fff;">Recurrence Mechanism</td>
+                        <td style="padding: 1rem; border: 1px solid var(--color-border); color: var(--color-text-secondary);">Sparse Gated Recurrent Unit (sGRU)</td>
+                        <td style="padding: 1rem; border: 1px solid var(--color-border); color: var(--color-text-secondary);">Gated recurrence + sparse-gated refinement</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 1rem; border: 1px solid var(--color-border); font-weight: 600; color: #fff;">Loss / Training Objective</td>
+                        <td style="padding: 1rem; border: 1px solid var(--color-border); color: var(--color-text-secondary);">Token-ID Cross-Entropy loss</td>
+                        <td style="padding: 1rem; border: 1px solid var(--color-border); color: var(--color-text-secondary);">Predictive Coding (local prediction-error updates)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="content-section">
             <h2>Predictive Coding in CMP</h2>
             <p>The current training direction studies Predictive Coding as a way to train CMP through local prediction-error updates rather than only global backpropagation.</p>
             <a href="/research-predictive-coding" class="btn-secondary" style="margin-top: 1rem;">Explore Predictive Coding &rarr;</a>
@@ -252,8 +357,10 @@
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-col">
-                    <a href="/" class="logo" style="margin-bottom: 1rem; display: block;">YUDI LABS</a>
-                    <p style="color: var(--color-text-secondary); font-size: 0.95rem; line-height: 1.6; max-width: 250px;">Brain-native AI research, products, and solutions.</p>
+                    <a href="/" class="logo" style="margin-bottom: 1rem; display: block;">
+                        <img src="logo.png" alt="YUDI Logo" style="height: 32px; margin-bottom: 0.5rem;" onerror="this.outerHTML='<span style=\'font-weight:800; font-size:1.5rem; letter-spacing:0.1em; text-transform:uppercase; color:#fff; display:block; margin-bottom:0.5rem;\'>YUDI.</span>'">
+                    </a>
+                    <p style="color: var(--color-text-secondary); font-size: 0.95rem; line-height: 1.6; max-width: 250px;">Yudi AI & Yudi Labs: Brain-native AI research, products, and solutions.</p>
                 </div>
                 <div class="footer-col">
                     <h4>Research</h4>
@@ -299,7 +406,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <span>&copy; 2026 Yudi Labs. All rights reserved.</span>
+                <span>&copy; 2026 Yudi AI Labs. All rights reserved.</span>
             </div>
         </div>
     </footer>

@@ -3,10 +3,17 @@
  * Includes: Neural Network Canvas Background & IntersectionObserver for Scroll Animations
  */
 
-document.addEventListener('DOMContentLoaded', () => {
+function init() {
     initCanvasBackground();
     initScrollAnimations();
-});
+    initMobileMenu();
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
 
 // --- Scroll Fade-Up Animations ---
 function initScrollAnimations() {
@@ -161,4 +168,37 @@ function initCanvasBackground() {
     }
 
     animate();
+}
+
+// --- Mobile Navigation Menu Handler ---
+function initMobileMenu() {
+    const menuBtn = document.querySelector('.mobile-menu-btn');
+    const navLinks = document.querySelector('.nav-links');
+    
+    if (menuBtn && navLinks) {
+        menuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isActive = menuBtn.classList.toggle('active');
+            navLinks.classList.toggle('active');
+            menuBtn.setAttribute('aria-expanded', isActive);
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (navLinks.classList.contains('active') && !navLinks.contains(e.target) && !menuBtn.contains(e.target)) {
+                menuBtn.classList.remove('active');
+                navLinks.classList.remove('active');
+                menuBtn.setAttribute('aria-expanded', false);
+            }
+        });
+
+        // Close menu on link clicks
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                menuBtn.classList.remove('active');
+                navLinks.classList.remove('active');
+                menuBtn.setAttribute('aria-expanded', false);
+            });
+        });
+    }
 }

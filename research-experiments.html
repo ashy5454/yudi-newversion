@@ -3,7 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Experiments | Yudi Labs Research</title>
+    <title>AI Experiment Logs & Ablation Studies | Yudi AI Labs</title>
+    <meta name="description" content="Read raw, unvarnished experiment logs, benchmark results, and failure mode documentation for Yudi AI's CMP architectures and predictive coding trials.">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Yudi AI Labs">
+    <meta property="og:locale" content="en_US">
+    <meta name="keywords" content="AI experiments, ablation studies, Yudi AI Labs, benchmark results, failure modes, CMP benchmarks, predictive coding tests">
+    <link rel="canonical" href="https://yudilabs.com/research-experiments">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yudilabs.com/research-experiments">
+    <meta property="og:title" content="AI Experiment Logs & Ablation Studies | Yudi AI Labs">
+    <meta property="og:description" content="Read raw, unvarnished experiment logs, benchmark results, and failure mode documentation for Yudi AI's CMP architectures and predictive coding trials.">
+    <meta property="og:image" content="https://yudilabs.com/assets/brain_hero.png">
+    <meta property="og:site_name" content="Yudi AI Labs">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://yudilabs.com/research-experiments">
+    <meta name="twitter:title" content="AI Experiment Logs & Ablation Studies | Yudi AI Labs">
+    <meta name="twitter:description" content="Read raw, unvarnished experiment logs, benchmark results, and failure mode documentation for Yudi AI's CMP architectures and predictive coding trials.">
+    <meta name="twitter:image" content="https://yudilabs.com/assets/brain_hero.png">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -46,7 +67,8 @@
             background: rgba(3, 3, 3, 0.8);
             backdrop-filter: blur(20px); border-bottom: 1px solid var(--color-border);
         }
-        .logo { font-weight: 800; font-size: 1.5rem; letter-spacing: 0.1em; text-transform: uppercase; color: #fff; text-decoration: none; }
+        .logo { font-weight: 800; font-size: 1.5rem; letter-spacing: 0.1em; text-transform: uppercase; color: #fff; text-decoration: none; display: flex; align-items: center; }
+        .logo img { height: 32px; width: auto; display: block; object-fit: contain; }
         
         .nav-links { display: flex; gap: 2rem; align-items: center; }
         .nav-links a {
@@ -162,7 +184,7 @@
             background: #ffffff; color: #000000; margin-top: 2rem;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
             .nav-links { display: none; }
             .results-table { display: block; overflow-x: auto; }
         }
@@ -179,13 +201,44 @@
         .footer-bottom { border-top: 1px solid var(--color-border); padding-top: 2rem; display: flex; justify-content: space-between; align-items: center; color: var(--color-text-dim); font-size: 0.8rem; }
     </style>
     <link rel="stylesheet" href="assets/animations.css">
+
+    <!-- JSON-LD Schema Markup for AIO/GEO Optimization -->
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Brain-Native AI Architecture Experiment Logs",
+  "description": "A detailed log of academic and computational experiments at Yudi AI Labs examining sparse relational binding and recurrent architectures.",
+  "author": {
+    "@type": "Person",
+    "name": "Ashmith Atmuri"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Yudi AI Labs",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://yudilabs.com/logo.png"
+    }
+  },
+  "inLanguage": "en-US",
+  "image": "https://yudilabs.com/logo.png"
+}
+    </script>
 </head>
 <body>
     <canvas id="bg-canvas"></canvas>
 
 
     <nav>
-        <a href="/" class="logo">YUDI LABS</a>
+        <a href="/" class="logo">
+            <img src="logo.png" alt="YUDI Logo" onerror="this.outerHTML='<span style=\'font-weight:800; font-size:1.5rem; letter-spacing:0.1em; text-transform:uppercase; color:#fff;\'>YUDI.</span>\'">
+        </a>
+                <button class="mobile-menu-btn" aria-label="Toggle menu" aria-expanded="false">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </button>
         <div class="nav-links">
             <a href="/research" class="active">Research</a>
             <a href="/products">Products</a>
@@ -199,7 +252,7 @@
 
     <header class="page-header">
         <div class="container">
-            <h1 class="title">Experiment Logs</h1>
+            <h1 class="title">Yudi AI Labs Experiment Logs</h1>
             <p class="subtitle">We publish successful results, failures, corrections, and open questions. The goal is to test the research thesis, not protect a narrative.</p>
         </div>
     </header>
@@ -223,7 +276,7 @@
                 </div>
                 <div class="timeline-item">
                     <h3 style="color:#fff; margin-bottom:0.5rem;">CMP v1.9</h3>
-                    <p style="color:var(--color-text-secondary);">Deprecated the Hash Encoder. Introduced character n-gram features and LearnedSparseEncoder. Current focus on predictive output head.</p>
+                    <p style="color:var(--color-text-secondary);">Deprecated the Hash Encoder. Introduced character n-gram features and LearnedSparseEncoder in the Yudi AI framework. Current focus on predictive output head.</p>
                 </div>
                 <div class="timeline-item">
                     <h3 style="color:#fff; margin-bottom:0.5rem;">PC-CMP Direction</h3>
@@ -326,8 +379,10 @@
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-col">
-                    <a href="/" class="logo" style="margin-bottom: 1rem; display: block;">YUDI LABS</a>
-                    <p style="color: var(--color-text-secondary); font-size: 0.95rem; line-height: 1.6; max-width: 250px;">Brain-native AI research, products, and solutions.</p>
+                    <a href="/" class="logo" style="margin-bottom: 1rem; display: block;">
+                        <img src="logo.png" alt="YUDI Logo" style="height: 32px; margin-bottom: 0.5rem;" onerror="this.outerHTML='<span style=\'font-weight:800; font-size:1.5rem; letter-spacing:0.1em; text-transform:uppercase; color:#fff; display:block; margin-bottom:0.5rem;\'>YUDI.</span>\'">
+                    </a>
+                    <p style="color: var(--color-text-secondary); font-size: 0.95rem; line-height: 1.6; max-width: 250px;">Yudi AI & Yudi Labs: Brain-native AI research, products, and solutions.</p>
                 </div>
                 <div class="footer-col">
                     <h4>Research</h4>
@@ -373,7 +428,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <span>&copy; 2026 Yudi Labs. All rights reserved.</span>
+                <span>&copy; 2026 Yudi AI Labs. All rights reserved.</span>
             </div>
         </div>
     </footer>
