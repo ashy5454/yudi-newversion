@@ -61,7 +61,7 @@ function initCanvasBackground() {
     let particles = [];
     
     // Config
-    const particleCount = window.innerWidth < 768 ? 40 : 80;
+    const particleCount = window.innerWidth < 900 ? 25 : 70;
     const connectionDistance = 150;
     const mouseRadius = 200;
     
@@ -139,8 +139,21 @@ function initCanvasBackground() {
         particles.push(new Particle());
     }
 
+    // Performance Optimization: Pause loop when canvas is off-screen
+    let isCanvasVisible = true;
+    if (typeof IntersectionObserver !== 'undefined') {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                isCanvasVisible = entry.isIntersecting;
+            });
+        }, { threshold: 0.001 });
+        observer.observe(canvas);
+    }
+
     function animate() {
         requestAnimationFrame(animate);
+        if (!isCanvasVisible) return;
+        
         ctx.clearRect(0, 0, width, height);
 
         particles.forEach(p => p.update());
