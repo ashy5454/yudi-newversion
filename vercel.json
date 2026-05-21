@@ -10,6 +10,11 @@
       "source": "/about",
       "destination": "/lab",
       "permanent": true
+    },
+    {
+      "source": "/cts",
+      "destination": "https://cts.yudi.co.in",
+      "permanent": true
     }
   ]
 }
