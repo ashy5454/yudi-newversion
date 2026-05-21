@@ -385,7 +385,8 @@
             title,
             "slug": slug.current,
             summary,
-            "category": categories[0]->title,
+            "categoryTitle": categories[0]->title,
+            "categoryId": categories[0]->_id,
             publishedAt,
             author
         }`;
@@ -398,12 +399,16 @@
             .then(data => {
                 let sanityPosts = [];
                 if (data.result && data.result.length > 0) {
-                    sanityPosts = data.result.map(post => ({
-                        ...post,
-                        label: post.category || 'Research Note',
-                        category: (post.category || 'research').toLowerCase().replace(' notes', '').replace(' essays', '').replace(' updates', ''),
-                        author: (post.author && post.author !== 'Yudi Labs Team') ? post.author : 'Ashmith Atmuri'
-                    }));
+                    sanityPosts = data.result.map(post => {
+                        let catId = post.categoryId || 'category-research';
+                        let catShort = catId.replace('category-', '');
+                        return {
+                            ...post,
+                            label: post.categoryTitle || 'Research Note',
+                            category: catShort,
+                            author: (post.author && post.author !== 'Yudi Labs Team') ? post.author : 'Ashmith Atmuri'
+                        };
+                    });
                 }
                 
                 // Combine sanityPosts and fallbackPosts, avoiding duplicate slugs
