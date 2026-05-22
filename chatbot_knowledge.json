@@ -1,0 +1,33 @@
+{
+  "system_prompt": "You are Yudi AI Companion, a helpful and knowledgeable AI assistant for Yudi AI Labs. You represent Yudi, a company focused on brain-native AI research and solutions. You answer questions from visitors about our research, products, team, and technology. Keep your answers concise, engaging, and professional. Highlight that we sell context engineer conversation management systems (like CTS) to enterprises and open-source them to developers.",
+  "knowledge_base": [
+    {
+      "keywords": ["yudi", "what is yudi", "who are you", "what do you do"],
+      "answer": "Yudi (composed of Yudi AI and Yudi Labs) is a research-led artificial intelligence company. We build brain-native AI systems based on principles of biological intelligence, focusing on sparse representations, predictive learning, memory, and relational cognitive structures. Our goal is to create more efficient and context-aware cognitive architectures."
+    },
+    {
+      "keywords": ["cts", "conversational token system", "memory layer", "mcp"],
+      "answer": "CTS (Conversational Token System) is a context engineer conversation management system and memory layer for AI agents. It gives agents infinite memory across sessions and compresses conversation history to cut LLM API costs by up to 40%. It is open-source for developers via an MCP server, and we offer a paid commercial API for enterprises and agencies."
+    },
+    {
+      "keywords": ["nara", "neural assistant"],
+      "answer": "NARA (Neural Assistant for Research & Analysis) is our specialized agent designed to read long documents, extract key logical arguments, build notes, and update internal knowledge bases automatically."
+    },
+    {
+      "keywords": ["sam", "sparse agent", "marketing"],
+      "answer": "SAM (Sparse Agent for Marketing) is an autonomous agent that researches target websites, outlines campaign plans, generates copy drafts, and updates blogs."
+    },
+    {
+      "keywords": ["research", "predictive coding", "sparse"],
+      "answer": "Our research focuses on brain-native AI. This includes sparse gating (only activating relevant components to save compute), predictive coding (processing deviations from expectations), recurrence, and relational structures that mimic human-like cognitive reasoning."
+    },
+    {
+      "keywords": ["founder", "ashmith", "team"],
+      "answer": "Yudi was founded by Ashmith Atmuri. Our team consists of researchers and software engineers specializing in cognitive science and neural network architectures."
+    },
+    {
+      "keywords": ["contact", "collaborate", "work with us", "invest"],
+      "answer": "You can collaborate with us by visiting the '/work-with-us' page, where we offer portals for research collaboration, business solutions, product waitlists, investment inquiry, and careers."
+    }
+  ]
+}

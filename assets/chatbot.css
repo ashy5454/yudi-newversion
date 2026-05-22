@@ -1,0 +1,343 @@
+/* Yudi AI Labs - Chatbot Widget Styling */
+
+:root {
+    --chat-bg: rgba(10, 10, 10, 0.85);
+    --chat-border: rgba(255, 255, 255, 0.08);
+    --chat-text-primary: rgba(255, 255, 255, 0.95);
+    --chat-text-secondary: rgba(255, 255, 255, 0.6);
+    --chat-user-msg-bg: rgba(255, 255, 255, 0.08);
+    --chat-bot-msg-bg: rgba(99, 102, 241, 0.15);
+    --chat-bot-msg-border: rgba(99, 102, 241, 0.25);
+    --chat-accent: #6366f1;
+    --chat-accent-hover: #4f46e5;
+    --chat-accent-glow: rgba(99, 102, 241, 0.4);
+    --chat-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 50px rgba(255, 255, 255, 0.02);
+}
+
+:root[data-theme="light"] {
+    --chat-bg: rgba(255, 255, 255, 0.9);
+    --chat-border: rgba(15, 23, 42, 0.08);
+    --chat-text-primary: #0f172a;
+    --chat-text-secondary: #475569;
+    --chat-user-msg-bg: rgba(15, 23, 42, 0.05);
+    --chat-bot-msg-bg: rgba(79, 70, 229, 0.08);
+    --chat-bot-msg-border: rgba(79, 70, 229, 0.15);
+    --chat-accent: #4f46e5;
+    --chat-accent-hover: #3730a3;
+    --chat-accent-glow: rgba(79, 70, 229, 0.2);
+    --chat-shadow: 0 20px 45px rgba(15, 23, 42, 0.08), 0 4px 12px rgba(15, 23, 42, 0.03);
+}
+
+/* Float Launcher Button */
+.yudi-chat-launcher {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--chat-accent);
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 8px 32px var(--chat-accent-glow), var(--chat-shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.yudi-chat-launcher:hover {
+    transform: scale(1.08) translateY(-2px);
+    background: var(--chat-accent-hover);
+    box-shadow: 0 12px 36px var(--chat-accent-glow);
+}
+
+.yudi-chat-launcher:active {
+    transform: scale(0.95);
+}
+
+.yudi-chat-launcher svg {
+    width: 26px;
+    height: 26px;
+    fill: currentColor;
+    transition: transform 0.3s ease;
+}
+
+.yudi-chat-launcher.active svg {
+    transform: rotate(90deg);
+}
+
+/* Chat Widget Container */
+.yudi-chat-widget {
+    position: fixed;
+    bottom: 96px;
+    right: 24px;
+    width: 380px;
+    height: 520px;
+    max-height: calc(100vh - 120px);
+    border-radius: 16px;
+    background: var(--chat-bg);
+    border: 1px solid var(--chat-border);
+    box-shadow: var(--chat-shadow);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    display: flex;
+    flex-direction: column;
+    z-index: 9998;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+    pointer-events: none;
+    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.yudi-chat-widget.active {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+@media (max-width: 450px) {
+    .yudi-chat-widget {
+        width: calc(100% - 32px);
+        right: 16px;
+        bottom: 90px;
+    }
+    .yudi-chat-launcher {
+        right: 16px;
+        bottom: 16px;
+    }
+}
+
+/* Header */
+.yudi-chat-header {
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--chat-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.yudi-chat-header-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.yudi-chat-status {
+    width: 8px;
+    height: 8px;
+    background: #10b981;
+    border-radius: 50%;
+    position: relative;
+    box-shadow: 0 0 10px #10b981;
+}
+
+.yudi-chat-status::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1px solid #10b981;
+    opacity: 0;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(0.5); opacity: 0; }
+    50% { opacity: 0.5; }
+    100% { transform: scale(1.5); opacity: 0; }
+}
+
+.yudi-chat-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--chat-text-primary);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.yudi-chat-close {
+    background: transparent;
+    border: none;
+    color: var(--chat-text-secondary);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.yudi-chat-close:hover {
+    background: var(--chat-user-msg-bg);
+    color: var(--chat-text-primary);
+}
+
+/* Message List */
+.yudi-chat-messages {
+    flex-grow: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--chat-border) transparent;
+}
+
+.yudi-chat-messages::-webkit-scrollbar {
+    width: 4px;
+}
+
+.yudi-chat-messages::-webkit-scrollbar-thumb {
+    background: var(--chat-border);
+    border-radius: 4px;
+}
+
+.yudi-chat-msg {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    animation: messageIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes messageIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.yudi-chat-msg.user {
+    align-self: flex-end;
+    background: var(--chat-user-msg-bg);
+    color: var(--chat-text-primary);
+    border-bottom-right-radius: 4px;
+    border: 1px solid var(--chat-border);
+}
+
+.yudi-chat-msg.bot {
+    align-self: flex-start;
+    background: var(--chat-bot-msg-bg);
+    color: var(--chat-text-primary);
+    border-bottom-left-radius: 4px;
+    border: 1px solid var(--chat-bot-msg-border);
+}
+
+/* Suggestion Chips */
+.yudi-chat-suggestions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 0 20px 15px 20px;
+}
+
+.yudi-chat-chip {
+    background: var(--chat-user-msg-bg);
+    border: 1px solid var(--chat-border);
+    color: var(--chat-text-secondary);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.yudi-chat-chip:hover {
+    background: var(--chat-bot-msg-bg);
+    border-color: var(--chat-bot-msg-border);
+    color: var(--chat-text-primary);
+    transform: translateY(-1px);
+}
+
+/* Typing Indicator */
+.yudi-chat-typing {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: var(--chat-bot-msg-bg);
+    border: 1px solid var(--chat-bot-msg-border);
+    width: 60px;
+    align-self: flex-start;
+}
+
+.yudi-chat-typing span {
+    width: 6px;
+    height: 6px;
+    background: var(--chat-text-secondary);
+    border-radius: 50%;
+    animation: typing 1.4s infinite ease-in-out both;
+}
+
+.yudi-chat-typing span:nth-child(1) { animation-delay: -0.32s; }
+.yudi-chat-typing span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes typing {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1); }
+}
+
+/* Input Area */
+.yudi-chat-input-area {
+    padding: 15px 20px;
+    border-top: 1px solid var(--chat-border);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.yudi-chat-input {
+    flex-grow: 1;
+    background: var(--chat-user-msg-bg);
+    border: 1px solid var(--chat-border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: var(--chat-text-primary);
+    font-size: 13px;
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.2s;
+}
+
+.yudi-chat-input:focus {
+    border-color: var(--chat-accent);
+}
+
+.yudi-chat-send {
+    background: var(--chat-accent);
+    color: #ffffff;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.yudi-chat-send:hover {
+    background: var(--chat-accent-hover);
+}
+
+.yudi-chat-send:active {
+    transform: scale(0.95);
+}
+
+.yudi-chat-send svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}

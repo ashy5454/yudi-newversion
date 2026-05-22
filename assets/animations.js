@@ -7,6 +7,15 @@ function init() {
     initCanvasBackground();
     initScrollAnimations();
     initMobileMenu();
+    initThemeToggle();
+    
+    // Dynamically inject chatbot widget
+    if (!document.getElementById('yudi-chatbot-script') && window.location.pathname !== '/admin-dashboard' && window.location.pathname !== '/admin-dashboard.html') {
+        const chatScript = document.createElement('script');
+        chatScript.id = 'yudi-chatbot-script';
+        chatScript.src = 'assets/chatbot.js';
+        document.body.appendChild(chatScript);
+    }
 }
 
 if (document.readyState === 'loading') {
@@ -129,7 +138,8 @@ function initCanvasBackground() {
         draw() {
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+            ctx.fillStyle = isLight ? 'rgba(15, 23, 42, 0.35)' : 'rgba(255, 255, 255, 0.35)';
             ctx.fill();
         }
     }
@@ -168,7 +178,8 @@ function initCanvasBackground() {
                 if (distance < connectionDistance) {
                     let opacity = 1 - (distance / connectionDistance);
                     ctx.beginPath();
-                    ctx.strokeStyle = `rgba(255, 255, 255, ${opacity * 0.15})`;
+                    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+                    ctx.strokeStyle = isLight ? `rgba(15, 23, 42, ${opacity * 0.15})` : `rgba(255, 255, 255, ${opacity * 0.15})`;
                     ctx.lineWidth = 1;
                     ctx.moveTo(particles[i].x, particles[i].y);
                     ctx.lineTo(particles[j].x, particles[j].y);
@@ -214,4 +225,38 @@ function initMobileMenu() {
             });
         });
     }
+}
+
+// --- Theme Toggle Listener Handler ---
+function initThemeToggle() {
+    // Locate the navigation links container
+    const navLinks = document.querySelector('.nav-links');
+    if (!navLinks) return;
+    
+    // Check if the toggle button already exists
+    let toggleBtn = document.getElementById('theme-toggle');
+    if (!toggleBtn) {
+        toggleBtn = document.createElement('button');
+        toggleBtn.id = 'theme-toggle';
+        toggleBtn.className = 'theme-toggle-btn';
+        toggleBtn.setAttribute('aria-label', 'Toggle theme');
+        toggleBtn.innerHTML = `
+            <svg class="sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2m-7.07-17.07 1.41 1.41M17.66 17.66l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+            </svg>
+            <svg class="moon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+            </svg>
+        `;
+        navLinks.appendChild(toggleBtn);
+    }
+    
+    toggleBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+    });
 }

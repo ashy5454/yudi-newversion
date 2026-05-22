@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const systemPrefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+            const theme = savedTheme || (systemPrefersLight ? 'light' : 'dark');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+    <title>Yudi | Chatbot Control Center & Admin Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-bg: #030303;
+            --color-nav-bg: rgba(3, 3, 3, 0.7);
+            --color-surface: rgba(255, 255, 255, 0.03);
+            --color-surface-hover: rgba(255, 255, 255, 0.06);
+            --color-border: rgba(255, 255, 255, 0.08);
+            --color-border-hover: rgba(255, 255, 255, 0.16);
+            --color-text-primary: rgba(255, 255, 255, 0.95);
+            --color-text-secondary: rgba(255, 255, 255, 0.6);
+            --color-accent: #6366f1;
+            --color-accent-hover: #4f46e5;
+            --color-danger: #ef4444;
+            --color-success: #10b981;
+            --title-gradient: linear-gradient(180deg, #FFFFFF 0%, #b3b3b3 100%);
+            --font-stack: 'Outfit', system-ui, -apple-system, sans-serif;
+            --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        :root[data-theme="light"] {
+            --color-bg: #f8fafc;
+            --color-nav-bg: rgba(248, 250, 252, 0.82);
+            --color-surface: rgba(15, 23, 42, 0.03);
+            --color-surface-hover: rgba(15, 23, 42, 0.06);
+            --color-border: rgba(15, 23, 42, 0.08);
+            --color-border-hover: rgba(15, 23, 42, 0.16);
+            --color-text-primary: #0f172a;
+            --color-text-secondary: #475569;
+            --color-accent: #4f46e5;
+            --color-accent-hover: #3730a3;
+            --color-danger: #dc2626;
+            --color-success: #059669;
+            --title-gradient: linear-gradient(180deg, #0f172a 0%, #64748b 100%);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--color-bg);
+            color: var(--color-text-primary);
+            font-family: var(--font-stack);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Nav */
+        nav {
+            position: fixed; top: 0; width: 100%; z-index: 100;
+            padding: 1.2rem 5%; transition: all 0.4s ease;
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--color-nav-bg);
+            backdrop-filter: blur(20px); border-bottom: 1px solid var(--color-border);
+        }
+        .logo { font-weight: 800; font-size: 1.4rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-text-primary); text-decoration: none; display: flex; align-items: center; }
+        .logo span { color: var(--color-accent); }
+        .nav-links { display: flex; gap: 2rem; align-items: center; }
+        .nav-links a {
+            color: var(--color-text-secondary); text-decoration: none;
+            font-size: 0.85rem; font-weight: 500; letter-spacing: 0.05em;
+            text-transform: uppercase; transition: color 0.3s;
+        }
+        .nav-links a:hover { color: var(--color-text-primary); }
+
+        .container { max-width: 1100px; margin: 8rem auto 4rem auto; padding: 0 5%; }
+
+        /* Title block */
+        .header-section { margin-bottom: 3rem; text-align: center; }
+        .header-section h1 {
+            font-size: 2.8rem; font-weight: 800; letter-spacing: -0.03em;
+            background: var(--title-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        .header-section p { color: var(--color-text-secondary); font-size: 1.1rem; }
+
+        /* Auth Overlay */
+        .auth-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--color-bg); z-index: 9999;
+            display: flex; align-items: center; justify-content: center;
+            transition: opacity 0.5s ease, pointer-events 0.5s ease;
+        }
+        .auth-card {
+            background: var(--color-surface); border: 1px solid var(--color-border);
+            border-radius: 16px; padding: 3rem; width: 100%; max-width: 420px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: center;
+        }
+        .auth-card h2 { font-size: 1.8rem; margin-bottom: 1rem; letter-spacing: -0.02em; }
+        .auth-card p { color: var(--color-text-secondary); margin-bottom: 2rem; font-size: 0.95rem; }
+        
+        .input-group { margin-bottom: 1.5rem; text-align: left; }
+        .input-label { display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; color: var(--color-text-secondary); margin-bottom: 0.5rem; }
+        .text-input {
+            width: 100%; background: var(--color-surface); border: 1px solid var(--color-border);
+            color: var(--color-text-primary); padding: 12px 16px; border-radius: 8px; font-size: 0.95rem;
+            outline: none; transition: border-color 0.2s;
+        }
+        .text-input:focus { border-color: var(--color-accent); }
+        
+        .btn {
+            width: 100%; padding: 12px; border-radius: 8px; font-weight: 600; border: none; cursor: pointer;
+            text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.85rem; transition: all 0.3s ease;
+        }
+        .btn-primary { background: var(--color-accent); color: #fff; }
+        .btn-primary:hover { background: var(--color-accent-hover); transform: translateY(-1px); }
+        .btn-danger { background: var(--color-danger); color: #fff; }
+        .btn-danger:hover { filter: brightness(1.1); }
+        .btn-secondary { background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-primary); }
+        .btn-secondary:hover { background: var(--color-surface-hover); }
+
+        .auth-error { color: var(--color-danger); font-size: 0.85rem; margin-top: 1rem; display: none; }
+
+        /* Dashboard Grid Layout */
+        .dashboard-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; }
+        @media (max-width: 900px) { .dashboard-grid { grid-template-columns: 1fr; } }
+
+        /* Card Section */
+        .dashboard-card {
+            background: var(--color-surface); border: 1px solid var(--color-border);
+            border-radius: 14px; padding: 2rem; margin-bottom: 2rem;
+        }
+        .dashboard-card-title {
+            font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+
+        /* Q&A Entry Item */
+        .kb-item {
+            border: 1px solid var(--color-border); border-radius: 8px; padding: 1.5rem;
+            margin-bottom: 1rem; background: rgba(255, 255, 255, 0.01); position: relative;
+            transition: border-color 0.2s;
+        }
+        .kb-item:hover { border-color: var(--color-border-hover); }
+        .kb-item-actions {
+            display: flex; gap: 8px; justify-content: flex-end; margin-top: 1rem;
+        }
+        .btn-small {
+            padding: 6px 12px; font-size: 0.75rem; border-radius: 6px; font-weight: 600;
+            border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 0.05em;
+        }
+
+        /* Live Simulator */
+        .sim-messages {
+            height: 250px; overflow-y: auto; border: 1px solid var(--color-border);
+            border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: 10px;
+            margin-bottom: 1rem; background: rgba(0,0,0,0.2);
+        }
+        .sim-msg {
+            max-width: 85%; padding: 8px 12px; border-radius: 8px; font-size: 0.85rem;
+        }
+        .sim-msg.user { align-self: flex-end; background: var(--color-surface); border: 1px solid var(--color-border); }
+        .sim-msg.bot { align-self: flex-start; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2); }
+
+        .sim-input-row { display: flex; gap: 8px; }
+
+        /* Alerts & Status Banner */
+        .toast {
+            position: fixed; bottom: 24px; left: 24px; padding: 12px 24px; border-radius: 8px;
+            background: var(--color-success); color: #fff; font-weight: 600; font-size: 0.9rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 10000;
+            opacity: 0; transform: translateY(10px); pointer-events: none;
+            transition: all 0.3s var(--ease-spring);
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body>
+    <!-- Theme canvas background (neural network styles will load from animations.css) -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Nav -->
+    <nav>
+        <a href="/" class="logo">Yudi <span>Admin</span></a>
+        <div class="nav-links">
+            <a href="/">View Site</a>
+            <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme">
+                <svg class="sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2m-7.07-17.07 1.41 1.41M17.66 17.66l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+                </svg>
+                <svg class="moon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Auth Prompt -->
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-card">
+            <h2>Access Authorized</h2>
+            <p>Please enter the admin secret key to manage Yudi's global chatbot configuration.</p>
+            <div class="input-group">
+                <label class="input-label" for="secretKey">Admin Secret Key</label>
+                <input type="password" class="text-input" id="secretKey" placeholder="••••••••" value="yudi_admin">
+            </div>
+            <button class="btn btn-primary" onclick="authenticate()">Unlock Console</button>
+            <div class="auth-error" id="authError">Invalid Admin Secret. Please try again.</div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <div class="header-section">
+            <h1>Chatbot Control Center</h1>
+            <p>Update the core knowledge, logic thresholds, and conversational guidelines for the YUDI website assistant.</p>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Left Side: Knowledge editor -->
+            <div>
+                <!-- System Prompt Edit -->
+                <div class="dashboard-card">
+                    <h2 class="dashboard-card-title">AI Persona & System Prompt</h2>
+                    <div class="input-group" style="margin-bottom: 0;">
+                        <label class="input-label" for="systemPrompt">System Guidelines</label>
+                        <textarea class="text-input" id="systemPrompt" rows="4" style="resize: vertical; font-family: inherit;"></textarea>
+                    </div>
+                </div>
+
+                <!-- Knowledge Base List -->
+                <div class="dashboard-card">
+                    <div class="dashboard-card-title">
+                        <span>Knowledge Base Rules</span>
+                        <button class="btn-small btn-primary" onclick="addRule()">Add New Rule</button>
+                    </div>
+                    <div id="rulesList">
+                        <!-- Dynamically populated rules -->
+                    </div>
+                </div>
+
+                <div style="margin-top: 1.5rem; display: flex; gap: 15px;">
+                    <button class="btn btn-primary" style="flex: 2; padding: 16px;" onclick="saveConfig()">Save Changes Globally</button>
+                    <button class="btn btn-secondary" style="flex: 1; padding: 16px;" onclick="fetchConfig()">Discard Edits</button>
+                </div>
+            </div>
+
+            <!-- Right Side: Simulation Tester -->
+            <div>
+                <div class="dashboard-card" style="position: sticky; top: 100px;">
+                    <h2 class="dashboard-card-title">Live Response Simulator</h2>
+                    <p style="font-size: 0.85rem; color: var(--color-text-secondary); margin-bottom: 1.5rem;">Test how the chatbot replies under the current local rule configuration before saving changes.</p>
+                    
+                    <div class="sim-messages" id="simMessages">
+                        <div class="sim-msg bot">Hello! Ask a question to test the current local rule configuration.</div>
+                    </div>
+                    
+                    <div class="sim-input-row">
+                        <input type="text" class="text-input" id="simInput" placeholder="Type test message...">
+                        <button class="btn btn-primary" style="width: auto; padding: 0 20px;" onclick="runSimulator()">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div class="toast" id="toast">Changes saved successfully!</div>
+
+    <script src="assets/animations.js"></script>
+    <script>
+        let adminSecret = '';
+        let currentConfig = { system_prompt: '', knowledge_base: [] };
+
+        function authenticate() {
+            const input = document.getElementById('secretKey').value;
+            fetch(`/api/admin/knowledge?secret=${encodeURIComponent(input)}`)
+                .then(res => {
+                    if (res.ok) {
+                        adminSecret = input;
+                        document.getElementById('authOverlay').style.opacity = '0';
+                        document.getElementById('authOverlay').style.pointerEvents = 'none';
+                        return res.json();
+                    } else {
+                        throw new Error('Unauthorized');
+                    }
+                })
+                .then(config => {
+                    currentConfig = config;
+                    renderConfig();
+                })
+                .catch(err => {
+                    document.getElementById('authError').style.display = 'block';
+                });
+        }
+
+        function fetchConfig() {
+            fetch(`/api/admin/knowledge?secret=${encodeURIComponent(adminSecret)}`)
+                .then(res => res.json())
+                .then(config => {
+                    currentConfig = config;
+                    renderConfig();
+                    showToast('Configuration reloaded.');
+                });
+        }
+
+        function renderConfig() {
+            document.getElementById('systemPrompt').value = currentConfig.system_prompt;
+            
+            const rulesList = document.getElementById('rulesList');
+            rulesList.innerHTML = '';
+            
+            currentConfig.knowledge_base.forEach((rule, idx) => {
+                const item = document.createElement('div');
+                item.className = 'kb-item';
+                item.innerHTML = `
+                    <div class="input-group">
+                        <label class="input-label">Keywords / Phrases (comma separated)</label>
+                        <input type="text" class="text-input" value="${rule.keywords.join(', ')}" onchange="updateKeywords(${idx}, this.value)">
+                    </div>
+                    <div class="input-group" style="margin-bottom: 0;">
+                        <label class="input-label">Chatbot Response</label>
+                        <textarea class="text-input" rows="3" style="resize: vertical; font-family: inherit;" onchange="updateAnswer(${idx}, this.value)">${rule.answer}</textarea>
+                    </div>
+                    <div class="kb-item-actions">
+                        <button class="btn-small btn-danger" onclick="deleteRule(${idx})">Delete Rule</button>
+                    </div>
+                `;
+                rulesList.appendChild(item);
+            });
+        }
+
+        function updateKeywords(idx, value) {
+            currentConfig.knowledge_base[idx].keywords = value.split(',').map(s => s.trim()).filter(Boolean);
+        }
+
+        function updateAnswer(idx, value) {
+            currentConfig.knowledge_base[idx].answer = value;
+        }
+
+        function deleteRule(idx) {
+            currentConfig.knowledge_base.splice(idx, 1);
+            renderConfig();
+        }
+
+        function addRule() {
+            currentConfig.knowledge_base.unshift({
+                keywords: ['new keyword'],
+                answer: 'Enter chatbot answer here.'
+            });
+            renderConfig();
+        }
+
+        function saveConfig() {
+            // Read current system prompt
+            currentConfig.system_prompt = document.getElementById('systemPrompt').value;
+            
+            fetch(`/api/admin/knowledge?secret=${encodeURIComponent(adminSecret)}`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'x-admin-secret': adminSecret
+                },
+                body: JSON.stringify(currentConfig)
+            })
+            .then(res => {
+                if (res.ok) {
+                    showToast('Changes saved and deployed live!');
+                } else {
+                    showToast('Failed to save changes.');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                showToast('Network error while saving.');
+            });
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Live simulator logic
+        function runSimulator() {
+            const input = document.getElementById('simInput');
+            const text = input.value.trim();
+            if (!text) return;
+            
+            // Append User msg
+            appendSimMessage('user', text);
+            input.value = '';
+
+            // Find matching rule locally (so we can test changes before saving)
+            const userMsgLower = text.toLowerCase();
+            let reply = '';
+            
+            for (const entry of currentConfig.knowledge_base) {
+                for (const keyword of entry.keywords) {
+                    if (userMsgLower.includes(keyword.toLowerCase())) {
+                        reply = entry.answer;
+                        break;
+                    }
+                }
+                if (reply) break;
+            }
+            
+            if (!reply) {
+                reply = "I'm not sure I understand that. You can ask me about: Yudi, CTS (Conversational Token System), NARA, SAM, our neuroscience and brain-native research, or how to work/collaborate with us.";
+            }
+
+            // Simulate typing delay
+            setTimeout(() => {
+                appendSimMessage('bot', reply);
+            }, 4000);
+        }
+
+        function appendSimMessage(sender, text) {
+            const box = document.getElementById('simMessages');
+            const msg = document.createElement('div');
+            msg.className = `sim-msg ${sender}`;
+            msg.textContent = text;
+            box.appendChild(msg);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        // Handle enter key in simulator
+        document.getElementById('simInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') runSimulator();
+        });
+    </script>
+</body>
+</html>

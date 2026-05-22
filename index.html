@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const systemPrefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+            const theme = savedTheme || (systemPrefersLight ? 'light' : 'dark');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Yudi | Brain-Native AI Research & Solutions (Yudi AI & Yudi Labs)</title>
@@ -420,7 +429,7 @@
                     <div class="meta">Status: Beta | Built from: Engineering</div>
                     <h3>CTS (Conversational Token System)</h3>
                     <p>For: Developers & Enterprises<br><br>An infrastructural API layer that compresses conversational state to significantly reduce token overhead for long-horizon context windows.</p>
-                    <a href="/products" class="btn-text">View Products &rarr;</a>
+                    <a href="/cts" class="btn-text">View CTS &rarr;</a>
                 </div>
                 <div class="card">
                     <div class="meta">Status: Prototype | Built from: Research</div>
